@@ -1,11 +1,13 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import { useAuth } from "../hooks/useAuth";
 import type {
   UserContextType,
   UserProviderProps,
 } from "../interfaces/userContext.interface";
+
 const DEBUG_AUTH = true;
+
 /**
  * User Context - provides authentication state to the entire app
  */
@@ -25,8 +27,41 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
  */
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   // Get all auth state and methods from useAuth hook
-  const authContextValue = useAuth();
+  const rawAuthContextValue = useAuth();
 
+  // ✅ Mémorise la valeur pour éviter les re-renders inutiles
+  const authContextValue = useMemo(() => {
+    // Normalise l'erreur en string ou null
+    let normalizedError: string | null = null;
+
+    if (rawAuthContextValue.error) {
+      if (typeof rawAuthContextValue.error === "string") {
+        normalizedError = rawAuthContextValue.error;
+      } else if (rawAuthContextValue.error instanceof Error) {
+        // ✅ Gère les objets Error natifs
+        normalizedError = rawAuthContextValue.error.message;
+      } else if (typeof rawAuthContextValue.error === "object") {
+        // ✅ Gère les objets d'erreur personnalisés
+        normalizedError = JSON.stringify(rawAuthContextValue.error);
+      }
+    }
+
+    return {
+      ...rawAuthContextValue,
+      error: normalizedError,
+    };
+  }, [
+    rawAuthContextValue.user,
+    rawAuthContextValue.token,
+    rawAuthContextValue.refreshToken,
+    rawAuthContextValue.isAuthenticated,
+    rawAuthContextValue.error,
+    rawAuthContextValue.login,
+    rawAuthContextValue.logout,
+    // ✅ Ajoute toutes les méthodes/propriétés de UserContextType
+  ]);
+
+  // ✅ useEffect avec dépendances correctes
   useEffect(() => {
     if (DEBUG_AUTH) {
       console.group("🔐 UserContext Auth State");
@@ -34,12 +69,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       console.log("🔑 Token:", authContextValue.token);
       console.log("♻️ Refresh Token:", authContextValue.refreshToken);
       console.log("✅ Authenticated:", authContextValue.isAuthenticated);
+      console.log("❌ Error:", authContextValue.error);
       console.groupEnd();
     }
   }, [
     authContextValue.user,
     authContextValue.token,
     authContextValue.refreshToken,
+    authContextValue.isAuthenticated,
+    authContextValue.error,
   ]);
 
   return (

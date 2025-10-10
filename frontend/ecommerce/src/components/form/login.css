@@ -1,3 +1,23 @@
+.login-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-form-wrapper {
+  width: 100%;
+}
+
+.login-container h2 {
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
 /* Quand l'input a directement la classe .is-valid */
 .form-control.is-valid {
   border-color: #198754; /* Vert */

@@ -6,8 +6,7 @@ import "./App.css";
 import { ToastContainer } from "react-toastify";
 import { UserProvider } from "./context/userContext";
 import { BrowserRouter } from "react-router-dom";
-import { AppRoutes } from "./routes";
-
+import { AppRoutes } from "./routes/index";
 function App() {
   return (
     <div className="App">

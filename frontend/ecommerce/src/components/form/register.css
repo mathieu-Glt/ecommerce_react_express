@@ -1,0 +1,101 @@
+/* register.css */
+
+.register-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.register-form-wrapper {
+  width: 100%;
+}
+
+.register-container h2 {
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Amélioration des champs de formulaire */
+.register-form-wrapper .form-control {
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.register-form-wrapper .form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #80bdff;
+}
+
+.register-form-wrapper .form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+/* Bouton de soumission */
+.register-form-wrapper .btn-primary {
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.register-form-wrapper .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.register-form-wrapper .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Liens */
+.register-form-wrapper a {
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.register-form-wrapper a:hover {
+  text-decoration: underline;
+}
+
+/* Messages d'erreur */
+.register-form-wrapper .alert {
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Feedback de validation */
+.register-form-wrapper .form-control.is-valid {
+  border-color: #3751e2;
+}
+
+.register-form-wrapper .form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+.register-form-wrapper .invalid-feedback {
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .register-container {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .register-form-wrapper .form-control {
+    padding: 10px;
+  }
+}

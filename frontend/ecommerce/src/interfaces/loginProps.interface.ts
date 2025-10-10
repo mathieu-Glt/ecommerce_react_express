@@ -7,7 +7,8 @@ export interface LoginProps {
   handleLogin: (
     values: SignInFormValues,
     formikHelpers?: any
-  ) => void;  loading: boolean;
+  ) => void;  
+  loading: boolean;
   formData: LoginFormData;
   onFormDataChange: (data: LoginFormData) => void;
   onGoogleLogin: () => void | Promise<void>;

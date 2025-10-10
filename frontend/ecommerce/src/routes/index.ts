@@ -1,7 +1,8 @@
 import { Component, lazy, Suspense } from "react";
 import { useRoutes, Navigate, replace } from "react-router-dom";
 import { RequireAuthAccess } from "../guards/RequireAuthAccess";
-import { RequireAdminRoleAccess } from "../guards/RequireAdminRoleAccess";
+import { MainLayout } from "./layout/MainLayout";
+import { AdminLayout } from "./layout/AdminLayout";
 import PageLoader from "../components/LoaderPage/PageLoader";
 import React from "react";
 
@@ -13,6 +14,7 @@ export function SuspenseWrapper(Component: React.ComponentType<any>) {
     React.createElement(Component)
   );
 }
+
 // ==================== PUBLIC PAGES ====================
 const HomePage = lazy(() =>
   import("../pages/HomePage").then((m) => ({ default: m.HomePage }))
@@ -61,30 +63,39 @@ const AdminCouponPage = lazy(() =>
 // ==================== ROUTES CONFIGURATION ====================
 export const AppRoutes = () => {
   const routes = useRoutes([
-    // PUBLIC ROUTES
-    { path: "/", element: SuspenseWrapper(HomePage) },
-    { path: "/products/:id", element: SuspenseWrapper(ProductPage) },
+    // ==================== ROUTES AVEC HEADER + FOOTER ====================
+    {
+      element: React.createElement(MainLayout),
+      children: [
+        // PUBLIC ROUTES
+        { path: "/", element: SuspenseWrapper(HomePage) },
+        { path: "/products/:id", element: SuspenseWrapper(ProductPage) },
+        { path: "/cart", element: SuspenseWrapper(CartPage) },
+        {
+          path: "/order-confirmation",
+          element: SuspenseWrapper(OrderConfirmationPage),
+        },
+
+        // USER ROUTES (Protégées par RequireAuthAccess)
+        {
+          path: "/profile",
+          element: React.createElement(
+            RequireAuthAccess,
+            null,
+            SuspenseWrapper(UserProfilePage)
+          ),
+        },
+      ],
+    },
+
+    // ==================== ROUTES SANS HEADER/FOOTER (Auth) ====================
     { path: "/login", element: SuspenseWrapper(LoginPage) },
     { path: "/register", element: SuspenseWrapper(RegisterPage) },
-    { path: "/cart", element: SuspenseWrapper(CartPage) },
-    {
-      path: "/order-confirmation",
-      element: SuspenseWrapper(OrderConfirmationPage),
-    },
 
-    // USER ROUTES
-    {
-      path: "/profile",
-      element: React.createElement(
-        RequireAuthAccess,
-        null,
-        SuspenseWrapper(UserProfilePage)
-      ),
-    },
-
-    // ADMIN ROUTES
+    // ==================== ADMIN ROUTES (Layout avec RequireAdminRoleAccess) ====================
     {
       path: "/admin",
+      element: React.createElement(AdminLayout),
       children: [
         {
           path: "",
@@ -95,39 +106,27 @@ export const AppRoutes = () => {
         },
         {
           path: "dashboard",
-          element: React.createElement(
-            RequireAdminRoleAccess,
-            null,
-            SuspenseWrapper(AdminDashboardPage)
-          ),
+          element: SuspenseWrapper(AdminDashboardPage),
         },
         {
           path: "products",
-          element: React.createElement(
-            RequireAdminRoleAccess,
-            null,
-            SuspenseWrapper(AdminProductCreatePage)
-          ),
+          element: SuspenseWrapper(AdminProductCreatePage),
         },
         {
           path: "coupons",
-          element: React.createElement(
-            RequireAdminRoleAccess,
-            null,
-            SuspenseWrapper(AdminCouponPage)
-          ),
+          element: SuspenseWrapper(AdminCouponPage),
         },
       ],
     },
 
-    // NOT FOUND
+    // ==================== NOT FOUND ====================
     { path: "*", element: SuspenseWrapper(NotFoundPage) },
   ]);
 
   return routes;
 };
 
-// ==================== TYPE-SAFE ROUTES (BONUS) ====================
+// ==================== URL ROUTES APP ====================
 export const ROUTES = {
   HOME: "/",
   PRODUCTS: "/products",

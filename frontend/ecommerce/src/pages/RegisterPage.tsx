@@ -1,10 +1,4 @@
 import React, { useState } from "react";
-import { Formik, Form as FormikForm, ErrorMessage } from "formik";
-import { Form, Button, Alert, Spinner } from "react-bootstrap";
-import { signUpValidationSchema } from "../../validators/validatorFormRegister";
-import type { RegisterFormData } from "../interfaces/regsiterProps.interface";
-import type { RegisterProps } from "../../interfaces/registerProps.interface";
-import "./register.css";
 import { useAppDispatch, useAppSelector } from "../hooks/useReduxHooks";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../redux/thunks/authThunk";
@@ -14,15 +8,16 @@ import type {
   User,
 } from "../interfaces/user.interface";
 import RegisterForm from "../components/form/RegisterForm";
+import type { RegisterFormData } from "../interfaces/regsiterProps.interface";
 
 /**
- * RegisterForm with Formik and Yup validation
- * Integrates with React Bootstrap styling
- * @param props - Props including handleRegister, loading, error
+ * RegisterPage component
+ * Handles user registration flow
  */
 export const RegisterPage = () => {
   const { loading, error, user } = useAppSelector((state) => state.auth);
   console.log("RegisterPage - auth state:", { loading, error, user });
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [validated, setValidated] = useState(false);
@@ -30,40 +25,65 @@ export const RegisterPage = () => {
     "user",
     null
   );
-
-  const initialValues: RegisterFormData = {
+  const [formData, setFormData] = useState<RegisterFormData>({
+    // Initialize with default values as per RegisterFormData interface
     firstname: "",
     lastname: "",
     email: "",
-    picture: "",
     password: "",
     confirmPassword: "",
-  };
+    picture: "",
+    address: "",
+  });
 
-  const handleRegister = async (
-    values: RegisterFormData,
-    formikHelpers?: any
-  ): Promise<void> => {
+  const handleRegister = async (values: RegisterFormData): Promise<void> => {
     setValidated(true);
     console.log("Form values:", values);
 
-    const result = await dispatch(registerUser(values));
-    if (registerUser.fulfilled.match(result)) {
-      const { user } = result.payload as ExtractRegisterResponse;
-      navigate("/login");
-    } else {
-      console.error("Registration failed:", result.payload);
+    // Ensure 'picture' is always a string
+    const safeValues = {
+      ...values,
+      picture: values.picture ?? "",
+    };
+
+    try {
+      const result = await dispatch(registerUser(safeValues));
+
+      if (registerUser.fulfilled.match(result)) {
+        const { user } = result.payload as ExtractRegisterResponse;
+        setUserStorage(user);
+
+        // Rediriger vers la page de login après inscription réussie
+        navigate("/login");
+      } else {
+        console.error("Registration failed:", result.payload);
+      }
+    } catch (err) {
+      console.error("Unexpected error during registration:", err);
     }
+  };
+
+  const handleFormDataChange = (updatedData: Partial<RegisterFormData>) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...updatedData,
+    }));
   };
 
   return (
     <div className="register-container">
-      <h2 className="mb-4">Create an Account</h2>
+      <h2>Create an Account</h2>
       <RegisterForm
         handleRegister={handleRegister}
         loading={loading}
-        error={error}
+        error={
+          typeof error === "string" || error === null
+            ? error
+            : JSON.stringify(error)
+        }
         validated={validated}
+        formData={formData}
+        onFormDataChange={handleFormDataChange}
       />
     </div>
   );

@@ -68,7 +68,7 @@ export const LoginPage = () => {
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h1>Sign In</h1>
       <LoginForm
         handleLogin={handleLoginForm}
@@ -81,7 +81,11 @@ export const LoginPage = () => {
         onAzureLogin={() => {
           console.log("Azure login clicked");
         }}
-        error={error}
+        error={
+          typeof error === "string" || error === null
+            ? error
+            : JSON.stringify(error)
+        }
         validated={validated}
       />
     </div>

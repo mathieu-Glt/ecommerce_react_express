@@ -1,5 +1,113 @@
-import React from "react";
+// src/components/navigation/NavBar.tsx
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { ROUTES } from "../../routes";
+import "./NavBar.css";
 
-export const NavBar = () => {
-  return <div>NavBar</div>;
+export const Navigation: React.FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    setIsDropdownOpen(false);
+  };
+
+  return (
+    <nav className="navbar">
+      <div className="navbar-container">
+        {/* Logo */}
+        <Link to={ROUTES.HOME} className="navbar-brand" onClick={closeMenu}>
+          EShop - 365
+        </Link>
+
+        {/* Menu burger (mobile) */}
+        <button
+          className={`navbar-toggle ${isMenuOpen ? "active" : ""}`}
+          onClick={toggleMenu}
+          aria-label="Toggle navigation"
+        >
+          <span className="toggle-line"></span>
+          <span className="toggle-line"></span>
+          <span className="toggle-line"></span>
+        </button>
+
+        {/* Menu de navigation */}
+        <div className={`navbar-menu ${isMenuOpen ? "active" : ""}`}>
+          <div className="nav-links">
+            <Link to={ROUTES.HOME} className="nav-link" onClick={closeMenu}>
+              Home
+            </Link>
+            <Link to={ROUTES.PRODUCTS} className="nav-link" onClick={closeMenu}>
+              Products
+            </Link>
+            <Link to={ROUTES.CART} className="nav-link" onClick={closeMenu}>
+              Cart
+            </Link>
+            <Link to={ROUTES.PROFILE} className="nav-link" onClick={closeMenu}>
+              Profile
+            </Link>
+
+            {/* Dropdown */}
+            <div className="nav-dropdown">
+              <button className="nav-dropdown-toggle" onClick={toggleDropdown}>
+                Dropdown
+                <svg
+                  className={`dropdown-arrow ${isDropdownOpen ? "rotate" : ""}`}
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="currentColor"
+                >
+                  <path d="M6 9L1 4h10z" />
+                </svg>
+              </button>
+
+              {isDropdownOpen && (
+                <div className="dropdown-menu">
+                  <Link
+                    to={ROUTES.LOGIN}
+                    className="dropdown-item"
+                    onClick={closeMenu}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    to={ROUTES.REGISTER}
+                    className="dropdown-item"
+                    onClick={closeMenu}
+                  >
+                    Sign up
+                  </Link>
+                  <Link
+                    to="#action/3.3"
+                    className="dropdown-item"
+                    onClick={closeMenu}
+                  >
+                    Something
+                  </Link>
+                  <div className="dropdown-divider"></div>
+                  <Link
+                    to="#action/3.4"
+                    className="dropdown-item"
+                    onClick={closeMenu}
+                  >
+                    Separated link
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
 };

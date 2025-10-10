@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Form as FormikForm, ErrorMessage } from "formik";
+import { useFormik } from "formik";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { signInValidationSchema } from "../../validators/validatorFormLogin";
 import type { SignInFormValues } from "../../validators/validatorFormLogin";
@@ -7,7 +7,7 @@ import type { LoginProps } from "../../interfaces/loginProps.interface";
 import "./login.css";
 
 /**
- * LoginForm with Formik and Yup validation
+ * LoginForm with useFormik hook and Yup validation
  * Integrates with React Bootstrap styling
  * @param props - Props including handleLogin, loading, error
  */
@@ -27,6 +27,23 @@ const LoginForm: React.FC<LoginProps> = ({
 
   console.log("Initial form values:", initialValues);
 
+  // Utilisation du hook useFormik au lieu du composant Formik
+  const formik = useFormik({
+    initialValues,
+    validationSchema: signInValidationSchema,
+    onSubmit: handleLogin,
+    validateOnChange: true,
+    validateOnBlur: true,
+  });
+
+  console.log("Formik state:", {
+    values: formik.values,
+    errors: formik.errors,
+    touched: formik.touched,
+    isValid: formik.isValid,
+    dirty: formik.dirty,
+  });
+
   return (
     <div className="login-form-wrapper">
       {/* Global error from API */}
@@ -37,127 +54,96 @@ const LoginForm: React.FC<LoginProps> = ({
         </Alert>
       )}
 
-      <Formik
-        initialValues={initialValues}
-        validationSchema={signInValidationSchema}
-        onSubmit={handleLogin}
-        validateOnChange={true}
-        validateOnBlur={true}
-      >
-        {({
-          errors,
-          touched,
-          isValid,
-          dirty,
-          values,
-          handleChange,
-          handleBlur,
-        }) => {
-          console.log("Formik state:", {
-            values,
-            errors,
-            touched,
-            isValid,
-            dirty,
-          });
-          return (
-            <FormikForm noValidate>
-              {/* Email Field */}
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  placeholder="Enter email"
-                  value={values.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  isInvalid={touched.email && !!errors.email}
-                  isValid={touched.email && !errors.email}
-                  disabled={loading}
-                />
-                <ErrorMessage name="email">
-                  {(msg) => (
-                    <Form.Control.Feedback type="invalid">
-                      {msg}
-                    </Form.Control.Feedback>
-                  )}
-                </ErrorMessage>
-                <Form.Text className="text-muted">
-                  We'll never share your email with anyone else.
-                </Form.Text>
-              </Form.Group>
+      <Form noValidate onSubmit={formik.handleSubmit}>
+        {/* Email Field */}
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Label>Email address</Form.Label>
+          <Form.Control
+            type="email"
+            name="email"
+            placeholder="Enter email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            isInvalid={formik.touched.email && !!formik.errors.email}
+            isValid={formik.touched.email && !formik.errors.email}
+            disabled={loading}
+          />
+          {formik.touched.email && formik.errors.email && (
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.email}
+            </Form.Control.Feedback>
+          )}
+          <Form.Text className="text-muted">
+            We'll never share your email with anyone else.
+          </Form.Text>
+        </Form.Group>
 
-              {/* Password Field */}
-              <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={values.password}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  isInvalid={touched.password && !!errors.password}
-                  isValid={touched.password && !errors.password}
-                  disabled={loading}
-                  minLength={8}
-                />
-                <ErrorMessage name="password">
-                  {(msg) => (
-                    <Form.Control.Feedback type="invalid">
-                      {msg}
-                    </Form.Control.Feedback>
-                  )}
-                </ErrorMessage>
-              </Form.Group>
+        {/* Password Field */}
+        <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            isInvalid={formik.touched.password && !!formik.errors.password}
+            isValid={formik.touched.password && !formik.errors.password}
+            disabled={loading}
+            minLength={8}
+          />
+          {formik.touched.password && formik.errors.password && (
+            <Form.Control.Feedback type="invalid">
+              {formik.errors.password}
+            </Form.Control.Feedback>
+          )}
+        </Form.Group>
 
-              {/* Remember Me Checkbox */}
-              <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check
-                  type="checkbox"
-                  name="rememberMe"
-                  label="Remember me"
-                  checked={values.rememberMe}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-              </Form.Group>
+        {/* Remember Me Checkbox */}
+        <Form.Group className="mb-3" controlId="formBasicCheckbox">
+          <Form.Check
+            type="checkbox"
+            name="rememberMe"
+            label="Remember me"
+            checked={formik.values.rememberMe}
+            onChange={formik.handleChange}
+            disabled={loading}
+          />
+        </Form.Group>
 
-              {/* Submit Button */}
-              <Button
-                variant="primary"
-                type="submit"
-                className="w-100 mb-3"
-                disabled={loading || !isValid || !dirty}
-              >
-                {loading ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                      className="me-2"
-                    />
-                    Logging in...
-                  </>
-                ) : (
-                  "Login"
-                )}
-              </Button>
+        {/* Submit Button */}
+        <Button
+          variant="primary"
+          type="submit"
+          className="w-100 mb-3"
+          disabled={loading || !formik.isValid || !formik.dirty}
+        >
+          {loading ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+                className="me-2"
+              />
+              Logging in...
+            </>
+          ) : (
+            "Login"
+          )}
+        </Button>
 
-              {/* Forgot Password Link */}
-              <div className="text-center mb-3">
-                <a href="/forgot-password" className="text-muted">
-                  Forgot password?
-                </a>
-              </div>
-            </FormikForm>
-          );
-        }}
-      </Formik>
+        {/* Forgot Password Link */}
+        <div className="text-center mb-3">
+          <a href="/forgot-password" className="text-muted">
+            Forgot password?
+          </a>
+        </div>
+      </Form>
 
       {/* OAuth Options */}
       {(typeof onGoogleLogin === "function" ||
@@ -207,6 +193,6 @@ const LoginForm: React.FC<LoginProps> = ({
     </div>
   );
 };
+
 // React.memo to prevent unnecessary re-renders if props don't change
-// REACT.memo wrapp compoennt LoginForm
 export default React.memo(LoginForm);
