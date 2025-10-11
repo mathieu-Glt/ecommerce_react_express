@@ -13,7 +13,7 @@ export interface LogoutSuccessResponse {
 
 // Réponse succès
 export interface ResponseSuccessInterface extends ResponseInterface {
-  success?: true; // discriminant
+  success?: true; 
   results?: object; // ici tu peux mettre { user, token }
   user?: User;
   message?: string;

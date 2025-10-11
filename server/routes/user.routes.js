@@ -48,7 +48,7 @@ router.get("/users", requireRole(["admin"]), getUsers);
  * @returns {Error} 404 - User not found
  * @returns {Error} 403 - Forbidden (if not admin)
  */
-router.get("/user/:email", requireRole(["admin"]), getUserByEmail);
+router.get("/users/:email", requireRole(["admin"]), getUserByEmail);
 
 /**
  * GET /api/users/:id
@@ -77,7 +77,7 @@ router.get("/users/:id", requireRole(["admin"]), getUserById);
  * @returns {Error} 403 - Forbidden (if not admin)
  */
 router.put(
-  "/user/:id",
+  "/users/:id",
   requireRole(["admin"]),
   updateUserProfileValidation,
   updateUser
@@ -94,6 +94,6 @@ router.put(
  * @returns {Error} 404 - User not found
  * @returns {Error} 403 - Forbidden (if not admin)
  */
-router.delete("/user/:id", requireRole(["admin"]), deleteUser);
+router.delete("/users/:id", requireRole(["admin"]), deleteUser);
 
 module.exports = router;

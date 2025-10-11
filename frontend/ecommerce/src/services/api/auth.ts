@@ -9,6 +9,7 @@ import type {
   RegisterCredentials,
 } from "../../interfaces/user.interface";
 import type { ApiResponse } from "../../interfaces/response.interface";
+import { API_ROUTES } from "../constants/api-routes";
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const api: AxiosInstance = useApi();
@@ -42,7 +43,7 @@ export async function signUp(body: RegisterCredentials): Promise<ApiResponse> {
   console.log("🚀 ~ file: auth.ts:47 ~ signUp ~ body:", body);
   try {
     const register: AxiosResponse<ApiResponse> = await api.post(
-      "/auth/register",
+      API_ROUTES.AUTH.REGISTER,
       body
     );
     console.log("🚀 ~ file: auth.ts:53 ~ signUp ~ register:", register);
@@ -79,7 +80,7 @@ export async function signIn(body: LoginCredentials): Promise<ApiResponse> {
   console.log("🚀 ~ file: auth.ts:66 ~ signIn ~ body:", body);
   try {
     const login: AxiosResponse<ApiResponse> = await api.post(
-      "auth/login",
+      API_ROUTES.AUTH.LOGIN,
       body
     );
     console.log("🚀 ~ file: auth.ts:69 ~ signIn ~ login:", login);
@@ -124,7 +125,9 @@ export async function signIn(body: LoginCredentials): Promise<ApiResponse> {
  */
 export async function getUserProfile(): Promise<ApiResponse | undefined> {
   try {
-    const userProfile: AxiosResponse<ApiResponse> = await api.get("auth/user");
+    const userProfile: AxiosResponse<ApiResponse> = await api.get(
+      API_ROUTES.AUTH.GET_PROFILE
+    );
     return userProfile.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -138,7 +141,7 @@ export async function getUserProfile(): Promise<ApiResponse | undefined> {
 // function send email reset password
 export async function sentEmailResetPassword(body: {}): Promise<any> {
   try {
-    const sentEmail = await api.post("auth/reset-password", body);
+    const sentEmail = await api.post(API_ROUTES.AUTH.RESET_PASSWORD, body);
     return sentEmail;
   } catch (error) {
     console.log("error auth" + error);
@@ -182,7 +185,7 @@ export async function sentEmailResetPassword(body: {}): Promise<any> {
  */
 export async function signOut(): Promise<ApiResponse> {
   try {
-    const logout = await api.get("auth/logout");
+    const logout = await api.get(API_ROUTES.AUTH.LOGOUT);
     return logout.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -202,7 +205,7 @@ export async function refreshTokens() {
 
   try {
     const refreshResponse = await axios.get(
-      import.meta.env.VITE_API_BASE_URL + "auth/refresh-token",
+      import.meta.env.VITE_API_BASE_URL + API_ROUTES.AUTH.REFRESH_TOKEN,
       { headers }
     );
     console.log(

@@ -1,0 +1,48 @@
+export const API_ROUTES = {
+  AUTH: {
+    LOGIN: "auth/login",
+    LOGIN_GOOGLE: "auth/google",
+    LOGIN_AZURE: "auth/azure",
+    LOGIN_GOOGLE_CALLBACK: "auth/google/callback",
+    LOGIN_AZURE_CALLBACK: "auth/azure/callback",
+    UPDATE_PROFILE: "auth/profile",
+    LOGOUT: "auth/logout",
+    REFRESH_TOKEN: "auth/refresh-token",
+    REGISTER: "auth/register",
+    FORGOT_PASSWORD: "auth/forgot-password",
+    RESET_PASSWORD: "auth/reset-password",
+    VERIFY_EMAIL: "auth/verify-email",
+    GET_PROFILE: "auth/user",
+  },
+  PRODUCTS: {
+    LIST: "products",
+    DETAILS_ID: (id: string) => `products/id/${id}`,
+    DETAILS_SLUG: (slug: string) => `products/slug/${slug}`,
+    CREATE: "products",
+    UPDATE: (id: string) => `products/${id}`,
+    DELETE: (id: string) => `products/${id}`,
+  },
+  USERS: {
+    LIST: "users",
+    DETAILS_ID: (id: string) => `users/${id}`,
+    DETAILS_EMAIL: (email: string) => `users/${email}`,
+    UPDATE: (id: string) => `users/${id}`,
+    DELETE: (id: string) => `users/${id}`,
+  },
+  CATEGORIES: {
+    LIST: "categories",
+    DETAILS_ID: (id: string) => `categories/id/${id}`,
+    DETAILS_SLUG: (slug: string) => `categories/slug/${slug}`,
+    CREATE: "categories",
+    UPDATE: (id: string) => `categories/${id}`,
+    DELETE: (id: string) => `categories/${id}`,
+  },
+  SUB_CATEGORIES: {
+    LIST: "subs",
+    // DETAILS_ID: (id: string) => `subs/id/${id}`, // existe pas pour le moment
+    DETAILS_SLUG: (slug: string) => `subs/slug/${slug}`,
+    CREATE: "subs",
+    UPDATE: (slug: string) => `subs/${slug}`,
+    DELETE: (slug: string) => `subs/${slug}`,
+  },
+};

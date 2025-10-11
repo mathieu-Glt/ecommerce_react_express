@@ -40,14 +40,14 @@ router.get("/products", getProducts);
  * @desc Get product details by slug
  * @access Public
  */
-router.get("/product/slug/:slug", getProductBySlug);
+router.get("/products/slug/:slug", getProductBySlug);
 
 /**
  * @route GET /product/id/:id
  * @desc Get product details by ID
  * @access Public
  */
-router.get("/product/id/:id", getProductById);
+router.get("/products/id/:id", getProductById);
 
 /**
  * @route POST /product
@@ -56,7 +56,7 @@ router.get("/product/id/:id", getProductById);
  * @middleware requireRole(["admin"]), upload.array("images", 5), uploadToCloudinary
  */
 router.post(
-  "/product",
+  "/products",
   requireRole(["admin"]),
   upload.array("images", 5),
   uploadToCloudinary,
@@ -70,7 +70,7 @@ router.post(
  * @middleware requireRole(["admin"]), upload.array("images", 5), uploadToCloudinary
  */
 router.put(
-  "/product/:id",
+  "/products/:id",
   requireRole(["admin"]),
   upload.array("images", 5),
   uploadToCloudinary,
@@ -83,6 +83,6 @@ router.put(
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.delete("/product/:id", requireRole(["admin"]), deleteProduct);
+router.delete("/products/:id", requireRole(["admin"]), deleteProduct);
 
 module.exports = router;

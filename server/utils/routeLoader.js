@@ -14,6 +14,7 @@ const loadRoutes = (app) => {
     if (file.endsWith(".routes.js")) {
       console.log("Loading route file:", file);
       const route = require(path.join(routesPath, file));
+      console.log("Loaded route module:", route);
       const routeName = file.replace(".routes.js", "");
       app.use(`/api/${routeName}`, route);
     }

@@ -6,6 +6,7 @@ import { loginUser } from "../redux/thunks/authThunk";
 import LoginForm from "../components/form/LoginForm";
 import { useState } from "react";
 import { signInValidationSchema } from "../validators/validatorFormLogin";
+import type { FormikHelpers } from "../interfaces/formikHelpers.interface";
 
 export const LoginPage = () => {
   const { loading, error, user, token, refreshToken } = useAppSelector(
@@ -48,7 +49,7 @@ export const LoginPage = () => {
         setTokenStorage(token);
         setRefreshTokenStorage(refreshToken);
 
-        navigate("/dashboard");
+        navigate("/");
       } else {
         console.error("Login failed:", result.payload);
       }
@@ -58,8 +59,8 @@ export const LoginPage = () => {
   };
   // Wrapper to match expected signature
   const handleLoginForm = async (
-    values: { rememberMe?: boolean; email: string; password: string },
-    formikHelpers?: any
+    values: { email: string; password: string },
+    formikHelpers?: FormikHelpers<{ email: string; password: string }>
   ) => {
     setValidated(true);
     const { email, password } = values;

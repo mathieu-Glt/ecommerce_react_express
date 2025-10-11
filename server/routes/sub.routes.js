@@ -36,7 +36,7 @@ router.get("/subs", getSubs);
  * @desc Get sub details by slug
  * @access Public
  */
-router.get("/sub/:slug", getSubBySlug);
+router.get("/subs/:slug", getSubBySlug);
 
 /**
  * @route POST /sub
@@ -44,7 +44,7 @@ router.get("/sub/:slug", getSubBySlug);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.post("/sub", requireRole(["admin"]), createSub);
+router.post("/subs", requireRole(["admin"]), createSub);
 
 /**
  * @route PUT /sub/:slug
@@ -52,7 +52,7 @@ router.post("/sub", requireRole(["admin"]), createSub);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.put("/sub/:slug", requireRole(["admin"]), updateSub);
+router.put("/subs/:slug", requireRole(["admin"]), updateSub);
 
 /**
  * @route DELETE /sub/:slug
@@ -60,6 +60,6 @@ router.put("/sub/:slug", requireRole(["admin"]), updateSub);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.delete("/sub/:slug", requireRole(["admin"]), deleteSub);
+router.delete("/subs/:slug", requireRole(["admin"]), deleteSub);
 
 module.exports = router;

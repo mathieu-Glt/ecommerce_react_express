@@ -127,8 +127,8 @@
 }
 
 .btn-primary-hero {
-  background-color: white;
-  color: #0f172a;
+  background-color: #3b82f6;
+  color: white;
   padding: 1rem 2rem;
   border-radius: 50px;
   font-weight: 600;
@@ -141,12 +141,14 @@
 
 .btn-primary-hero:hover {
   background-color: #f3f4f6;
+  color: #3b82f6;
   transform: scale(1.05);
 }
 
 .btn-secondary-hero {
-  background-color: transparent;
-  color: white;
+  /* background-color: transparent; */
+  background-color: gold;
+  color: rgb(44, 26, 105);
   padding: 1rem 2rem;
   border-radius: 50px;
   font-weight: 600;

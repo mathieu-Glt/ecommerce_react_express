@@ -37,14 +37,14 @@ router.get("/categories", getCategories);
  * @desc Get category details by slug
  * @access Public
  */
-router.get("/category/slug/:slug", getCategoryBySlug);
+router.get("/categories/slug/:slug", getCategoryBySlug);
 
 /**
  * @route GET /category/id/:id
  * @desc Get category details by ID
  * @access Public
  */
-router.get("/category/id/:id", getCategoryById);
+router.get("/categories/id/:id", getCategoryById);
 
 /**
  * @route POST /category
@@ -52,7 +52,7 @@ router.get("/category/id/:id", getCategoryById);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.post("/category", requireRole(["admin"]), createCategory);
+router.post("/categories", requireRole(["admin"]), createCategory);
 
 /**
  * @route PUT /category/:id
@@ -60,7 +60,7 @@ router.post("/category", requireRole(["admin"]), createCategory);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.put("/category/:id", requireRole(["admin"]), updateCategory);
+router.put("/categories/:id", requireRole(["admin"]), updateCategory);
 
 /**
  * @route DELETE /category/:id
@@ -68,6 +68,6 @@ router.put("/category/:id", requireRole(["admin"]), updateCategory);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.delete("/category/:id", requireRole(["admin"]), deleteCategory);
+router.delete("/categories/:id", requireRole(["admin"]), deleteCategory);
 
 module.exports = router;
