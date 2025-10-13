@@ -10,6 +10,7 @@ import type {
 } from "../../interfaces/user.interface";
 import type { ApiResponse } from "../../interfaces/response.interface";
 import { API_ROUTES } from "../constants/api-routes";
+import type { RegisterFormData } from "../../interfaces/regsiterProps.interface";
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const api: AxiosInstance = useApi();
@@ -39,7 +40,9 @@ const api: AxiosInstance = useApi();
  *   picture: "data:image/png;base64,..."
  * });
  */
-export async function signUp(body: RegisterCredentials): Promise<ApiResponse> {
+export async function signUp(
+  body: RegisterFormData | FormData
+): Promise<ApiResponse> {
   console.log("🚀 ~ file: auth.ts:47 ~ signUp ~ body:", body);
   try {
     const register: AxiosResponse<ApiResponse> = await api.post(

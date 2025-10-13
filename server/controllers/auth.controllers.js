@@ -13,6 +13,7 @@
 
 const { asyncHandler } = require("../utils/errorHandler");
 const AuthServiceFactory = require("../factories/authServiceFactory");
+const { fs } = require("fs");
 const { saveBase64Image, validateBase64Image } = require("../utils/imageUtils");
 const jwt = require("jsonwebtoken");
 const { getIO, emitToSession } = require("../config/socket");
@@ -175,6 +176,10 @@ exports.getUserProfile = asyncHandler(async (req, res) => {
  */
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  console.log("📝 Données reçues pour la connexion:", {
+    email,
+    hasPassword: !!password,
+  });
 
   // Check email and pass
   if (!email || !password) {
@@ -226,80 +231,91 @@ exports.login = asyncHandler(async (req, res) => {
  * @returns {Object} 400 - Validation errors
  */
 exports.register = asyncHandler(async (req, res) => {
-  const { email, password, firstname, lastname, picture, address } = req.body;
+  const { email, password, firstname, lastname, address } = req.body;
 
   console.log("📝 Données reçues pour l'inscription:", {
     email,
     firstname,
     lastname,
     hasPassword: !!password,
-    hasPicture: !!picture,
-    address: address || "Not communicated",
+    hasPicture: !!req.file,
+    file: req.file,
+    address: address || "Non communiqué",
   });
 
-  // Check required fields
-  if (!email || !password || !firstname || !lastname || !picture) {
+  // ✅ Validation des champs REQUIS (picture est optionnel)
+  if (!email || !password || !firstname || !lastname) {
+    // Supprimer le fichier uploadé si validation échoue
+    if (req.file) {
+      fs.unlinkSync(req.file.path); // ✅ Version synchrone plus simple
+    }
+
     return res.status(400).json({
       success: false,
-      error: "Email, password, firstname, lastname and picture required",
+      error: "Email, password, firstname et lastname sont requis",
     });
   }
-  // Validate password length
+
+  // Validation de la longueur du mot de passe
   if (password.length < 8) {
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+
     return res.status(400).json({
       success: false,
-      error: "Password must be at least 8 characters long",
+      error: "Le mot de passe doit contenir au moins 8 caractères",
     });
   }
 
-  // Validate and save the picture
-  const imageValidation = await validateBase64Image(picture, 5); // 5MB max
-  if (!imageValidation.success) {
-    return res.status(400).json({
-      success: false,
-      error: imageValidation.error,
-    });
+  // ✅ Construire le chemin de l'image pour la BDD
+  let picturePath = null;
+  if (req.file) {
+    // Chemin relatif pour stockage en BDD
+    picturePath = `/uploads/avatars/${req.file.filename}`;
+    console.log("✅ Image enregistrée:", picturePath);
+  } else {
+    console.log("ℹ️ Aucune image uploadée (optionnel)");
   }
 
-  // Save the image and get the path
-  const imageResult = await saveBase64Image(
-    picture,
-    "avatars",
-    `${firstname}-${lastname}`
-  );
-  if (!imageResult.success) {
-    return res.status(400).json({
-      success: false,
-      error: imageResult.error,
+  try {
+    // Créer l'utilisateur dans la base de données
+    const result = await authService.createUser({
+      email,
+      password,
+      firstname,
+      lastname,
+      address: address || "",
+      role: "user",
+      picture: picturePath, // null si pas d'image
     });
-  }
 
-  // Create the user in the database with the image path
-  const result = await authService.createUser({
-    email,
-    password,
-    firstname,
-    lastname,
-    address: address || "", // if null or undefined, set to empty string
-    role: "user", // Role by default "user"
-    picture: imageResult.path, // Using the saved image path instead of Base64
-  });
+    if (!result.success) {
+      // Supprimer le fichier si la création échoue
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
 
-  if (!result.success) {
-    return res.status(400).json({
-      success: false,
-      error: result.error,
+      return res.status(400).json({
+        success: false,
+        error: result.error,
+      });
+    }
+
+    // ✅ Succès - Retourner les données utilisateur
+    res.status(201).json({
+      success: true,
+      message: "Utilisateur créé avec succès",
+      user: result.user,
     });
+  } catch (error) {
+    // Supprimer le fichier en cas d'erreur
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    throw error; // Laisse asyncHandler gérer l'erreur
   }
-
-  // Return the user data and the token
-  res.status(201).json({
-    success: true,
-    message: "User created successfully",
-    user: result.user,
-  });
 });
-
 /**
  * Verify JWT token validity
  * @access Protected

@@ -34,8 +34,27 @@ export const signUpValidationSchema = Yup.object().shape({
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Please confirm your password"),
 
-  picture: Yup.string().url("Must be a valid URL").optional(),
-
+  picture: Yup.mixed<File>()
+    .nullable()
+    .optional()
+    .test("fileSize", "File is too large (max 5MB)", (value) => {
+      if (!value) return true; // Optional field
+      return (value as File).size <= 5 * 1024 * 1024;
+    })
+    .test(
+      "fileType",
+      "Only images are allowed (JPEG, PNG, GIF, WebP)",
+      (value) => {
+        if (!value) return true;
+        return [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ].includes((value as File).type);
+      }
+    ),
   address: Yup.string()
     .max(200, "Address must not exceed 200 characters")
     .optional(),

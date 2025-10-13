@@ -38,9 +38,7 @@ const userSchema = new mongoose.Schema(
     lastname: { type: String, trim: true },
     picture: {
       type: String,
-      required: function () {
-        return !!this.googleId;
-      },
+      required: false,
       trim: true,
     },
     email: {

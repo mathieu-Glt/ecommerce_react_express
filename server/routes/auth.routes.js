@@ -33,6 +33,7 @@ const {
   getUserProfileValidation,
   deleteUserValidation,
 } = require("../validators");
+const { uploadAvatar, handleMulterError } = require("../utils/multerPicture");
 
 /**
  * Auth Routes
@@ -98,7 +99,13 @@ router.post("/login", loginValidation, login);
  * @returns 201 - User created successfully
  * @returns 400 - Validation error
  */
-router.post("/register", registerValidation, register);
+router.post(
+  "/register",
+  uploadAvatar,
+  handleMulterError,
+  registerValidation,
+  register
+);
 
 /**
  * @route GET /auth/verify

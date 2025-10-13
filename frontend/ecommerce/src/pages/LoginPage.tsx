@@ -7,8 +7,9 @@ import LoginForm from "../components/form/LoginForm";
 import { useState } from "react";
 import { signInValidationSchema } from "../validators/validatorFormLogin";
 import type { FormikHelpers } from "../interfaces/formikHelpers.interface";
-
+import { useAuth } from "../hooks/useAuth";
 export const LoginPage = () => {
+  const { login } = useAuth();
   const { loading, error, user, token, refreshToken } = useAppSelector(
     (state) => state.auth
   );
@@ -36,18 +37,16 @@ export const LoginPage = () => {
 
   const handleLogin = async (
     email: string,
-    password: string
+    password: string,
+    rememberMe = false
   ): Promise<void> => {
     try {
-      const result = await dispatch(loginUser({ email, password }));
+      const result = await login(email, password, rememberMe);
+      console.log("Login result:", result.payload);
 
       if (loginUser.fulfilled.match(result)) {
         const { user, token, refreshToken } =
           result.payload as ExtractLoginResponse;
-
-        setUserStorage(user);
-        setTokenStorage(token);
-        setRefreshTokenStorage(refreshToken);
 
         navigate("/");
       } else {
@@ -59,13 +58,13 @@ export const LoginPage = () => {
   };
   // Wrapper to match expected signature
   const handleLoginForm = async (
-    values: { email: string; password: string },
+    values: { email: string; password: string; rememberMe: boolean },
     formikHelpers?: FormikHelpers<{ email: string; password: string }>
   ) => {
     setValidated(true);
-    const { email, password } = values;
+    const { email, password, rememberMe } = values;
     console.log("Form values:", values);
-    await handleLogin(email, password);
+    await handleLogin(email, password, rememberMe);
   };
 
   return (

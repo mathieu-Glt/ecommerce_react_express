@@ -13,6 +13,7 @@ import type {
   ApiResponse,
 } from "../../interfaces/response.interface";
 import { signIn, signOut, signUp } from "../../services/api/auth";
+import type { RegisterFormData } from "../../interfaces/regsiterProps.interface";
 
 export const loginUser = createAsyncThunk<
   ApiResponse,
@@ -25,6 +26,7 @@ export const loginUser = createAsyncThunk<
     //   credentials
     // );
     const response = await signIn(credentials);
+    console.log("Response from signIn:", response);
     const { user, token, refreshToken } = response as ResponseDataLogin;
     return { success: true, results: { user, token, refreshToken } };
   } catch (err: any) {
@@ -37,15 +39,51 @@ export const loginUser = createAsyncThunk<
 
 export const registerUser = createAsyncThunk<
   ApiResponse,
-  RegisterCredentials,
+  RegisterFormData,
   { rejectValue: ResponseErrorInterface }
 >("auth/registerUser", async (userInfo, thunkAPI) => {
+  console.log("Registering user with info:", userInfo);
   try {
     // const response: AxiosResponse<ResponseDataRegister> = await axios.post(
     //   "/api/auth/register",
     //   userInfo
     // );
-    const response = await signUp(userInfo);
+    // Créer le FormData à partir de userInfo
+    const formData = new FormData();
+    formData.append("firstname", userInfo.firstname);
+    formData.append("lastname", userInfo.lastname);
+    formData.append("email", userInfo.email);
+    formData.append("password", userInfo.password);
+    formData.append("confirmPassword", userInfo.confirmPassword || "");
+
+    // Ajouter l'adresse si présente
+    if (userInfo.address) {
+      formData.append("address", userInfo.address);
+    }
+
+    // Ajouter le fichier si présent
+    if (userInfo.picture instanceof File) {
+      formData.append("picture", userInfo.picture);
+      console.log("📎 File added to FormData:", {
+        name: userInfo.picture.name,
+        size: userInfo.picture.size,
+        type: userInfo.picture.type,
+      });
+    }
+    console.log("📦 FormData content:");
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}:`, {
+          name: value.name,
+          size: value.size,
+          type: value.type,
+        });
+      } else {
+        console.log(`  ${key}:`, value);
+      }
+    }
+    const response = await signUp(formData);
+    console.log("Response from signUp:", response);
     const { user } = response as ResponseDataRegister;
     return { success: true, results: { user } };
   } catch (err: any) {

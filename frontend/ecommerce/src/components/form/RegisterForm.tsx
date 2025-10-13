@@ -1,6 +1,5 @@
 import React from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { Form, Button, Alert, Spinner, Row, Col } from "react-bootstrap";
 import type {
   RegisterFormData,
@@ -8,16 +7,6 @@ import type {
 } from "../../interfaces/regsiterProps.interface";
 import "./register.css";
 import { signUpValidationSchema } from "../../validators/validatorsFormRegister";
-// Interface pour les données du formulaire
-// export interface RegisterFormData {
-//   firstname: string;
-//   lastname: string;
-//   email: string;
-//   password: string;
-//   confirmPassword: string;
-//   picture?: string;
-//   address?: string;
-// }
 
 /**
  * RegisterForm with useFormik hook and Yup validation
@@ -27,6 +16,7 @@ const RegisterForm: React.FC<RegisterProps> = ({
   handleRegister,
   loading,
   error,
+  errors,
   validated,
 }) => {
   // Initial form values
@@ -36,7 +26,7 @@ const RegisterForm: React.FC<RegisterProps> = ({
     email: "",
     password: "",
     confirmPassword: "",
-    picture: "",
+    picture: null, // ✅ null au lieu de ""
     address: "",
   };
 
@@ -44,14 +34,42 @@ const RegisterForm: React.FC<RegisterProps> = ({
   const formik = useFormik({
     initialValues,
     validationSchema: signUpValidationSchema,
-    onSubmit: (values) => {
-      // Préparer les données pour l'API (sans confirmPassword)
-      const { confirmPassword, ...registerData } = values;
-      handleRegister(registerData);
+    onSubmit: async (values, { setErrors, setFieldError }) => {
+      try {
+        // ✅ Préparer les données pour l'API (sans confirmPassword)
+        const { confirmPassword, ...registerData } = values;
+
+        // ✅ Passer directement les données avec le File
+        await handleRegister({
+          ...values,
+          confirmPassword: values.confirmPassword ?? "",
+        });
+      } catch (error: any) {
+        // ✅ Gérer les erreurs du backend
+        if (error.response?.data?.errors) {
+          // Si le backend renvoie des erreurs par champ
+          setErrors(error.response.data.errors);
+        } else if (error.response?.data?.error) {
+          // Si c'est une erreur globale, l'afficher sur email (ou autre champ)
+          setFieldError("email", error.response.data.error);
+        }
+      }
     },
     validateOnChange: true,
     validateOnBlur: true,
   });
+
+  // ✅ Handler pour l'upload de fichier
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+    console.log("Selected file:", file);
+    if (file) {
+      formik.setFieldValue("picture", file);
+      formik.setFieldTouched("picture", true);
+    } else {
+      formik.setFieldValue("picture", null);
+    }
+  };
 
   console.log("Formik state:", {
     values: formik.values,
@@ -67,11 +85,16 @@ const RegisterForm: React.FC<RegisterProps> = ({
       {error && (
         <Alert variant="danger" dismissible className="mb-3">
           <Alert.Heading>Registration Failed</Alert.Heading>
-          <p>{error}</p>
+          <p>{error.error}</p>
         </Alert>
       )}
 
-      <Form noValidate validated={validated} onSubmit={formik.handleSubmit}>
+      <Form
+        noValidate
+        validated={validated}
+        onSubmit={formik.handleSubmit}
+        encType="multipart/form-data"
+      >
         {/* Firstname and Lastname */}
         <Row>
           <Col md={6}>
@@ -201,27 +224,31 @@ const RegisterForm: React.FC<RegisterProps> = ({
           </Col>
         </Row>
 
-        {/* Picture URL (optional) */}
+        {/* ✅ Picture Upload */}
         <Form.Group className="mb-3" controlId="formPicture">
-          <Form.Label>Profile Picture URL (optional)</Form.Label>
+          <Form.Label>Profile Picture (optional)</Form.Label>
           <Form.Control
-            type="url"
+            type="file"
             name="picture"
-            placeholder="https://example.com/picture.jpg"
-            value={formik.values.picture}
-            onChange={formik.handleChange}
+            accept="image/*"
+            onChange={handleFileChange}
             onBlur={formik.handleBlur}
             isInvalid={formik.touched.picture && !!formik.errors.picture}
             isValid={formik.touched.picture && !formik.errors.picture}
             disabled={loading}
           />
+          {formik.values.picture && (
+            <Form.Text className="text-success d-block mt-2">
+              ✓ File selected: {(formik.values.picture as File).name}
+            </Form.Text>
+          )}
           {formik.touched.picture && formik.errors.picture && (
             <Form.Control.Feedback type="invalid">
               {formik.errors.picture}
             </Form.Control.Feedback>
           )}
           <Form.Text className="text-muted">
-            Enter a URL to your profile picture (optional).
+            Upload your profile picture (JPEG, PNG, GIF, WebP - max 5MB).
           </Form.Text>
         </Form.Group>
 

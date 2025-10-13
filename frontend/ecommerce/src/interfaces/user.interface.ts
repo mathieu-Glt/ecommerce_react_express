@@ -39,6 +39,8 @@ export interface RegisterCredentials {
   confirmPassword: string;
 }
 
+
+
 export interface ResponseDataLogin {
   user: User;
   token: string;

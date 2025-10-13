@@ -5,17 +5,17 @@ import { destroyTokenUser, refreshTokens } from "../services/api/auth";
 export function useApi(): AxiosInstance {
   const api: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-    // baseURL: 'http://localhost:8000/api',
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    },
+    withCredentials: true,
+    // ❌ NE PAS mettre de Content-Type par défaut
+    // headers: {
+    //   "Content-Type": "application/json", // ❌ SUPPRIMÉ
+    // },
   });
 
   // interceptor pour injection token
   api.interceptors.request.use(
     (config) => {
-      // Logique supplémentaire pour modifier la requête
+      // ✅ Logique pour gérer FormData vs JSON
       const token: string | null = localStorage.getItem("accessToken");
       if (token) {
         config.headers["Authorization"] = "Bearer " + token;
@@ -24,10 +24,17 @@ export function useApi(): AxiosInstance {
           token
         );
       }
+
+      // ✅ IMPORTANT : Définir Content-Type seulement si ce n'est PAS un FormData
+      if (!(config.data instanceof FormData)) {
+        config.headers["Content-Type"] = "application/json";
+      }
+      // Si c'est un FormData, axios gérera automatiquement le Content-Type avec boundary
+
       return config;
     },
     (error) => {
-      Promise.reject(error);
+      return Promise.reject(error);
     }
   );
 

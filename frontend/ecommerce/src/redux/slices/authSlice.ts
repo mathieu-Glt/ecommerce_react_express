@@ -60,11 +60,14 @@ const authSlice: Slice<AuthState> = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log("Login fulfilled with payload:", action.payload);
         state.loading = false;
-        state.user = (action.payload as payloadDataUser).user ?? null;
-        state.token = (action.payload as payloadDataToken).token ?? null;
+        state.user = (action.payload.results as payloadDataUser).user ?? null;
+        state.token =
+          (action.payload.results as payloadDataToken).token ?? null;
         state.refreshToken =
-          (action.payload as payloadDataRefreshToken).refreshToken ?? null;
+          (action.payload.results as payloadDataRefreshToken).refreshToken ??
+          null;
         state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {

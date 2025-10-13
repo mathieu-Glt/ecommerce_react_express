@@ -127,27 +127,30 @@ export const useAuth = () => {
    * }
    */
   const login = useCallback(
-    async (email: string, password: string): Promise<boolean> => {
+    async (
+      email: string,
+      password: string,
+      rememberMe: boolean
+    ): Promise<boolean> => {
       try {
         const result = await dispatch(loginUser({ email, password }));
+        console.log("Login result:", result.payload);
 
         if (loginUser.fulfilled.match(result)) {
-          const { user } = result.payload.results;
-          const token = result.payload.accessToken || ""; // Adjust property name as per ApiResponse
-
-          // Store in localStorage
-          setUserStorage(user);
-          setTokenStorage(token);
-          // If your API response includes refreshToken elsewhere, access it accordingly.
-          // Example: const refreshToken = result.payload.refreshToken;
-          // if (refreshToken) {
-          //   setRefreshTokenStorage(refreshToken);
-          // }
+          const user = result.payload.results.user;
+          const token = result.payload.results.token || ""; // Adjust property name as per ApiResponse
+          const refreshToken = result.payload.results.refreshToken || ""; // Adjust property name as per ApiResponse
+          if (rememberMe) {
+            // Store in localStorage
+            setUserStorage(user);
+            setTokenStorage(token);
+            setRefreshTokenStorage(refreshToken);
+          }
 
           console.log("Login successful:", user.email);
 
           // Navigate to dashboard
-          navigate("/dashboard");
+          navigate("/");
 
           return true;
         } else {

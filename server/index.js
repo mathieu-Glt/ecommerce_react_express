@@ -7,7 +7,7 @@
 const dotenv = require("dotenv");
 dotenv.config({ path: __dirname + "/.env" });
 
-// Impport express dependence framework HTTP server
+// Import express dependence framework HTTP server
 const express = require("express");
 // Handler for users sessions
 const session = require("express-session");
@@ -23,7 +23,7 @@ const bodyParser = require("body-parser");
 const fs = require("fs");
 // Path utilities
 const path = require("path");
-// Paseport for authentication
+// Passport for authentication
 const passport = require("./config/passport");
 // Socket.io for real-time communication
 const { initSocket } = require("./config/socket");
@@ -63,7 +63,6 @@ const sessionConfig = {
 
 // Apply session middleware to Express app
 const sessionMiddleware = session(sessionConfig);
-app.use(sessionMiddleware);
 
 // Initialize Socket.io with session support
 initSocket(httpServer, sessionMiddleware);
@@ -72,21 +71,29 @@ initSocket(httpServer, sessionMiddleware);
 // Global Middlewares
 // ---------------------------------------------
 
-// CORS policy configuration
+// ✅ DEBUG MIDDLEWARE (temporaire - pour déboguer)
+app.use((req, res, next) => {
+  if (req.url.includes("/register")) {
+    console.log("=== INCOMING REQUEST ===");
+    console.log("URL:", req.url);
+    console.log("Method:", req.method);
+    console.log("Content-Type:", req.headers["content-type"]);
+    console.log("========================");
+  }
+  next();
+});
+
+// ✅ CORS EN PREMIER - Configuration corrigée
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: "http://localhost:5173",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
-// Parse JSON payloads (limit increased for base64 images)
-app.use(express.json({ limit: "10mb" }));
-app.use(bodyParser.json({ limit: "10mb" }));
-
-// Logging & security middlewares
+// ✅ Logging & security middlewares (AVANT body parsers)
 app.use(morgan("dev"));
 app.use(helmet());
 
@@ -128,33 +135,15 @@ app.use(
 // Serve public files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Additional session middleware (could be consolidated with sessionConfig)
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false },
-  })
-);
+// ✅ Session middleware (UNE SEULE FOIS)
+app.use(sessionMiddleware);
 
 // Initialize Passport.js authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Serve uploaded images with CORS headers
-app.use(
-  "/api/uploads",
-  (req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "*");
-    res.header("Cross-Origin-Resource-Policy", "cross-origin");
-    res.header("Cross-Origin-Embedder-Policy", "unsafe-none");
-    next();
-  },
-  express.static("uploads")
-);
+// ✅ Serve uploaded images (version nettoyée)
+app.use("/api/uploads", express.static("uploads"));
 
 // Apply less restrictive headers to allow images to display correctly
 app.use((req, res, next) => {
@@ -162,6 +151,28 @@ app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
   next();
 });
+
+// ✅ IMPORTANT: Body parsers conditionnels
+// Parse JSON SEULEMENT si ce n'est PAS multipart/form-data
+app.use((req, res, next) => {
+  // Si c'est multipart/form-data, ne pas parser (laisser multer s'en occuper)
+  if (req.is("multipart/form-data")) {
+    console.log("⏭️  Skipping JSON parser for multipart request");
+    return next();
+  }
+  // Sinon, parser en JSON
+  express.json({ limit: "10mb" })(req, res, next);
+});
+
+app.use((req, res, next) => {
+  if (req.is("multipart/form-data")) {
+    return next();
+  }
+  bodyParser.json({ limit: "10mb" })(req, res, next);
+});
+
+// Parse URL-encoded bodies (formulaires HTML classiques)
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // ---------------------------------------------
 // Application Initialization
@@ -179,6 +190,8 @@ const initializeApp = async () => {
   try {
     validateDatabaseConfig();
     await connectDB();
+
+    // ✅ Load routes (multer middlewares sont dans les routes)
     loadRoutes(app);
 
     // Must be last: global error handler
