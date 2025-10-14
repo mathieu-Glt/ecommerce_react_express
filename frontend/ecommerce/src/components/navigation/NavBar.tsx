@@ -55,9 +55,23 @@ export const Navigation: React.FC = () => {
             <Link to={ROUTES.PROFILE} className="nav-link" onClick={closeMenu}>
               Profile
             </Link>
+            <Link
+              to={ROUTES.LOGIN}
+              className="dropdown-item"
+              onClick={closeMenu}
+            >
+              Sign in
+            </Link>
+            <Link
+              to={ROUTES.REGISTER}
+              className="dropdown-item"
+              onClick={closeMenu}
+            >
+              Sign up
+            </Link>
 
             {/* Dropdown */}
-            <div className="nav-dropdown">
+            {/* <div className="nav-dropdown">
               <button className="nav-dropdown-toggle" onClick={toggleDropdown}>
                 Dropdown
                 <svg
@@ -73,20 +87,6 @@ export const Navigation: React.FC = () => {
 
               {isDropdownOpen && (
                 <div className="dropdown-menu">
-                  <Link
-                    to={ROUTES.LOGIN}
-                    className="dropdown-item"
-                    onClick={closeMenu}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    to={ROUTES.REGISTER}
-                    className="dropdown-item"
-                    onClick={closeMenu}
-                  >
-                    Sign up
-                  </Link>
                   <Link
                     to="#action/3.3"
                     className="dropdown-item"
@@ -104,7 +104,7 @@ export const Navigation: React.FC = () => {
                   </Link>
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

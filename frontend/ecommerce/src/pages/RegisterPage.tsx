@@ -27,7 +27,6 @@ export const RegisterPage = () => {
   const handleRegister = async (values: RegisterFormData): Promise<void> => {
     console.log("Starting registration with values:", values);
     setValidated(true);
-    // console.log("Form values:", values);
 
     try {
       if (values.password !== values.confirmPassword) {
@@ -35,12 +34,9 @@ export const RegisterPage = () => {
         setValidated(false);
         return;
       }
-      // const result = await dispatch(registerUser(values));
+
       const result = await register(values);
       console.log("Registration result:", result);
-      //
-      // const result = await dispatch(registerUser(values));
-      // console.log("Registration result:", result);
 
       if (registerUser.fulfilled.match(result)) {
         const { user } = result.payload as ExtractRegisterResponse;
@@ -61,20 +57,46 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="register-container">
-      <h2>Create an Account</h2>
+    <div className="register-page-container">
+      {/* Formes d'arrière-plan animées */}
+      <div className="register-background-shapes">
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
+        <div className="shape shape-3"></div>
+      </div>
 
-      <RegisterForm
-        errors={errors}
-        handleRegister={handleRegister}
-        loading={loading}
-        error={
-          typeof error === "object" || error === null
-            ? error
-            : JSON.stringify(error)
-        }
-        validated={validated}
-      />
+      {/* Card de register */}
+      <div className="register-card-wrapper">
+        <div className="register-card">
+          {/* Header avec logo */}
+          <div className="register-header">
+            <div className="register-logo">
+              {/* Icône de création de compte - utilisez Bootstrap Icons */}
+              <i className="bi bi-person-plus-fill"></i>
+            </div>
+            <h1 className="register-title">Créez votre compte</h1>
+            <p className="register-subtitle">
+              Rejoignez-nous dès aujourd'hui !
+            </p>
+          </div>
+
+          {/* Formulaire d'inscription */}
+          <RegisterForm
+            errors={errors}
+            handleRegister={handleRegister}
+            loading={loading}
+            error={
+              typeof error === "object" || error === null
+                ? error
+                : JSON.stringify(error)
+            }
+            validated={validated}
+          />
+        </div>
+
+        {/* Ombre décorative */}
+        <div className="register-card-shadow"></div>
+      </div>
     </div>
   );
 };

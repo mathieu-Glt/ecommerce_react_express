@@ -36,16 +36,16 @@ const RegisterForm: React.FC<RegisterProps> = ({
     validationSchema: signUpValidationSchema,
     onSubmit: async (values, { setErrors, setFieldError }) => {
       try {
-        // ✅ Préparer les données pour l'API (sans confirmPassword)
+        // Préparer les données pour l'API (sans confirmPassword)
         const { confirmPassword, ...registerData } = values;
 
-        // ✅ Passer directement les données avec le File
+        // Passer directement les données avec le File
         await handleRegister({
           ...values,
           confirmPassword: values.confirmPassword ?? "",
         });
       } catch (error: any) {
-        // ✅ Gérer les erreurs du backend
+        // Gérer les erreurs du backend
         if (error.response?.data?.errors) {
           // Si le backend renvoie des erreurs par champ
           setErrors(error.response.data.errors);
@@ -59,7 +59,7 @@ const RegisterForm: React.FC<RegisterProps> = ({
     validateOnBlur: true,
   });
 
-  // ✅ Handler pour l'upload de fichier
+  // Handler pour l'upload de fichier
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0];
     console.log("Selected file:", file);
@@ -224,7 +224,7 @@ const RegisterForm: React.FC<RegisterProps> = ({
           </Col>
         </Row>
 
-        {/* ✅ Picture Upload */}
+        {/* Picture Upload */}
         <Form.Group className="mb-3" controlId="formPicture">
           <Form.Label>Profile Picture (optional)</Form.Label>
           <Form.Control

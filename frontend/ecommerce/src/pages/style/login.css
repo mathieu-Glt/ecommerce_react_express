@@ -7,24 +7,22 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  overflow-x: hidden;
 }
 
-/* Container principal avec gradient animé orange-rouge */
-.register-page-container {
+/* Container principal avec gradient animé */
+.login-page-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: 1rem;
   background: linear-gradient(
     135deg,
-    #ff6b6b 0%,
-    #ee5a6f 20%,
-    #f093fb 40%,
-    #feca57 60%,
-    #ff9ff3 80%,
-    #ff6348 100%
+    #173ad5 0%,
+    #211f83 25%,
+    #2e78c3 50%,
+    #4facfe 75%,
+    #00f2fe 100%
   );
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
@@ -45,7 +43,7 @@ body {
 }
 
 /* Éléments d'arrière-plan animés */
-.register-background-shapes {
+.login-background-shapes {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -65,7 +63,7 @@ body {
   right: -10%;
   width: 400px;
   height: 400px;
-  background: rgba(255, 107, 107, 0.4);
+  background: rgba(168, 85, 247, 0.4);
   animation: float 8s ease-in-out infinite;
 }
 
@@ -74,7 +72,7 @@ body {
   left: -10%;
   width: 400px;
   height: 400px;
-  background: rgba(254, 202, 87, 0.4);
+  background: rgba(59, 130, 246, 0.4);
   animation: float 10s ease-in-out infinite reverse;
 }
 
@@ -84,7 +82,7 @@ body {
   transform: translate(-50%, -50%);
   width: 400px;
   height: 400px;
-  background: rgba(255, 99, 72, 0.3);
+  background: rgba(236, 72, 153, 0.3);
   animation: float 12s ease-in-out infinite;
 }
 
@@ -98,11 +96,11 @@ body {
   }
 }
 
-/* Card avec effet glassmorphism */
-.register-card-wrapper {
+/* Card de login avec effet glassmorphism */
+.login-card-wrapper {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 480px;
   z-index: 10;
   animation: fadeInUp 0.6s ease-out;
 }
@@ -118,7 +116,7 @@ body {
   }
 }
 
-.register-card {
+.login-card {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -127,15 +125,16 @@ body {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.2) inset;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
 }
 
-/* Header */
-.register-header {
+/* Header avec logo */
+.login-header {
   text-align: center;
   margin-bottom: 2.5rem;
 }
 
-.register-logo {
+.login-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -148,16 +147,16 @@ body {
   transition: transform 0.3s ease;
 }
 
-.register-logo:hover {
-  transform: scale(1.05) rotate(5deg);
+.login-logo:hover {
+  transform: scale(1.05);
 }
 
-.register-logo i {
+.login-logo i {
   font-size: 2.5rem;
-  color: #ff6348;
+  color: #667eea;
 }
 
-.register-title {
+.login-title {
   color: white;
   font-size: 2rem;
   font-weight: 700;
@@ -165,14 +164,14 @@ body {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.register-subtitle {
-  color: rgba(255, 255, 255, 0.85);
+.login-subtitle {
+  color: rgba(32, 68, 165, 0.85);
   font-size: 1rem;
 }
 
-/* Form styles */
+/* Styles pour le formulaire */
 .form-label {
-  color: white;
+  color: rgb(56, 58, 185);
   font-weight: 500;
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
@@ -205,26 +204,30 @@ body {
   font-size: 0.85rem;
 }
 
-/* File input */
-input[type="file"]::file-selector-button {
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.25);
+.form-check-input {
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  color: white;
-  font-weight: 500;
   cursor: pointer;
-  margin-right: 1rem;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
-input[type="file"]::file-selector-button:hover {
-  background: rgba(255, 255, 255, 0.35);
+.form-check-input:checked {
+  background-color: white;
+  border-color: white;
+}
+
+.form-check-label {
+  color: white;
+  font-size: 0.95rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
 }
 
 /* Bouton principal */
 .btn-primary {
-  background: white;
-  color: #ff6348;
+  background: rgb(28, 83, 154);
+  color: #667eea;
   border: none;
   border-radius: 12px;
   padding: 0.9rem 1.5rem;
@@ -238,14 +241,19 @@ input[type="file"]::file-selector-button:hover {
   background: rgba(255, 255, 255, 0.95);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-  color: #ff6348;
+  color: #667eea;
 }
 
-/* Links */
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Liens */
 a {
   color: white;
   text-decoration: none;
   font-weight: 500;
+  transition: opacity 0.3s ease;
 }
 
 a:hover {
@@ -254,6 +262,53 @@ a:hover {
   color: white;
 }
 
+/* Divider */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.divider-text {
+  position: relative;
+  display: inline-block;
+  padding: 0 1rem;
+  background: transparent;
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Boutons OAuth */
+.btn-outline-secondary {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  padding: 0.85rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  color: white;
+}
+
+/* Texte */
 .text-muted {
   color: rgba(255, 255, 255, 0.8) !important;
 }
@@ -263,8 +318,8 @@ a:hover {
   font-weight: 600;
 }
 
-/* Shadow decoration */
-.register-card-shadow {
+/* Décoration en bas de la carte */
+.login-card-shadow {
   position: absolute;
   bottom: -8px;
   left: 50%;
@@ -276,15 +331,40 @@ a:hover {
   filter: blur(8px);
 }
 
+/* Bouton de test */
+.test-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.test-button:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
 /* Responsive */
 @media (max-width: 576px) {
-  .register-card {
+  .login-card {
     padding: 2rem 1.5rem;
     border-radius: 24px;
   }
 
-  .register-title {
+  .login-title {
     font-size: 1.75rem;
+  }
+
+  .login-logo {
+    width: 64px;
+    height: 64px;
   }
 
   .shape {
