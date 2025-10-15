@@ -89,7 +89,7 @@ export const registerUser = createAsyncThunk<
   } catch (err: any) {
     return thunkAPI.rejectWithValue({
       success: false,
-      error: err.response?.data?.message || "Registration failed",
+      error: err.response?.data?.error,
     });
   }
 });

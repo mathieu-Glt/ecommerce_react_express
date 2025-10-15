@@ -3,13 +3,27 @@ import type { AxiosInstance, AxiosResponse } from "axios";
 import { destroyTokenUser, refreshTokens } from "../services/api/auth";
 
 export function useApi(): AxiosInstance {
+  // Instance en commentaire pour les tests unitaires
+  // (car jest ne supporte pas import.meta.env)
+  // Il faut donc définir la variable d'environnement BASE_URL
+  // dans le fichier .env.test à la racine du projet
+  // et utiliser cette instance dans les tests unitaires
+
+  // const api: AxiosInstance = axios.create({
+  //   baseURL: import.meta.env.VITE_API_BASE_URL,
+  //   withCredentials: true,
+  // });
+
+  const BASE_URL =
+    typeof import.meta !== "undefined" &&
+    import.meta.env &&
+    import.meta.env.VITE_API_BASE_URL
+      ? import.meta.env.VITE_API_BASE_URL
+      : "http://localhost:5173";
+
   const api: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: BASE_URL,
     withCredentials: true,
-    // ❌ NE PAS mettre de Content-Type par défaut
-    // headers: {
-    //   "Content-Type": "application/json", // ❌ SUPPRIMÉ
-    // },
   });
 
   // interceptor pour injection token

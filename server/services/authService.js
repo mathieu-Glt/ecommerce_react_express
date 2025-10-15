@@ -41,6 +41,46 @@ class AuthService {
     this.jwtExpiresRefreshTokenIn =
       process.env.JWT_EXPIRES_REFRESHTOKEN_IN || "7d";
   }
+  /**
+   * @typedef {Object} AuthResult
+   * @property {boolean} success - Whether authentication succeeded
+   * @property {Object} [user] - User data (if success, without password)
+   * @property {string} [token] - JWT token (if success)
+   * @property {string} [error] - Error message (if failure)
+   */
+
+  /**
+   * Check if a user exists by email.
+   * @param {string} email - User email.
+   * @returns {Promise<Object>} Result object containing:
+   *  - success {boolean} Whether user was found
+   *  - user {Object} User data (if found, without password)
+   */
+  async userExists(email) {
+    try {
+      const userResult = await this.userRepository.getUserByEmail(email);
+      if (!userResult.success || !userResult.user) {
+        return { success: false };
+      }
+      const user = userResult.user;
+      const userData = {
+        _id: user._id,
+        email: user.email,
+        name:
+          user.name || `${user.firstname || ""} ${user.lastname || ""}`.trim(),
+        firstname: user.firstname,
+        lastname: user.lastname,
+        picture: user.picture,
+        address: user.address || "",
+        role: user.role || "user",
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+      return { success: true, user: userData };
+    } catch (error) {
+      return { success: false, error: "Error checking user existence" };
+    }
+  }
 
   /**
    * Authenticate a user using email and password.
@@ -247,6 +287,24 @@ class AuthService {
   async getUserRole(userId) {
     try {
       const result = await this.userRepository.findUserById(userId);
+      if (!result.success || !result.user)
+        return { success: false, error: "User not found" };
+      return { success: true, role: result.user.role || "user" };
+    } catch (error) {
+      return { success: false, error: "Error retrieving user role" };
+    }
+  }
+
+  /**
+   * Get the role of a user by their email.
+   * @param {string} email - User ID.
+   * @returns {Promise<Object>} Result containing:
+   *  - success {boolean}
+   *  - error {string} Error message (if failure)
+   */
+  async getUserRoleByEmail(email) {
+    try {
+      const result = await this.userRepository.getUserByEmail(email);
       if (!result.success || !result.user)
         return { success: false, error: "User not found" };
       return { success: true, role: result.user.role || "user" };

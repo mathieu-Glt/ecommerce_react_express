@@ -8,21 +8,17 @@ import type {
   LoginCredentials,
   RegisterCredentials,
 } from "../../interfaces/user.interface";
-import type { ApiResponse } from "../../interfaces/response.interface";
+import type {
+  ApiResponse,
+  LoginResponse,
+} from "../../interfaces/response.interface";
 import { API_ROUTES } from "../constants/api-routes";
 import type { RegisterFormData } from "../../interfaces/regsiterProps.interface";
 
+// Define BASE_URL or import from your config
+const BASE_URL = process.env.VITE_API_BASE_URL || "http://localhost:5173";
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const api: AxiosInstance = useApi();
-
-// export async function signUp(body: {email: string, password: string}): Promise<any> {
-//   try {
-//     const register = await api.post("/auth/register", body);
-//     return register;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
 
 /**
  * Registers a new user
@@ -53,9 +49,7 @@ export async function signUp(
     return register.data;
   } catch (error) {
     if (error instanceof AxiosError) {
-      throw new Error(
-        error.response?.data?.error || error.message || "Failed during signUp"
-      );
+      throw new Error(error.response?.data?.error);
     }
 
     throw new Error("Failed during signUp");
@@ -79,10 +73,10 @@ export async function signUp(
  * localStorage.setItem("token", response.token);
  * localStorage.setItem("user", JSON.stringify(response.user));
  */
-export async function signIn(body: LoginCredentials): Promise<ApiResponse> {
+export async function signIn(body: LoginCredentials): Promise<LoginResponse> {
   console.log("🚀 ~ file: auth.ts:66 ~ signIn ~ body:", body);
   try {
-    const login: AxiosResponse<ApiResponse> = await api.post(
+    const login: AxiosResponse<LoginResponse> = await api.post(
       API_ROUTES.AUTH.LOGIN,
       body
     );
@@ -208,7 +202,8 @@ export async function refreshTokens() {
 
   try {
     const refreshResponse = await axios.get(
-      import.meta.env.VITE_API_BASE_URL + API_ROUTES.AUTH.REFRESH_TOKEN,
+      // import.meta.env.VITE_API_BASE_URL + API_ROUTES.AUTH.REFRESH_TOKEN,
+      BASE_URL + API_ROUTES.AUTH.REFRESH_TOKEN,
       { headers }
     );
     console.log(

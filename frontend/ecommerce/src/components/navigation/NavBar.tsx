@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../routes";
+import logo from "../../assets/logo.png";
 import "./NavBar.css";
 
 export const Navigation: React.FC = () => {
@@ -25,9 +26,7 @@ export const Navigation: React.FC = () => {
     <nav className="navbar">
       <div className="navbar-container">
         {/* Logo */}
-        <Link to={ROUTES.HOME} className="navbar-brand" onClick={closeMenu}>
-          EShop - 365
-        </Link>
+        <img src={logo} alt="Logo" className="logo-loader_nav " />
 
         {/* Menu burger (mobile) */}
         <button

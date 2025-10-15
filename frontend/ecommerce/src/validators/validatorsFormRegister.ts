@@ -31,8 +31,13 @@ export const signUpValidationSchema = Yup.object().shape({
     .required("Password is required"),
 
   confirmPassword: Yup.string()
+    .min(8, "ConfirmPassword must be at least 8 characters")
+    .matches(
+      PASSWORD_REGEX,
+      "ConfirmPassword must contain uppercase, lowercase, number and special character"
+    )
     .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Please confirm your password"),
+    .required("ConfirmPassword is required"),
 
   picture: Yup.mixed<File>()
     .nullable()

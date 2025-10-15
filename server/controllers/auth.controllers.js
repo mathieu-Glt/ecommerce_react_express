@@ -176,7 +176,7 @@ exports.getUserProfile = asyncHandler(async (req, res) => {
  */
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  console.log("📝 Données reçues pour la connexion:", {
+  console.log("Données reçues pour la connexion:", {
     email,
     hasPassword: !!password,
   });
@@ -243,16 +243,24 @@ exports.register = asyncHandler(async (req, res) => {
     address: address || "Non communiqué",
   });
 
-  // ✅ Validation des champs REQUIS (picture est optionnel)
+  // Validation des champs REQUIS (picture est optionnel)
   if (!email || !password || !firstname || !lastname) {
     // Supprimer le fichier uploadé si validation échoue
     if (req.file) {
-      fs.unlinkSync(req.file.path); // ✅ Version synchrone plus simple
+      fs.unlinkSync(req.file.path); // Version synchrone plus simple
     }
 
     return res.status(400).json({
       success: false,
       error: "Email, password, firstname et lastname sont requis",
+    });
+  }
+  // Vérifier si l'utilisateur n'existe pas déja
+  const existingUser = await authService.userExists(email);
+  if (existingUser.success && existingUser.user) {
+    return res.status(400).json({
+      success: false,
+      error: "Email already exists",
     });
   }
 
@@ -268,7 +276,7 @@ exports.register = asyncHandler(async (req, res) => {
     });
   }
 
-  // ✅ Construire le chemin de l'image pour la BDD
+  // Construire le chemin de l'image pour la BDD
   let picturePath = null;
   if (req.file) {
     // Chemin relatif pour stockage en BDD

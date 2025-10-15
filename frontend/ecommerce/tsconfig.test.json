@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext", // ✅ Permet import.meta
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "types": ["jest", "node"]
+  },
+  "include": ["tests/**/*", "src/**/*"],
+  "exclude": ["node_modules"]
+}
