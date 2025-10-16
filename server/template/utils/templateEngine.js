@@ -8,7 +8,8 @@ const path = require("path");
  * @returns {Promise<string>} - Rendered HTML content
  */
 const renderTemplate = async (templateName, data) => {
-  const filePath = path.join(__dirname, "template", `${templateName}.ejs`);
+  // Remonte d'un dossier pour accéder à template/
+  const filePath = path.join(__dirname, "..", `${templateName}.ejs`);
   return ejs.renderFile(filePath, data);
 };
 

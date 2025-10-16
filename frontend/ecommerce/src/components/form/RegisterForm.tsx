@@ -81,14 +81,25 @@ const RegisterForm: React.FC<RegisterProps> = ({
 
   return (
     <div className="register-form-wrapper">
-      {/* Global error from API */}
-      {error && (
+      {/* Erreur locale (errors) */}
+      {errors && errors.error && (
         <Alert variant="danger" dismissible className="mb-3">
           <Alert.Heading>Registration Failed</Alert.Heading>
-          <p>{error.error}</p>
+          <p>{errors.error}</p>
         </Alert>
       )}
 
+      {/* Erreur Redux (error) - fallback */}
+      {!errors && error && (
+        <Alert variant="danger" dismissible className="mb-3">
+          <Alert.Heading>Registration Failed</Alert.Heading>
+          <p>
+            {typeof error === "string"
+              ? error
+              : (error as any).error || "An error occurred"}
+          </p>
+        </Alert>
+      )}
       <Form
         noValidate
         validated={validated}

@@ -74,23 +74,46 @@ export async function signUp(
  * localStorage.setItem("user", JSON.stringify(response.user));
  */
 export async function signIn(body: LoginCredentials): Promise<LoginResponse> {
-  console.log("🚀 ~ file: auth.ts:66 ~ signIn ~ body:", body);
   try {
     const login: AxiosResponse<LoginResponse> = await api.post(
       API_ROUTES.AUTH.LOGIN,
       body
     );
-    console.log("🚀 ~ file: auth.ts:69 ~ signIn ~ login:", login);
     return login.data;
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      throw new Error(
-        error.response?.data?.error || error.message || "Failed during signUp"
-      );
-    }
-    throw new Error("Failed during signIn");
+  } catch (error: any) {
+    // Vérifie la structure plutôt que l'instance
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error?.message ||
+      "Failed during signIn";
+
+    throw new Error(errorMessage);
   }
 }
+
+/**
+ * Reset user password
+ *
+ * @param body - Object containing email and optional phone number
+ * @return Success message if reset link sent
+ *
+ * @throws {Error} If request fails or server is unreachable
+ *
+ * @example
+ * try {
+ *   const response = await sentEmailResetPassword({ email: "user@example.com" });
+ */
+
+export async function resetPassword(body: {}): Promise<any> {
+  try {
+    const reset = await api.post(API_ROUTES.AUTH.RESET_PASSWORD, body);
+    return reset.data;
+  } catch (error) {
+    console.log("error auth" + error);
+  }
+}
+
 /**
  * Retrieves the authenticated user's profile information
  *
@@ -133,15 +156,6 @@ export async function getUserProfile(): Promise<ApiResponse | undefined> {
       );
     }
     throw new Error("Not User found");
-  }
-}
-// function send email reset password
-export async function sentEmailResetPassword(body: {}): Promise<any> {
-  try {
-    const sentEmail = await api.post(API_ROUTES.AUTH.RESET_PASSWORD, body);
-    return sentEmail;
-  } catch (error) {
-    console.log("error auth" + error);
   }
 }
 

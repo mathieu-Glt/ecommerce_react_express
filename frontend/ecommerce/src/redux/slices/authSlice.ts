@@ -9,7 +9,7 @@ import type {
 import type { User } from "../../interfaces/user.interface";
 import { loginUser, registerUser } from "../thunks/authThunk";
 
-// Initial state
+// -- Initial state -- //
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
@@ -18,7 +18,7 @@ const initialState: AuthState = {
   error: null,
   loading: false,
 };
-// --- Slice ---
+// --- Slice --- //
 const authSlice: Slice<AuthState> = createSlice({
   name: "auth",
   initialState,

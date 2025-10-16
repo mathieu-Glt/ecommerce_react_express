@@ -37,6 +37,9 @@ const OrderConfirmationPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import("../services/utils/NotFoundPage").then((m) => ({ default: m.default }))
 );
+const ForgotPasswordPage = lazy(() =>
+  import("../pages/ForgotPasswordPage").then((m) => ({ default: m.default }))
+);
 
 // ==================== PROTECTED PAGES (USER) ====================
 const UserProfilePage = lazy(() =>
@@ -84,6 +87,10 @@ export const AppRoutes = () => {
             null,
             SuspenseWrapper(UserProfilePage)
           ),
+        },
+        {
+          path: "/forgot-password",
+          element: SuspenseWrapper(ForgotPasswordPage),
         },
       ],
     },

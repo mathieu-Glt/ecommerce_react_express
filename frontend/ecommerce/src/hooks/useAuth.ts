@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage";
+import useToast from "./usetoast";
+
 import { useAppDispatch, useAppSelector } from "./useReduxHooks";
-import { loginUser, registerUser, logoutUser } from "../redux/thunks/authThunk";
 import { clearAuthState } from "../redux/slices/authSlice";
 import type {
   User,
   LoginCredentials,
   RegisterCredentials,
 } from "../interfaces/user.interface";
+import { registerUser } from "../redux/thunks/authThunk";
+import { sendResetPasswordEmail } from "../redux/thunks/forgotPasswordThunk";
 
 /**
  * Custom hook for authentication management
@@ -41,14 +44,16 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   // Redux state - memoized selector
+  // Redux state - memoized selector
   const authState = useAppSelector((state) => state.auth);
+  // import useToast from hooks
+  const toast = useToast();
   const {
     user: reduxUser,
     loading,
     error,
     isAuthenticated: reduxIsAuthenticated,
   } = authState;
-
   // LocalStorage management
   const [userStorage, setUserStorage] = useLocalStorage<User | null>(
     "user",
@@ -172,6 +177,32 @@ export const useAuth = () => {
   );
 
   /**
+   * Reset password functionality
+   * Memoized function to prevent recreation on each render
+   * Currently a placeholder for future implementation
+   * @param email - User's email address
+   *
+   * @returns Promise<void>
+   */
+
+  const forgotResetPassword = useCallback(
+    async (email: string): Promise<void> => {
+      try {
+        const result = await dispatch(sendResetPasswordEmail({ email }));
+        console.log("Reset password result:", result.payload);
+        if (sendResetPasswordEmail.fulfilled.match(result)) {
+          console.log("Reset password email sent successfully");
+        } else {
+          console.error("Reset password failed:", result.payload);
+        }
+      } catch (err) {
+        console.error("Unexpected error during password reset:", err);
+      }
+    },
+    [dispatch]
+  );
+
+  /**
    * Registers a new user
    * Memoized function to prevent recreation on each render
    *
@@ -196,6 +227,11 @@ export const useAuth = () => {
           const { user } = result.payload.results;
 
           console.log("Registration successful:", user.email);
+
+          // 📨 Afficher un message de succès
+          toast.showSuccess(
+            `Welcome ${user.firstname} dear Please log in with your new account. Don’t forget to check your spam folder if you don’t see our confirmation email.`
+          );
 
           // Navigate to login page after successful registration
           navigate("/login");
@@ -319,6 +355,7 @@ export const useAuth = () => {
       refreshAuth,
       clearLocalStorage,
       updateUserProfile,
+      forgotResetPassword,
     }),
     [
       currentUser,
@@ -332,6 +369,7 @@ export const useAuth = () => {
       refreshAuth,
       clearLocalStorage,
       updateUserProfile,
+      forgotResetPassword,
     ]
   );
 

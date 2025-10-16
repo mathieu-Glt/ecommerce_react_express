@@ -6,22 +6,27 @@
 
 const Brevo = require("@getbrevo/brevo");
 const renderTemplate = require("../template/utils/templateEngine");
+require("dotenv").config();
 
 // Init API
 const emailAPI = new Brevo.TransactionalEmailsApi();
 emailAPI.authentications.apiKey.apiKey = process.env.BREVO_API_KEY;
 
 // Constants
-const APP_NAME = process.env.APP_NAME || "shop39";
+const APP_NAME = process.env.APP_NAME || "cellphone365";
 const LOGO_URL =
-  process.env.APP_LOGO_URL || "http://localhost:8000/public/logo.png";
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+  process.env.APP_LOGO_URL ||
+  "https://res.cloudinary.com/dcvo1xkgv/image/upload/logo_fgib4w.jpg";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
 
 /**
  * Send reset password email
  */
 const sendResetEmail = async (toEmail, name, resetLink) => {
   try {
+    console.log("📧 [Welcome Email] Starting...");
+    console.log("📧 [Welcome Email] To:", toEmail);
+    console.log("📧 [Welcome Email] Name:", name);
     // Render EJS template
     const htmlContent = await renderTemplate("resetPassword", {
       name,
@@ -29,6 +34,8 @@ const sendResetEmail = async (toEmail, name, resetLink) => {
       appName: APP_NAME,
       logoUrl: LOGO_URL,
     });
+
+    console.log("✅ [Welcome Email] Template rendered successfully");
 
     // Plain text fallback
     const textContent = `
@@ -48,7 +55,8 @@ ${APP_NAME} Support Team
     `;
 
     const email = new Brevo.SendSmtpEmail();
-    email.sender = { email: "no-reply@shop39.com", name: APP_NAME };
+    // email.sender = { email: "mathieu.gillet@hotmail.fr", name: APP_NAME };
+    email.sender = { email: "andres@cellphone365.com", name: APP_NAME };
     email.to = [{ email: toEmail }];
     email.subject = `Reset your password for ${APP_NAME}`;
     email.textContent = textContent;
@@ -69,7 +77,7 @@ ${APP_NAME} Support Team
 const sendWelcomeEmail = async (toEmail, name) => {
   try {
     // Render EJS template
-    const htmlContent = await renderTemplate("welcome", {
+    const htmlContent = await renderTemplate("welcomeRegister", {
       name,
       toEmail,
       appName: APP_NAME,
@@ -103,7 +111,8 @@ This email was sent to ${toEmail}
     `;
 
     const email = new Brevo.SendSmtpEmail();
-    email.sender = { email: "no-reply@shop39.com", name: APP_NAME };
+    email.sender = { email: "andres@cellphone365.com", name: APP_NAME };
+    // email.sender = { email: "mathieu.gillet@hotmail.fr", name: APP_NAME };
     email.to = [{ email: toEmail }];
     email.subject = `Welcome to ${APP_NAME} - Account Created Successfully!`;
     email.textContent = textContent;

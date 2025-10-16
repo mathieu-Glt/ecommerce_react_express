@@ -4,10 +4,7 @@ import type { SignInFormValues } from "../validators/validatorFormLogin";
  * Props for LoginForm component
  */
 export interface LoginProps {
-  handleLogin: (
-    values: SignInFormValues,
-    formikHelpers?: any
-  ) => void;  
+  handleLogin: (values: SignInFormValues, formikHelpers?: any) => void;
   loading: boolean;
   formData: LoginFormData;
   onFormDataChange: (data: LoginFormData) => void;

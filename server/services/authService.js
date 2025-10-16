@@ -95,32 +95,30 @@ class AuthService {
   async authenticateUser(email, password) {
     try {
       const userResult = await this.userRepository.getUserByEmail(email);
-      console.log("User lookup result:", userResult);
-      console.log("Has user:", !!userResult);
 
+      // Vérifier si l'utilisateur existe
       if (!userResult.success || !userResult.user) {
         return { success: false, error: "Email or password incorrect" };
       }
 
       const user = userResult.user;
-      console.log("Found user:", user);
 
+      // Vérifier si l'utilisateur a un mot de passe (cas OAuth)
+      // Message générique pour ne pas révéler que le compte existe
       if (!user.password) {
         return { success: false, error: "Email or password incorrect" };
       }
 
+      // Vérifier le mot de passe
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      console.log("Password valid:", isPasswordValid);
 
       if (!isPasswordValid) {
         return { success: false, error: "Email or password incorrect" };
       }
 
-      // const token = AuthService.generateToken(user);
+      // Générer les tokens
       const token = this.generateToken(user);
-      console.log("Generated token:", token);
       const refreshToken = this.generateRefreshToken(user);
-      console.log("Generated refresh token:", refreshToken);
 
       const userData = {
         _id: user._id,
@@ -140,10 +138,10 @@ class AuthService {
 
       return { success: true, user: userData, token, refreshToken };
     } catch (error) {
+      console.error("Authentication error:", error);
       return { success: false, error: "Authentication error" };
     }
   }
-
   /**
    * Generate a JWT token for a user.
    * @param {Object} user - User object.

@@ -17,6 +17,7 @@ const { fs } = require("fs");
 const { saveBase64Image, validateBase64Image } = require("../utils/imageUtils");
 const jwt = require("jsonwebtoken");
 const { getIO, emitToSession } = require("../config/socket");
+const { sendWelcomeEmail } = require("../config/brevo");
 require("dotenv").config();
 
 // Create auth service based on database type (mongoose or mysql)
@@ -176,39 +177,33 @@ exports.getUserProfile = asyncHandler(async (req, res) => {
  */
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  console.log("Données reçues pour la connexion:", {
-    email,
-    hasPassword: !!password,
-  });
 
-  // Check email and pass
-  if (!email || !password) {
+  // Validation des champs requis
+  if (!email) {
     return res.status(400).json({
       success: false,
-      message: "Email and password required",
+      message: "Email is required",
     });
   }
 
-  // Authenticate the user
+  if (!password) {
+    return res.status(400).json({
+      success: false,
+      message: "Password is required",
+    });
+  }
+
+  // Authentification
   const result = await authService.authenticateUser(email, password);
-  console.log("result", result.user);
 
   if (!result.success) {
     return res.status(401).json({
       success: false,
-      error: result.error,
+      message: result.error,
     });
   }
 
-  // Emit the Socket.IO event after saving
-  // const io = getIO();
-  // io.to(req.session.id).emit("user:connected", {
-  //   user: req.user,
-  //   token: token,
-  //   refreshToken: refreshToken,
-  // });
-
-  // Return the user data and the token
+  // Succès
   res.status(200).json({
     success: true,
     message: "Connection successful",
@@ -252,7 +247,7 @@ exports.register = asyncHandler(async (req, res) => {
 
     return res.status(400).json({
       success: false,
-      error: "Email, password, firstname et lastname sont requis",
+      error: "Email, password, firstname et lastname are required",
     });
   }
   // Vérifier si l'utilisateur n'existe pas déja
@@ -272,7 +267,7 @@ exports.register = asyncHandler(async (req, res) => {
 
     return res.status(400).json({
       success: false,
-      error: "Le mot de passe doit contenir au moins 8 caractères",
+      error: "The password must be at least 8 characters long",
     });
   }
 
@@ -310,7 +305,15 @@ exports.register = asyncHandler(async (req, res) => {
       });
     }
 
-    // ✅ Succès - Retourner les données utilisateur
+    try {
+      await sendWelcomeEmail(email, firstname || lastname || "User");
+      console.log("✅ Welcome email sent successfully");
+    } catch (emailErr) {
+      console.error("⚠️ Welcome email failed:", emailErr);
+      // on ne bloque pas l’inscription si le mail échoue
+    }
+
+    // Succès - Retourner les données utilisateur
     res.status(201).json({
       success: true,
       message: "Utilisateur créé avec succès",

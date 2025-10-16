@@ -1,6 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import type { Reducer } from "redux";
 import authReducer from "./authSlice";
+import forgotPasswordReducer from "./forgotPasswordSlice";
 // import cartReducer from './cartSlice';
 // import categoryReducer from './categorySlice';
 // import subCategoryReducer from './subCategorySlice';
@@ -16,6 +17,7 @@ export const rootReducer = combineReducers({
   // comments: commentsReducer,
   // users: usersReducer,
   auth: authReducer,
+  forgotPassword: forgotPasswordReducer,
   // orders: orderReducer,
 });
 export type RootState = ReturnType<typeof rootReducer>;

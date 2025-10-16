@@ -87,9 +87,20 @@ export const registerUser = createAsyncThunk<
     const { user } = response as ResponseDataRegister;
     return { success: true, results: { user } };
   } catch (err: any) {
+    console.error("❌ Registration error:", err);
+
+    // ✅ Extraction robuste du message d'erreur
+    const errorMessage =
+      err.response?.data?.error || // Backend : { error: "..." }
+      err.response?.data?.message || // Backend : { message: "..." }
+      err.message || // Axios error message
+      "Registration failed"; // Fallback
+
+    console.log("📤 Rejecting with error:", errorMessage);
+
     return thunkAPI.rejectWithValue({
       success: false,
-      error: err.response?.data?.error,
+      error: errorMessage,
     });
   }
 });
