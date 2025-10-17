@@ -60,6 +60,33 @@ export interface ResponseSuccessInterface {
 }
 
 /**
+ * Interface spécifique pour la réponse de FORGOT PASSWORD
+ */
+export interface ForgotPasswordResponse {
+  success: true;
+  status?: number;
+  message: string;
+  results?: string; // Message de confirmation
+}
+/**
+ * Interface spécifique pour la réponse de FORGOT PASSWORD
+ */
+export interface ResetPasswordResponse {
+  status: true;
+  message: string;
+  results?: string; // Message de confirmation
+}
+
+/**
+ * Interface spécifique pour la réponse de FORGOT PASSWORD
+ */
+export interface ResetPasswordResponse {
+  success: true;
+  message: string;
+  results?: string; // Message de confirmation
+}
+
+/**
  * Type union pour toutes les réponses API possibles
  * TypeScript peut maintenant distinguer les types grâce au champ 'success'
  */
@@ -68,6 +95,7 @@ export type ApiResponse =
   | RegisterResponse
   | ProfileResponse
   | LogoutSuccessResponse
+  | ForgotPasswordResponse
   | ResponseSuccessInterface
   | ResponseErrorInterface;
 

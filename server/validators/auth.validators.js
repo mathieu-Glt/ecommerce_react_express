@@ -40,8 +40,12 @@ const { body, validationResult } = require("express-validator");
 // If no validation errors are found, it calls `next()` to proceed to the next middleware.
 
 const handleValidationErrors = (req, res, next) => {
+  console.log("=== VALIDATION CHECK ===");
+  console.log("req.body:", req.body);
+  console.log("req.body.email:", req.body.email);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log("❌ VALIDATION ERRORS:", errors.array());
     return res.status(400).json({
       success: false,
       errors: errors.array().map((error) => ({
@@ -50,6 +54,7 @@ const handleValidationErrors = (req, res, next) => {
       })),
     });
   }
+  console.log("✅ Validation passed");
   next();
 };
 

@@ -10,8 +10,10 @@ import type {
   LoginCredentials,
   RegisterCredentials,
 } from "../interfaces/user.interface";
-import { registerUser } from "../redux/thunks/authThunk";
+import { loginUser, registerUser } from "../redux/thunks/authThunk";
 import { sendResetPasswordEmail } from "../redux/thunks/forgotPasswordThunk";
+import { resetPasswordThunk } from "../redux/thunks/resetPasswordThunk";
+import type { DataResetPassword } from "../interfaces/resetPassword";
 
 /**
  * Custom hook for authentication management
@@ -152,20 +154,22 @@ export const useAuth = () => {
             setRefreshTokenStorage(refreshToken);
           }
 
+          toast.showSuccess(`Welcome back, ${user.firstname}!`);
           console.log("Login successful:", user.email);
 
           // Navigate to dashboard
           navigate("/");
 
           return true;
-        } else {
-          console.error("Login failed:", result.payload);
-          return false;
         }
       } catch (err) {
         console.error("Unexpected error during login:", err);
+        toast.showError("Login failed due to an unexpected error.");
         return false;
       }
+
+      // Ensure a boolean is always returned if login did not succeed
+      return false;
     },
     [
       dispatch,
@@ -177,7 +181,7 @@ export const useAuth = () => {
   );
 
   /**
-   * Reset password functionality
+   * Forgot password functionality
    * Memoized function to prevent recreation on each render
    * Currently a placeholder for future implementation
    * @param email - User's email address
@@ -188,15 +192,59 @@ export const useAuth = () => {
   const forgotResetPassword = useCallback(
     async (email: string): Promise<void> => {
       try {
-        const result = await dispatch(sendResetPasswordEmail({ email }));
-        console.log("Reset password result:", result.payload);
-        if (sendResetPasswordEmail.fulfilled.match(result)) {
-          console.log("Reset password email sent successfully");
-        } else {
-          console.error("Reset password failed:", result.payload);
+        // unwrap() de redux  extrait les données OU lance une exception
+        const result = await dispatch(
+          sendResetPasswordEmail({ email })
+        ).unwrap();
+
+        console.log("Reset password success:", result);
+        toast.showSuccess(
+          result.message || "Reset link has been sent to your email."
+        );
+      } catch (error: any) {
+        console.error("Reset password error:", error);
+        const errorMessage =
+          error?.error ||
+          error?.message ||
+          "Failed to send reset password email";
+        toast.showError(errorMessage);
+      }
+    },
+    [dispatch]
+  );
+
+  /**
+   * Reset password functionality
+   * Memoized function to prevent recreation on each render
+   * Currently a placeholder for future implementation
+   * @param password - User's password
+   * @param confirmPassword - User's confirmPassword
+   *
+   * @returns Promise<void>
+   */
+
+  const resetPasswordAuth = useCallback(
+    async (datas: DataResetPassword): Promise<void> => {
+      console.log("resetPasswordAuth datas:", datas);
+      try {
+        if (datas.password !== datas.confirmPassword) {
+          toast.showError("Passwords do not match.");
+          return;
         }
-      } catch (err) {
-        console.error("Unexpected error during password reset:", err);
+        const result = await dispatch(
+          resetPasswordThunk({ password: datas.password, token: datas.token })
+        ).unwrap();
+
+        console.log("Reset password success:", result);
+        toast.showSuccess(
+          result.message || "Reset password has been confirmed."
+        );
+        navigate("/login");
+      } catch (error: any) {
+        console.error("Reset password error:", error);
+        const errorMessage =
+          error?.error || error?.message || "Failed to reset password";
+        toast.showError(errorMessage);
       }
     },
     [dispatch]
@@ -243,6 +291,7 @@ export const useAuth = () => {
         }
       } catch (err) {
         console.error("Unexpected error during registration:", err);
+        toast.showError("Registration failed due to an unexpected error.");
         return false;
       }
     },
@@ -356,6 +405,7 @@ export const useAuth = () => {
       clearLocalStorage,
       updateUserProfile,
       forgotResetPassword,
+      resetPasswordAuth,
     }),
     [
       currentUser,
@@ -370,6 +420,7 @@ export const useAuth = () => {
       clearLocalStorage,
       updateUserProfile,
       forgotResetPassword,
+      resetPasswordAuth,
     ]
   );
 

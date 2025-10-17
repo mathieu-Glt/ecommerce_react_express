@@ -3,3 +3,4 @@ export interface ForgotPasswordState {
   success: string | null;
   error: string | null;
 }
+

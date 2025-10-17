@@ -6,9 +6,10 @@ import type {
 } from "../../interfaces/response.interface";
 import type { ForgotPasswordState } from "../../interfaces/forgotPassword.interface";
 import { sendResetPasswordEmail } from "../thunks/forgotPasswordThunk";
+import type { ResetPasswordState } from "../../interfaces/resetPassword";
 
 // -- Initial state -- //
-const initialState: ForgotPasswordState = {
+const initialState: ResetPasswordState = {
   loading: false,
   success: null,
   error: null,

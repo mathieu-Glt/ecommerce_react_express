@@ -69,7 +69,6 @@ export const LoginPage = () => {
 
   return (
     <div className="login-container">
-      <h1>Sign In</h1>
       <div className="login-background-shapes">
         <div className="shape shape-1"></div>
         <div className="shape shape-2"></div>

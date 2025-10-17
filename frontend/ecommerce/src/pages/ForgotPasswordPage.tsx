@@ -9,29 +9,19 @@ function ForgotPasswordPage() {
     (state) => state.forgotPassword
   );
 
-  //   const [loading, error, success] = useAppSelector(
-  //     (state) => state.forgotPassword
-  //   );
-
-  const handleForgotPassword = async (
-    e: React.FormEvent,
-    email: string
-  ): Promise<void> => {
-    e.preventDefault();
+  const handleForgotPassword = async (email: string): Promise<void> => {
     // setLoading(true);
     // setLoading(false);
-    const result = await forgotResetPassword(email);
-    console.log("Login result:", result.payload);
+    await forgotResetPassword(email);
 
     try {
     } catch (error) {
-        console.error("Forgot password failed:", result.payload);
+      console.error("Forgot password failed:", error);
       //   setError(error as string);
     }
   };
   return (
     <div className="login-container">
-      <h2>Forgot Password</h2>
       <div className="login-background-shapes">
         <div className="shape shape-1"></div>
         <div className="shape shape-2"></div>

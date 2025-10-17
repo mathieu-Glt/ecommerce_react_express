@@ -41,6 +41,10 @@ const ForgotPasswordPage = lazy(() =>
   import("../pages/ForgotPasswordPage").then((m) => ({ default: m.default }))
 );
 
+const ResetPasswordPage = lazy(() =>
+  import("../pages/ResetPasswordPage").then((m) => ({ default: m.default }))
+);
+
 // ==================== PROTECTED PAGES (USER) ====================
 const UserProfilePage = lazy(() =>
   import("../pages/UserProfilePage").then((m) => ({ default: m.default }))
@@ -92,12 +96,16 @@ export const AppRoutes = () => {
           path: "/forgot-password",
           element: SuspenseWrapper(ForgotPasswordPage),
         },
+        {
+          path: "/reset-password/:token",
+          element: SuspenseWrapper(ResetPasswordPage),
+        },
+
+        // ==================== ROUTES SANS HEADER/FOOTER (Auth) ====================
+        { path: "/login", element: SuspenseWrapper(LoginPage) },
+        { path: "/register", element: SuspenseWrapper(RegisterPage) },
       ],
     },
-
-    // ==================== ROUTES SANS HEADER/FOOTER (Auth) ====================
-    { path: "/login", element: SuspenseWrapper(LoginPage) },
-    { path: "/register", element: SuspenseWrapper(RegisterPage) },
 
     // ==================== ADMIN ROUTES (Layout avec RequireAdminRoleAccess) ====================
     {

@@ -46,10 +46,24 @@ class ResetPasswordService {
    */
   async createPasswordResetToken(userId, userEmail, userName) {
     // Generates a cryptographically secure random token
+    // Génère 32 bytes aléatoires → converti en hexadécimal
+    // Résultat : "a3f7b2c9d1e4f8a6b5c3d2e1f9a7b4c6d3e2f1a8b7c5d4e3f2a1b9c8d7e6f5a4"
+    // 32 bytes = 256 bits = sécurisé pour un token
+    // 32 bytes * 8 bits/byte = 256 bits
+    // 32 bytes → 64 caractères hexadécimaux (2 caractères par byte) 1 byte = 8 bits = 2 caractères hex
+    // 1 byte = 2 caractères hexadécimaux
+    // 1 byte = 8 bits
+    // 1 byte = 2 hex characters = 256 valeurs possibles (0- 255) en hexa -> (00 à FF) donc 32 bytes = 64 caractères hex
     const token = crypto.randomBytes(32).toString("hex");
 
     // Hash the token with bcrypt for secure storage
+    // Plus le nombre est élevé, plus c'est sécurisé (mais lent)
+    // 10 = bon compromis sécurité/performance
+    // lien utile : https://nordvpn.com/fr/blog/what-is-bcrypt/
+    //           https://en.wikipedia.org/wiki/Bcrypt -  https://www.npmjs.com/package/bcrypt
     const saltRounds = 10;
+    // Transforme le token en hash impossible à inverser
+    // Résultat : "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"
     const hashedToken = await bcrypt.hash(token, saltRounds);
 
     // Store both the plain token (for lookup) and hashed token (for security)
@@ -61,7 +75,7 @@ class ResetPasswordService {
 
     if (result.success) {
       // Generate the password reset link
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
       const resetLink = `${frontendUrl}/reset-password/${token}`;
 
       console.log("Reset link generated:", resetLink);
