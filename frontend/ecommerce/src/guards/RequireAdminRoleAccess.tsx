@@ -1,18 +1,21 @@
-// src/guards/RequireAdminRoleAccess.tsx
-import React from "react";
-import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useUserContext } from "../context/userContext";
+import React from "react";
+import PageLoader from "../components/LoaderPage/PageLoader";
 
 interface RequireAdminRoleAccessProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const RequireAdminRoleAccess: React.FC<RequireAdminRoleAccessProps> = ({
   children,
 }) => {
-  // Utilise ton contexte
-  const { user, isAuthenticated } = useUserContext();
+  const { user, isAuthenticated, loading } = useUserContext();
+
+  // Attente pendant le chargement
+  if (loading) {
+    return <PageLoader />;
+  }
 
   // Pas connecté → Redirige vers login
   if (!isAuthenticated || !user) {
@@ -24,6 +27,5 @@ export const RequireAdminRoleAccess: React.FC<RequireAdminRoleAccessProps> = ({
     return <Navigate to="/" replace />;
   }
 
-  // Admin confirmé  -> Affiche les enfants
   return <>{children}</>;
 };

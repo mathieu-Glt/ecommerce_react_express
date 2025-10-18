@@ -1,171 +1,241 @@
 import { useState, useEffect, useCallback } from "react";
-import { useUserContext } from "../context/userContext";
-import { useAuth } from "./useAuth";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+// import { useUser } from "../contexts/userContext";
 
-// Constants
-const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const SESSION_WARNING_TIME = 60 * 1000; // 1 minute avant expiration
-const CHECK_INTERVAL = 30 * 1000; // Vérifier toutes les 30 secondes
+const SESSION_CHECK_INTERVAL = 30000; // 30 secondes
+const SESSION_WARNING_TIME = 60000; // 1 minute avant expiration
 
-// Types
+interface User {
+  // Définir les propriétés de l'utilisateur selon votre modèle
+  [key: string]: any;
+}
+
 interface SessionManagerReturn {
   sessionExpired: boolean;
   showWarning: boolean;
   timeUntilExpiry: number;
   refreshSession: () => void;
   forceLogout: () => void;
+  updateActivity: () => void;
 }
 
-/**
- * Custom hook for managing user session expiration
- *
- * Monitors user activity and displays warnings before session expires.
- * Automatically logs out users after session timeout.
- *
- * @returns Session state and management functions
- *
- * @example
- * const { showWarning, refreshSession, forceLogout } = useSessionManager();
- */
-const useSessionManager = (): SessionManagerReturn => {
-  const { user, token } = useUserContext();
-  const { logout } = useAuth();
-
+function useSessionManager(): SessionManagerReturn {
   const [sessionExpired, setSessionExpired] = useState<boolean>(false);
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [timeUntilExpiry, setTimeUntilExpiry] = useState<number>(0);
+  const { user, logout } = useUser();
+  const [token] = useLocalStorage<string | null>("token", null);
 
-  /**
-   * Get last activity timestamp from sessionStorage
-   */
-  const getLastActivity = (): number => {
-    const lastActivity = sessionStorage.getItem("lastActivity");
-    return lastActivity ? parseInt(lastActivity, 10) : Date.now();
-  };
-
-  /**
-   * Update last activity timestamp
-   */
-  const updateActivity = useCallback((): void => {
-    if (user && token) {
-      sessionStorage.setItem("lastActivity", Date.now().toString());
-
-      // Reset warnings if session was previously expiring
-      if (showWarning || sessionExpired) {
-        setShowWarning(false);
-        setSessionExpired(false);
-      }
-    }
-  }, [user, token, showWarning, sessionExpired]);
-
-  /**
-   * Check session status and show warnings if needed
-   */
+  // Vérifier l'état de la session
   const checkSessionStatus = useCallback((): void => {
-    if (!user || !token) return;
+    const sessionUser = sessionStorage.getItem("user");
+    const sessionToken = sessionStorage.getItem("token");
+    const lastActivity = sessionStorage.getItem("lastActivity");
 
     const now = Date.now();
-    const lastActivity = getLastActivity();
-    const timeSinceLastActivity = now - lastActivity;
-    const timeRemaining = SESSION_TIMEOUT - timeSinceLastActivity;
+    const sessionTimeout = 30 * 60 * 1000; // 30 minutes
+    const timeSinceLastActivity = lastActivity
+      ? now - parseInt(lastActivity)
+      : 0;
 
-    // Session has expired
-    if (timeRemaining <= 0) {
-      setSessionExpired(true);
-      setShowWarning(true);
-      setTimeUntilExpiry(0);
+    console.log("useSessionManager - checkSessionStatus:");
+    console.log("  sessionUser:", sessionUser ? "Présent" : "Absent");
+    console.log("  sessionToken:", sessionToken ? "Présent" : "Absent");
+    console.log("  lastActivity:", lastActivity);
+    console.log("  timeSinceLastActivity:", timeSinceLastActivity, "ms");
+    console.log("  sessionTimeout:", sessionTimeout, "ms");
+    console.log("  user:", user ? "Présent" : "Absent");
+    console.log("  token:", token ? "Présent" : "Absent");
+
+    // Ne pas afficher la popup si l'utilisateur vient de se connecter
+    // Si pas de session mais qu'on a un user/token, synchroniser automatiquement
+    if ((!sessionUser || !sessionToken) && (user || token)) {
+      console.log(
+        "useSessionManager - Session manquante, synchronisation automatique"
+      );
+      // Synchroniser automatiquement au lieu d'afficher la popup
+      sessionStorage.setItem("user", JSON.stringify(user));
+      sessionStorage.setItem("token", token || "");
+      sessionStorage.setItem("lastActivity", Date.now().toString());
+      setShowWarning(false);
+      setSessionExpired(false);
       return;
     }
 
-    // Show warning if session will expire soon
-    if (timeRemaining <= SESSION_WARNING_TIME) {
+    // Si la session a expiré
+    if (lastActivity && timeSinceLastActivity > sessionTimeout) {
+      console.log("useSessionManager - Session expirée, affichage popup");
+      setSessionExpired(true);
       setShowWarning(true);
-      setTimeUntilExpiry(Math.floor(timeRemaining / 1000));
+      return;
+    }
+
+    // Si la session va expirer bientôt (dans les 30 secondes pour le test)
+    if (lastActivity && timeSinceLastActivity > sessionTimeout - 30000) {
+      console.log(
+        "useSessionManager - Session va expirer, affichage avertissement"
+      );
+      setShowWarning(true);
+      setTimeUntilExpiry(
+        Math.max(0, Math.floor((sessionTimeout - timeSinceLastActivity) / 1000))
+      );
     } else {
+      console.log("useSessionManager - Session OK, pas de popup");
       setShowWarning(false);
       setSessionExpired(false);
     }
   }, [user, token]);
 
-  /**
-   * Refresh the session and reset the timer
-   */
-  const refreshSession = useCallback((): void => {
-    if (!user || !token) {
-      forceLogout();
-      return;
+  // Mettre à jour l'activité utilisateur
+  const updateActivity = useCallback((): void => {
+    if (user || token) {
+      sessionStorage.setItem("lastActivity", Date.now().toString());
+      // Ne pas fermer automatiquement la popup avec l'activité
+      // setSessionExpired(false);
+      // setShowWarning(false);
     }
-
-    // Update activity timestamp
-    sessionStorage.setItem("lastActivity", Date.now().toString());
-
-    // Reset states
-    setSessionExpired(false);
-    setShowWarning(false);
-    setTimeUntilExpiry(0);
   }, [user, token]);
 
-  /**
-   * Force logout and clear all session data
-   */
+  // Rafraîchir la session
+  const refreshSession = useCallback((): void => {
+    console.log("useSessionManager - Rafraîchissement de session...");
+
+    // Utiliser les valeurs actuelles de sessionStorage ou localStorage
+    const currentUser: User | null =
+      user || JSON.parse(sessionStorage.getItem("user") || "null");
+    const currentToken: string | null = token || sessionStorage.getItem("token");
+
+    if (currentUser && currentToken) {
+      // Synchroniser sessionStorage avec localStorage
+      sessionStorage.setItem("user", JSON.stringify(currentUser));
+      sessionStorage.setItem("token", currentToken);
+      sessionStorage.setItem("lastActivity", Date.now().toString());
+
+      // S'assurer que localStorage est à jour
+      localStorage.setItem("user", JSON.stringify(currentUser));
+      localStorage.setItem("token", currentToken);
+
+      // Réinitialiser les états
+      setSessionExpired(false);
+      setShowWarning(false);
+
+      console.log("useSessionManager - Session rafraîchie avec succès");
+    } else {
+      console.log(
+        "useSessionManager - Impossible de rafraîchir la session (user ou token manquant)"
+      );
+      // Si pas de données valides, déconnecter directement
+      try {
+        sessionStorage.clear();
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("lastActivity");
+        setSessionExpired(false);
+        setShowWarning(false);
+        logout();
+        window.location.href = "/login";
+      } catch (error) {
+        console.error(
+          "useSessionManager - Erreur lors de la déconnexion:",
+          error
+        );
+      }
+    }
+  }, [user, token, logout]);
+
+  // Déconnecter l'utilisateur
   const forceLogout = useCallback((): void => {
-    // Clear session storage
-    sessionStorage.clear();
+    console.log("useSessionManager - Déconnexion complète en cours...");
 
-    // Reset states
-    setSessionExpired(false);
-    setShowWarning(false);
-    setTimeUntilExpiry(0);
+    try {
+      // Supprimer sessionStorage
+      sessionStorage.clear();
+      console.log("useSessionManager - sessionStorage supprimé");
 
-    // Call context logout
-    logout();
+      // Supprimer localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("lastActivity");
+      console.log("useSessionManager - localStorage supprimé");
+
+      // Réinitialiser les états
+      setSessionExpired(false);
+      setShowWarning(false);
+
+      // Appeler la fonction de déconnexion du contexte
+      logout();
+
+      // Rediriger vers login
+      window.location.href = "/login";
+
+      console.log("useSessionManager - Déconnexion complète terminée");
+    } catch (error) {
+      console.error(
+        "useSessionManager - Erreur lors de la déconnexion:",
+        error
+      );
+    }
   }, [logout]);
 
-  /**
-   * Track user activity events
-   */
+  // Écouter les événements d'activité utilisateur
   useEffect(() => {
-    // Don't track activity if warning modal is shown
-    if (showWarning) return;
-
-    const handleUserActivity = (): void => {
+    const handleUserActivity = (event: Event): void => {
+      const modal = document.querySelector(".modal.show");
+      if (modal && modal.contains(event.target as Node)) {
+        console.log(
+          "useSessionManager - Clic sur la modale, pas de mise à jour d'activité"
+        );
+        return;
+      }
       updateActivity();
     };
 
-    // Events to track
-    const events = ["click", "keypress", "scroll", "mousemove"];
+    // DÉSACTIVER complètement les événements d'activité quand la modale est affichée
+    if (showWarning) {
+      console.log(
+        "useSessionManager - Modale affichée, événements d'activité désactivés"
+      );
+      return;
+    }
+
+    // Événements moins sensibles pour éviter de fermer la popup par accident
+    const events: Array<keyof DocumentEventMap> = [
+      "click", // Clics explicites
+      "keypress", // Frappe clavier
+      "scroll", // Défilement
+    ];
 
     events.forEach((event) => {
-      document.addEventListener(event, handleUserActivity, { passive: true });
+      document.addEventListener(event, handleUserActivity, true);
     });
 
     return () => {
       events.forEach((event) => {
-        document.removeEventListener(event, handleUserActivity);
+        document.removeEventListener(event, handleUserActivity, true);
       });
     };
-  }, [updateActivity, showWarning]);
+  }, [updateActivity, showWarning]); // Ajouter showWarning comme dépendance
 
-  /**
-   * Initialize session on user login
-   */
+  // Vérifier la session régulièrement
   useEffect(() => {
-    if (user && token) {
-      sessionStorage.setItem("lastActivity", Date.now().toString());
-    }
-  }, [user, token]);
-
-  /**
-   * Periodically check session status
-   */
-  useEffect(() => {
-    const interval = setInterval(checkSessionStatus, CHECK_INTERVAL);
-
-    // Check immediately on mount
-    checkSessionStatus();
+    const interval = setInterval(() => {
+      checkSessionStatus();
+    }, SESSION_CHECK_INTERVAL);
 
     return () => clearInterval(interval);
   }, [checkSessionStatus]);
+
+  // Vérifier au chargement
+  useEffect(() => {
+    checkSessionStatus();
+  }, [checkSessionStatus]);
+
+  // Mettre à jour l'activité quand l'utilisateur se connecte
+  useEffect(() => {
+    if (user && token) {
+      updateActivity();
+    }
+  }, [user, token, updateActivity]);
 
   return {
     sessionExpired,
@@ -173,7 +243,8 @@ const useSessionManager = (): SessionManagerReturn => {
     timeUntilExpiry,
     refreshSession,
     forceLogout,
+    updateActivity,
   };
-};
+}
 
 export default useSessionManager;

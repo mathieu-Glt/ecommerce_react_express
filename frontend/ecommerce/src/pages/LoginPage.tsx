@@ -27,30 +27,39 @@ export const LoginPage = () => {
     "user",
     null
   );
-  const [tokenStorage, setTokenStorage] = useLocalStorage<string | null>(
-    "token",
+  const [tokenStorage, setTokenStorage] = useLocalStorage<string>("token", "");
+  const [refreshTokenStorage, setRefreshTokenStorage] = useLocalStorage<string>(
+    "refreshToken",
     ""
   );
-  const [refreshTokenStorage, setRefreshTokenStorage] = useLocalStorage<
-    string | null
-  >("refreshToken", "");
-
   const handleLogin = async (
     email: string,
     password: string,
     rememberMe = false
   ): Promise<void> => {
     try {
-      const result = await login(email, password, rememberMe);
-      console.log("Login result:", result.payload);
+      const result = await login(email, password);
+      console.log("Login result:", result);
 
-      if (loginUser.fulfilled.match(result)) {
-        const { user, token, refreshToken } =
-          result.payload as ExtractLoginResponse;
+      // Vérifie directement le succès
+      if (result.success) {
+        if (rememberMe) {
+          // Stocke dans le localStorage via useLocalStorage
+          setUserStorage(result.results.user);
+          setTokenStorage(result.results.token);
+          setRefreshTokenStorage(result.results.refreshToken);
+        }
+
+        console.log(
+          "Login successful:",
+          result.results.user,
+          result.results.token,
+          result.results.refreshToken
+        );
 
         navigate("/");
       } else {
-        console.error("Login failed:", result.payload);
+        console.error("Login failed:", result);
       }
     } catch (err) {
       console.error("Unexpected error during login:", err);

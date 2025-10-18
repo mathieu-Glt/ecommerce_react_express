@@ -4,6 +4,7 @@ import ResetPasswordForm from "../components/form/resetPasswordForm";
 import { useParams } from "react-router-dom";
 
 function ResetPasswordPage() {
+  // index.ts sera default: m.default }
   const params = useParams();
   const { resetPasswordAuth } = useAuth();
   const { loading, error, success } = useAppSelector(
@@ -46,4 +47,4 @@ function ResetPasswordPage() {
   );
 }
 
-export default ResetPasswordPage;
+export default ResetPasswordPage; // sera default: m.default dans fichier routes/index.ts

@@ -27,15 +27,30 @@ const productService = ProductServiceFactory.createProductService(
  * @access Public
  * @returns {Array} 200 - List of all products
  * @returns {Object} 404 - No products found
+ * @returns {Object} 500 - Internal server error
  */
 exports.getProducts = asyncHandler(async (req, res) => {
-  console.log("🔍 getProducts called");
-  const products = await productService.getProducts();
-  console.log("📦 Products retrieved:", products);
-  if (!products) {
-    return res.status(404).json({ message: "No products found" });
+  try {
+    const products = await productService.getProducts();
+
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
-  res.status(200).json(products);
 });
 
 /**

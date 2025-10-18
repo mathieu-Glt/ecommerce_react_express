@@ -1,6 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import type { Reducer } from "redux";
-import authReducer from "./authSlice";
+import authSlice from "./authSlice";
+import productSlice from "./productSlice";
+import cartSlice from "./cartSlice";
 import forgotPasswordReducer from "./forgotPasswordSlice";
 // import cartReducer from './cartSlice';
 // import categoryReducer from './categorySlice';
@@ -10,13 +11,13 @@ import forgotPasswordReducer from "./forgotPasswordSlice";
 // import usersReducer from './userSlice';
 // import orderReducer from './orderSlice';
 export const rootReducer = combineReducers({
-  // cart: cartReducer,
+  cart: cartSlice,
   // category: categoryReducer,
   // sub: subCategoryReducer,
-  // products: productReducer,
+  products: productSlice,
   // comments: commentsReducer,
   // users: usersReducer,
-  auth: authReducer,
+  auth: authSlice,
   forgotPassword: forgotPasswordReducer,
   // orders: orderReducer,
 });

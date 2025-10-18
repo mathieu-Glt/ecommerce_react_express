@@ -9,4 +9,4 @@ const NotFoundPage = () => {
   );
 };
 
-export default NotFoundPage;
+export default NotFoundPage; // sera default: m.default dans fichier routes/index.ts

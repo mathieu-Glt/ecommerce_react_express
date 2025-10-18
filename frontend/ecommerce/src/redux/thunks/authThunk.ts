@@ -1,32 +1,36 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import type { AxiosResponse } from "axios";
 import type {
   LoginCredentials,
   RegisterCredentials,
   ResponseDataLogin,
   ResponseDataRegister,
+  User,
 } from "../../interfaces/user.interface";
 import type {
   ResponseErrorInterface,
   LogoutSuccessResponse,
   ApiResponse,
+  FetchCurrentUserResponse,
 } from "../../interfaces/response.interface";
-import { signIn, signOut, signUp } from "../../services/api/auth";
+import {
+  getCurrentUser,
+  signIn,
+  signOut,
+  signUp,
+} from "../../services/api/auth";
 import type { RegisterFormData } from "../../interfaces/regsiterProps.interface";
+import { logout } from "../slices/authSlice";
 
+// ==============================
+// 🔐 LOGIN
+// ==============================
 export const loginUser = createAsyncThunk<
   ApiResponse,
   LoginCredentials,
   { rejectValue: ResponseErrorInterface }
 >("auth/loginUser", async (credentials, thunkAPI) => {
   try {
-    // const response: AxiosResponse<ResponseDataLogin> = await axios.post(
-    //   "/api/auth/login",d
-    //   credentials
-    // );
     const response = await signIn(credentials);
-    console.log("Response from signIn:", response);
     const { user, token, refreshToken } = response as ResponseDataLogin;
     return { success: true, results: { user, token, refreshToken } };
   } catch (err: any) {
@@ -37,18 +41,15 @@ export const loginUser = createAsyncThunk<
   }
 });
 
+// ==============================
+// 📝 REGISTER
+// ==============================
 export const registerUser = createAsyncThunk<
   ApiResponse,
   RegisterFormData,
   { rejectValue: ResponseErrorInterface }
 >("auth/registerUser", async (userInfo, thunkAPI) => {
-  console.log("Registering user with info:", userInfo);
   try {
-    // const response: AxiosResponse<ResponseDataRegister> = await axios.post(
-    //   "/api/auth/register",
-    //   userInfo
-    // );
-    // Créer le FormData à partir de userInfo
     const formData = new FormData();
     formData.append("firstname", userInfo.firstname);
     formData.append("lastname", userInfo.lastname);
@@ -56,70 +57,91 @@ export const registerUser = createAsyncThunk<
     formData.append("password", userInfo.password);
     formData.append("confirmPassword", userInfo.confirmPassword || "");
 
-    // Ajouter l'adresse si présente
-    if (userInfo.address) {
-      formData.append("address", userInfo.address);
-    }
-
-    // Ajouter le fichier si présent
-    if (userInfo.picture instanceof File) {
+    if (userInfo.address) formData.append("address", userInfo.address);
+    if (userInfo.picture instanceof File)
       formData.append("picture", userInfo.picture);
-      console.log("📎 File added to FormData:", {
-        name: userInfo.picture.name,
-        size: userInfo.picture.size,
-        type: userInfo.picture.type,
-      });
-    }
-    console.log("📦 FormData content:");
-    for (let [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}:`, {
-          name: value.name,
-          size: value.size,
-          type: value.type,
-        });
-      } else {
-        console.log(`  ${key}:`, value);
-      }
-    }
+
     const response = await signUp(formData);
-    console.log("Response from signUp:", response);
     const { user } = response as ResponseDataRegister;
+
     return { success: true, results: { user } };
   } catch (err: any) {
-    console.error("❌ Registration error:", err);
-
-    // ✅ Extraction robuste du message d'erreur
     const errorMessage =
-      err.response?.data?.error || // Backend : { error: "..." }
-      err.response?.data?.message || // Backend : { message: "..." }
-      err.message || // Axios error message
-      "Registration failed"; // Fallback
+      err.response?.data?.error ||
+      err.response?.data?.message ||
+      err.message ||
+      "Registration failed";
 
-    console.log("📤 Rejecting with error:", errorMessage);
-
-    return thunkAPI.rejectWithValue({
-      success: false,
-      error: errorMessage,
-    });
+    return thunkAPI.rejectWithValue({ success: false, error: errorMessage });
   }
 });
 
+// ==============================
+// 🚪 LOGOUT
+// ==============================
 export const logoutUser = createAsyncThunk<
   LogoutSuccessResponse,
-  {},
+  void,
   { rejectValue: ResponseErrorInterface }
 >("auth/logoutUser", async (_, thunkAPI) => {
   try {
-    const response = await signOut();
-    return {
-      success: true,
-      message: response.message || "Logout successful",
-    };
+    const response = await signOut(); // Appel à l'API pour la déconnexion
+    console.log(
+      "🚪authThunk- logoutUser [logoutUser] Logout response:",
+      response
+    );
+    // Nettoyage du localStorage sera géré dans le reducer
+    // Provide a value cast to any to satisfy the action's required-argument type
+    if (response.success) {
+      // Cleanup will be handled in the reducer
+      thunkAPI.dispatch(logout(undefined as any));
+    }
+
+    return { success: true, message: response.message || "Logout successful" };
   } catch (err: any) {
     return thunkAPI.rejectWithValue({
       success: false,
       error: err?.response?.data?.message || "Logout failed",
     });
+  }
+});
+
+// ==============================
+// 👤 FETCH CURRENT USER
+// ==============================
+export const fetchCurrentUser = createAsyncThunk<
+  FetchCurrentUserResponse,
+  void,
+  { rejectValue: string }
+>("auth/fetchCurrentUser", async (_, { rejectWithValue }) => {
+  try {
+    console.log("🔍 [fetchCurrentUser] Récupération de l'utilisateur...");
+
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      try {
+        const user = JSON.parse(storedUser) as User;
+        return { success: true, user, token: storedToken };
+      } catch (parseError) {
+        console.error("❌ [fetchCurrentUser] Erreur parsing user:", parseError);
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+      }
+    }
+
+    if (!storedToken) return rejectWithValue("No authentication token found");
+
+    const response = await getCurrentUser(storedToken);
+
+    if (response.success && response.user) {
+      return { success: true, user: response.user, token: storedToken };
+    }
+
+    return rejectWithValue("Invalid user data received from server");
+  } catch (error: any) {
+    console.error("❌ [fetchCurrentUser] Erreur:", error);
+    return rejectWithValue(error.message || "Failed to fetch current user");
   }
 });

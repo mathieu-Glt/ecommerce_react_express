@@ -76,7 +76,8 @@ export const AppRoutes = () => {
       children: [
         // PUBLIC ROUTES
         { path: "/", element: SuspenseWrapper(HomePage) },
-        { path: "/products/:id", element: SuspenseWrapper(ProductPage) },
+        { path: "/products", element: SuspenseWrapper(ProductPage) },
+        // { path: "/products/:id", element: SuspenseWrapper(ProductDetails) },
         { path: "/cart", element: SuspenseWrapper(CartPage) },
         {
           path: "/order-confirmation",
@@ -151,6 +152,7 @@ export const ROUTES = {
   CART: "/cart",
   ORDER_CONFIRMATION: "/order-confirmation",
   PROFILE: "/profile",
+  LOGOUT: "/logout",
   ADMIN: {
     ROOT: "/admin",
     DASHBOARD: "/admin/dashboard",

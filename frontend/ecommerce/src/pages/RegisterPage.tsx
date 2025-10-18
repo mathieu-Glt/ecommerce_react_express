@@ -11,7 +11,8 @@ import type {
 import RegisterForm from "../components/form/RegisterForm";
 import type { RegisterFormData } from "../interfaces/regsiterProps.interface";
 import type { ErrorObject } from "../interfaces/regsiterProps.interface";
-
+// importe de cette façon dans le fichier routes/index.ts
+// car pas "default" pour l'export de ce composant ({ default: m.LoginPage }))
 export const RegisterPage = () => {
   const { register } = useAuth();
   const { loading, error, user } = useAppSelector((state) => state.auth);

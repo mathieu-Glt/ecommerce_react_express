@@ -4,8 +4,13 @@ import { Link } from "react-router-dom";
 import { ROUTES } from "../../routes";
 import logo from "../../assets/logo.png";
 import "./NavBar.css";
+import { useUserContext } from "../../context/userContext";
+import { useAuth } from "../../hooks/useAuth";
+import LogoutButton from "../Logout/LogoutButton";
 
 export const Navigation: React.FC = () => {
+  // const {user, isAuthenticated} = useUserContext();
+  const { user, isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -68,6 +73,7 @@ export const Navigation: React.FC = () => {
             >
               Sign up
             </Link>
+            {isAuthenticated && user ? <LogoutButton /> : null}
 
             {/* Dropdown */}
             {/* <div className="nav-dropdown">

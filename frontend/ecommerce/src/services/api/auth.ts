@@ -10,6 +10,7 @@ import type {
 } from "../../interfaces/user.interface";
 import type {
   ApiResponse,
+  CurrentUserResponse,
   LoginResponse,
 } from "../../interfaces/response.interface";
 import { API_ROUTES } from "../constants/api-routes";
@@ -196,7 +197,8 @@ export async function getUserProfile(): Promise<ApiResponse | undefined> {
  */
 export async function signOut(): Promise<ApiResponse> {
   try {
-    const logout = await api.get(API_ROUTES.AUTH.LOGOUT);
+    const logout = await api.post(API_ROUTES.AUTH.LOGOUT);
+    console.log("🚪 ~ file: auth.tsx:151 ~ signOut ~ logout:", logout);
     return logout.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -236,3 +238,72 @@ export async function destroyTokenUser() {
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
 }
+
+/**
+ * Récupère l'utilisateur actuellement connecté
+ *
+ * @param token - JWT token pour l'authentification
+ * @returns Données utilisateur si authentifié
+ *
+ * @throws Error si token invalide (401) ou utilisateur introuvable (404)
+ *
+ * @example
+ * ```typescript
+ * const response = await authService.getCurrentUser(token);
+ * if (response.success) {
+ *   console.log("User:", response.user);
+ * }
+ * ```
+ */
+export async function getCurrentUser(
+  token: string
+): Promise<CurrentUserResponse> {
+  try {
+    const response: AxiosResponse<CurrentUserResponse> = await api.get(
+      API_ROUTES.AUTH.CURRENT_USER,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Pour les cookies de session
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data?.error);
+    }
+    throw new Error("Failed to fetch current user");
+  }
+}
+
+/// reflexion a la creation d'une classe service
+// class AuthService {
+//   private api: AxiosInstance;
+//
+//   constructor(api: AxiosInstance) {
+//     this.api = api;
+//   }
+//
+//   async getCurrentUser(token: string): Promise<CurrentUserResponse> {
+//     try {
+//       const response: AxiosResponse<CurrentUserResponse> = await this.api.get(
+//         API_ROUTES.AUTH.CURRENT_USER,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             "Content-Type": "application/json",
+//           },
+//           withCredentials: true, // Pour les cookies de session
+//         }
+//       );
+//       return response.data;
+//     } catch (error) {
+//       if (error instanceof AxiosError) {
+//         throw new Error(error.response?.data?.error);
+//       }
+//       throw new Error("Failed to fetch current user");
+//     }
+//   }
+// }

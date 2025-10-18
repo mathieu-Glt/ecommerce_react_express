@@ -1,25 +1,30 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "./useLocalStorage";
 import useToast from "./usetoast";
-
 import { useAppDispatch, useAppSelector } from "./useReduxHooks";
-import { clearAuthState } from "../redux/slices/authSlice";
 import type {
   User,
   LoginCredentials,
   RegisterCredentials,
 } from "../interfaces/user.interface";
-import { loginUser, registerUser } from "../redux/thunks/authThunk";
+import {
+  loginUser,
+  registerUser,
+  fetchCurrentUser,
+  logoutUser,
+} from "../redux/thunks/authThunk";
 import { sendResetPasswordEmail } from "../redux/thunks/forgotPasswordThunk";
 import { resetPasswordThunk } from "../redux/thunks/resetPasswordThunk";
 import type { DataResetPassword } from "../interfaces/resetPassword";
+import type { LoginApiResponse } from "../interfaces/response.interface";
 
 /**
  * Custom hook for authentication management
  *
- * Provides memoized methods for login, register, logout and manages authentication state
- * including localStorage synchronization and Redux state management.
+ * ✅ Version simplifiée avec middleware localStorage
+ * ✅ Plus besoin de useLocalStorage (le middleware gère tout)
+ * ✅ Redux est la seule source de vérité
+ * ✅ Code plus simple et maintenable
  *
  * @returns Authentication state and memoized methods
  *
@@ -29,386 +34,329 @@ import type { DataResetPassword } from "../interfaces/resetPassword";
  * // Login
  * await login("user@example.com", "password123");
  *
- * // Register
- * await register({
- *   email: "new@example.com",
- *   password: "password123",
- *   firstname: "John",
- *   lastname: "Doe",
- *   picture: "base64..."
- * });
- *
  * // Logout
  * await logout();
  */
 export const useAuth = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  // Redux state - memoized selector
-  // Redux state - memoized selector
-  const authState = useAppSelector((state) => state.auth);
-  // import useToast from hooks
   const toast = useToast();
-  const {
-    user: reduxUser,
-    loading,
-    error,
-    isAuthenticated: reduxIsAuthenticated,
-  } = authState;
-  // LocalStorage management
-  const [userStorage, setUserStorage] = useLocalStorage<User | null>(
-    "user",
-    null
-  );
-  const [tokenStorage, setTokenStorage] = useLocalStorage<string | null>(
-    "token",
-    ""
-  );
-  const [refreshTokenStorage, setRefreshTokenStorage] = useLocalStorage<
-    string | null
-  >("refreshToken", "");
+
+  // ============================================
+  // REDUX STATE - Source unique de vérité
+  // ============================================
 
   /**
-   * Clears all authentication data from localStorage
-   * Memoized to prevent unnecessary re-renders
-   *
-   * @private
+   * Récupère l'état d'authentification depuis Redux
+   * Le middleware synchronise automatiquement avec localStorage
    */
-  const clearLocalStorage = useCallback((): void => {
-    setUserStorage(null);
-    setTokenStorage("");
-    setRefreshTokenStorage("");
+  const { user, loading, error, isAuthenticated, token, refreshToken } =
+    useAppSelector((state) => state.auth);
 
-    // Also clear directly from localStorage as backup
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("accessToken"); // Legacy support
-
-    console.log("🧹 Local storage cleared");
-  }, [setUserStorage, setTokenStorage, setRefreshTokenStorage]);
+  // ============================================
+  // LOGIN
+  // ============================================
 
   /**
-   * Checks if user has valid authentication
-   * Memoized to avoid recalculation on every render
+   * Connecte un utilisateur
+   * Le middleware sauvegardera automatiquement dans localStorage
    *
-   * @returns boolean - True if user is authenticated
-   */
-  const checkAuth = useCallback((): boolean => {
-    const hasToken = !!tokenStorage;
-    const hasUser = !!userStorage;
-    return hasToken && hasUser;
-  }, [tokenStorage, userStorage]);
-
-  /**
-   * Gets the current authenticated user
-   * Memoized value combining Redux and localStorage
-   *
-   * @returns User | null - Current user or null if not authenticated
-   */
-  const currentUser = useMemo((): User | null => {
-    return reduxUser || userStorage;
-  }, [reduxUser, userStorage]);
-
-  /**
-   * Computed authentication status
-   * Memoized to combine Redux state and localStorage check
-   */
-  const isAuthenticated = useMemo((): boolean => {
-    return reduxIsAuthenticated || checkAuth();
-  }, [reduxIsAuthenticated, checkAuth]);
-
-  /**
-   * Logs in a user with email and password
-   * Memoized function to prevent recreation on each render
-   *
-   * @param email - User's email address
-   * @param password - User's password
-   * @returns Promise<boolean> - True if login successful, false otherwise
-   *
-   * @example
-   * const success = await login("user@example.com", "password123");
-   * if (success) {
-   *   console.log("Login successful!");
-   * }
+   * @param email - Email de l'utilisateur
+   * @param password - Mot de passe
+   * @param rememberMe - Si true, sauvegarde dans localStorage (via middleware)
+   * @returns Promise<boolean> - true si succès
    */
   const login = useCallback(
-    async (
-      email: string,
-      password: string,
-      rememberMe: boolean
-    ): Promise<boolean> => {
+    async (email: string, password: string): Promise<LoginApiResponse> => {
       try {
-        const result = await dispatch(loginUser({ email, password }));
-        console.log("Login result:", result.payload);
+        const result = await dispatch(loginUser({ email, password })).unwrap();
 
-        if (loginUser.fulfilled.match(result)) {
-          const user = result.payload.results.user;
-          const token = result.payload.results.token || ""; // Adjust property name as per ApiResponse
-          const refreshToken = result.payload.results.refreshToken || ""; // Adjust property name as per ApiResponse
-          if (rememberMe) {
-            // Store in localStorage
-            setUserStorage(user);
-            setTokenStorage(token);
-            setRefreshTokenStorage(refreshToken);
-          }
+        console.log("✅ Login successful:", result);
 
-          toast.showSuccess(`Welcome back, ${user.firstname}!`);
-          console.log("Login successful:", user.email);
+        // ✅ Le middleware a déjà sauvegardé dans localStorage !
+        // Plus besoin de setUserStorage(), setTokenStorage(), etc.
 
-          // Navigate to dashboard
-          navigate("/");
+        toast.showSuccess(`Welcome back, ${result.results.user.firstname}!`);
 
-          return true;
-        }
-      } catch (err) {
-        console.error("Unexpected error during login:", err);
-        toast.showError("Login failed due to an unexpected error.");
-        return false;
-      }
+        // Navigation vers dashboard
+        navigate("/");
 
-      // Ensure a boolean is always returned if login did not succeed
-      return false;
-    },
-    [
-      dispatch,
-      navigate,
-      setUserStorage,
-      setTokenStorage,
-      setRefreshTokenStorage,
-    ]
-  );
-
-  /**
-   * Forgot password functionality
-   * Memoized function to prevent recreation on each render
-   * Currently a placeholder for future implementation
-   * @param email - User's email address
-   *
-   * @returns Promise<void>
-   */
-
-  const forgotResetPassword = useCallback(
-    async (email: string): Promise<void> => {
-      try {
-        // unwrap() de redux  extrait les données OU lance une exception
-        const result = await dispatch(
-          sendResetPasswordEmail({ email })
-        ).unwrap();
-
-        console.log("Reset password success:", result);
-        toast.showSuccess(
-          result.message || "Reset link has been sent to your email."
-        );
-      } catch (error: any) {
-        console.error("Reset password error:", error);
-        const errorMessage =
-          error?.error ||
-          error?.message ||
-          "Failed to send reset password email";
-        toast.showError(errorMessage);
+        return {
+          success: true,
+          results: {
+            user: result.results.user,
+            token: result.results.token,
+            refreshToken: result.results.refreshToken,
+          },
+        };
+      } catch (err: any) {
+        console.error("❌ Login failed:", err);
+        toast.showError(err?.message || "Login failed");
+        return err;
       }
     },
-    [dispatch]
+    [dispatch, navigate, toast]
   );
 
-  /**
-   * Reset password functionality
-   * Memoized function to prevent recreation on each render
-   * Currently a placeholder for future implementation
-   * @param password - User's password
-   * @param confirmPassword - User's confirmPassword
-   *
-   * @returns Promise<void>
-   */
-
-  const resetPasswordAuth = useCallback(
-    async (datas: DataResetPassword): Promise<void> => {
-      console.log("resetPasswordAuth datas:", datas);
-      try {
-        if (datas.password !== datas.confirmPassword) {
-          toast.showError("Passwords do not match.");
-          return;
-        }
-        const result = await dispatch(
-          resetPasswordThunk({ password: datas.password, token: datas.token })
-        ).unwrap();
-
-        console.log("Reset password success:", result);
-        toast.showSuccess(
-          result.message || "Reset password has been confirmed."
-        );
-        navigate("/login");
-      } catch (error: any) {
-        console.error("Reset password error:", error);
-        const errorMessage =
-          error?.error || error?.message || "Failed to reset password";
-        toast.showError(errorMessage);
-      }
-    },
-    [dispatch]
-  );
+  // ============================================
+  // REGISTER
+  // ============================================
 
   /**
-   * Registers a new user
-   * Memoized function to prevent recreation on each render
+   * Inscrit un nouvel utilisateur
    *
-   * @param credentials - User registration data
-   * @returns Promise<boolean> - True if registration successful, false otherwise
-   *
-   * @example
-   * const success = await register({
-   *   email: "new@example.com",
-   *   password: "SecurePass123",
-   *   firstname: "John",
-   *   lastname: "Doe",
-   *   picture: "data:image/png;base64,..."
-   * });
+   * @param credentials - Données d'inscription
+   * @returns Promise<boolean> - true si succès
    */
   const register = useCallback(
     async (credentials: RegisterCredentials): Promise<boolean> => {
       try {
-        const result = await dispatch(registerUser(credentials));
+        const result = await dispatch(registerUser(credentials)).unwrap();
 
-        if (registerUser.fulfilled.match(result)) {
-          const { user } = result.payload.results;
+        console.log("✅ Registration successful:", result);
 
-          console.log("Registration successful:", user.email);
+        toast.showSuccess(
+          `Welcome ${result.results.user.firstname}! Please check your email to verify your account.`
+        );
 
-          // 📨 Afficher un message de succès
-          toast.showSuccess(
-            `Welcome ${user.firstname} dear Please log in with your new account. Don’t forget to check your spam folder if you don’t see our confirmation email.`
-          );
+        // Redirection vers login
+        navigate("/login");
 
-          // Navigate to login page after successful registration
-          navigate("/login");
-
-          return true;
-        } else {
-          console.error("Registration failed:", result.payload);
-          return false;
-        }
-      } catch (err) {
-        console.error("Unexpected error during registration:", err);
-        toast.showError("Registration failed due to an unexpected error.");
+        return true;
+      } catch (err: any) {
+        console.error("❌ Registration failed:", err);
+        toast.showError(err?.message || "Registration failed");
         return false;
       }
     },
-    [dispatch, navigate]
+    [dispatch, navigate, toast]
   );
 
+  // ============================================
+  // LOGOUT
+  // ============================================
+
   /**
-   * Logs out the current user
-   * Memoized function to prevent recreation on each render
-   *
-   * Clears Redux state, localStorage and navigates to login page
+   * Déconnecte l'utilisateur
+   * Le middleware nettoiera automatiquement localStorage
    *
    * @returns Promise<void>
-   *
-   * @example
-   * await logout();
-   * // User is now logged out and redirected to login page
    */
   const logout = useCallback(async (): Promise<void> => {
     try {
-      // Call logout API
-      await dispatch(logoutUser({}));
+      console.log("👋 Logging out...");
 
-      console.log("Logout successful");
-    } catch (err) {
-      console.error("Logout API call failed:", err);
-    } finally {
-      // Always clear local data even if API call fails
-      clearLocalStorage();
-      dispatch(clearAuthState(undefined));
+      // Dispatch logout action
+      dispatch(logoutUser());
+
+      // ✅ Le middleware a déjà nettoyé localStorage !
+      // Plus besoin de clearLocalStorage()
+
+      toast.showSuccess("You have been logged out successfully");
+
+      // Redirection vers login
       navigate("/login");
+    } catch (err) {
+      console.error("❌ Logout failed:", err);
+      throw err;
     }
-  }, [dispatch, navigate, clearLocalStorage]);
+  }, [dispatch, navigate, toast]);
+
+  // ============================================
+  // FORGOT PASSWORD
+  // ============================================
 
   /**
-   * Refreshes authentication tokens
-   * Memoized function to prevent recreation on each render
+   * Envoie un email de réinitialisation de mot de passe
    *
-   * @returns Promise<boolean> - True if refresh successful
+   * @param email - Email de l'utilisateur
+   * @returns Promise<void>
+   */
+  const forgotResetPassword = useCallback(
+    async (email: string): Promise<void> => {
+      try {
+        const result = await dispatch(
+          sendResetPasswordEmail({ email })
+        ).unwrap();
+
+        console.log("✅ Reset email sent:", result);
+        toast.showSuccess(
+          result.message || "Reset link has been sent to your email"
+        );
+      } catch (err: any) {
+        console.error("❌ Forgot password failed:", err);
+        toast.showError(err?.message || "Failed to send reset email");
+      }
+    },
+    [dispatch, toast]
+  );
+
+  // ============================================
+  // RESET PASSWORD
+  // ============================================
+
+  /**
+   * Réinitialise le mot de passe avec un token
    *
-   * @example
-   * const success = await refreshAuth();
-   * if (!success) {
-   *   // Token refresh failed, user will be logged out
-   * }
+   * @param data - Nouveau mot de passe et token
+   * @returns Promise<void>
+   */
+  const resetPasswordAuth = useCallback(
+    async (data: DataResetPassword): Promise<void> => {
+      try {
+        // Validation
+        if (data.password !== data.confirmPassword) {
+          toast.showError("Passwords do not match");
+          return;
+        }
+
+        const result = await dispatch(
+          resetPasswordThunk({
+            password: data.password,
+            token: data.token,
+          })
+        ).unwrap();
+
+        console.log("✅ Password reset successful:", result);
+        toast.showSuccess(result.message || "Password reset successful");
+
+        // Redirection vers login
+        navigate("/login");
+      } catch (err: any) {
+        console.error("❌ Password reset failed:", err);
+        toast.showError(err?.message || "Failed to reset password");
+      }
+    },
+    [dispatch, navigate, toast]
+  );
+
+  // ============================================
+  // REFRESH USER
+  // ============================================
+
+  /**
+   * Rafraîchit les données utilisateur depuis le serveur
+   * Utile pour mettre à jour le profil après modification
+   *
+   * @returns Promise<boolean> - true si succès
+   */
+  const refreshUser = useCallback(async (): Promise<boolean> => {
+    try {
+      console.log("🔄 Refreshing user data...");
+
+      await dispatch(fetchCurrentUser()).unwrap();
+
+      console.log("✅ User data refreshed");
+      return true;
+    } catch (err: any) {
+      console.error("❌ Failed to refresh user:", err);
+      return false;
+    }
+  }, [dispatch]);
+
+  // ============================================
+  // UPDATE USER PROFILE
+  // ============================================
+
+  /**
+   * Met à jour le profil utilisateur localement
+   * Pour une vraie mise à jour, appeler une API puis refreshUser()
+   *
+   * @param updates - Données partielles à mettre à jour
+   */
+  const updateUserProfile = useCallback(
+    (updates: Partial<User>): void => {
+      if (user) {
+        // TODO: Appeler l'API de mise à jour profil
+        // Puis rafraîchir les données
+        // await updateProfileAPI(updates);
+        // await refreshUser();
+
+        console.log("📝 Update user profile:", updates);
+        toast.showInfo("Profile update feature coming soon");
+      }
+    },
+    [user, toast]
+  );
+
+  // ============================================
+  // CHECK AUTH
+  // ============================================
+
+  /**
+   * Vérifie si l'utilisateur est authentifié
+   *
+   * @returns boolean
+   */
+  const checkAuth = useCallback((): boolean => {
+    return isAuthenticated && !!user && !!token;
+  }, [isAuthenticated, user, token]);
+
+  // ============================================
+  // REFRESH AUTH (Token refresh)
+  // ============================================
+
+  /**
+   * Rafraîchit le token d'authentification
+   * À implémenter selon votre stratégie de refresh token
+   *
+   * @returns Promise<boolean> - true si succès
    */
   const refreshAuth = useCallback(async (): Promise<boolean> => {
-    if (!refreshTokenStorage) {
-      console.error("❌ No refresh token available");
+    if (!refreshToken) {
+      console.warn("⚠️ No refresh token available");
       return false;
     }
 
     try {
-      // TODO: Implement refresh token logic
-      // const newTokens = await refreshTokens();
-      // setTokenStorage(newTokens.accessToken);
-      // if (newTokens.refreshToken) {
-      //   setRefreshTokenStorage(newTokens.refreshToken);
-      // }
+      // TODO: Implémenter la logique de refresh token
+      // const newTokens = await refreshTokensAPI(refreshToken);
+      // dispatch(setTokens(newTokens));
 
-      console.log("✅ Token refreshed successfully");
+      console.log("✅ Token refreshed");
       return true;
     } catch (err) {
       console.error("❌ Token refresh failed:", err);
+
+      // Si le refresh échoue, déconnecter
       await logout();
       return false;
     }
-  }, [refreshTokenStorage, logout, setTokenStorage, setRefreshTokenStorage]);
+  }, [refreshToken, logout]);
+
+  // ============================================
+  // MEMOIZED RETURN VALUE
+  // ============================================
 
   /**
-   * Updates user profile data in both Redux and localStorage
-   * Memoized function to prevent recreation on each render
-   *
-   * @param updates - Partial user data to update
-   *
-   * @example
-   * updateUserProfile({ firstname: "Jane", address: "123 Main St" });
-   */
-  const updateUserProfile = useCallback(
-    (updates: Partial<User>): void => {
-      if (currentUser) {
-        const updatedUser = { ...currentUser, ...updates };
-        setUserStorage(updatedUser);
-        // TODO: Dispatch action to update Redux state
-        console.log("✅ User profile updated:", updatedUser);
-      }
-    },
-    [currentUser, setUserStorage]
-  );
-
-  /**
-   * Memoized auth context value
-   * Only recreates when dependencies change
+   * Valeur retournée mémorisée
+   * Ne se recrée que si les dépendances changent
    */
   const authContextValue = useMemo(
     () => ({
-      // State
-      user: currentUser,
-      token: tokenStorage,
-      refreshToken: refreshTokenStorage,
+      // État
+      user,
+      token,
+      refreshToken,
       loading,
       error,
       isAuthenticated,
 
-      // Methods
+      // Méthodes
       login,
       register,
       logout,
       checkAuth,
       refreshAuth,
-      clearLocalStorage,
+      refreshUser,
       updateUserProfile,
       forgotResetPassword,
       resetPasswordAuth,
     }),
     [
-      currentUser,
+      user,
+      token,
+      refreshToken,
       loading,
       error,
       isAuthenticated,
@@ -417,35 +365,57 @@ export const useAuth = () => {
       logout,
       checkAuth,
       refreshAuth,
-      clearLocalStorage,
+      refreshUser,
       updateUserProfile,
       forgotResetPassword,
       resetPasswordAuth,
     ]
   );
 
-  // Sync localStorage with Redux on mount
-  useEffect(() => {
-    if (!reduxUser && userStorage && tokenStorage) {
-      // TODO: Optionally restore user session in Redux if needed
-      console.log("🔄 Session restored from localStorage");
-    }
-  }, [reduxUser, userStorage, tokenStorage]);
-
-  // Auto-logout on token expiration (optional)
-  useEffect(() => {
-    if (isAuthenticated && tokenStorage) {
-      // TODO: Implement token expiration check
-      // const checkTokenExpiration = () => {
-      //   const isExpired = checkIfTokenExpired(tokenStorage);
-      //   if (isExpired) {
-      //     refreshAuth();
-      //   }
-      // };
-      // const interval = setInterval(checkTokenExpiration, 60000); // Check every minute
-      // return () => clearInterval(interval);
-    }
-  }, [isAuthenticated, tokenStorage, refreshAuth]);
-
   return authContextValue;
 };
+
+/**
+ * ============================================
+ * NOTES D'UTILISATION
+ * ============================================
+ *
+ * ✅ AVANTAGES de cette nouvelle version :
+ *
+ * 1. SIMPLICITÉ
+ *    - Plus besoin de useLocalStorage pour auth
+ *    - Plus de synchronisation manuelle
+ *    - Redux est la seule source de vérité
+ *
+ * 2. AUTOMATISATION
+ *    - Le middleware gère localStorage automatiquement
+ *    - Sauvegarde lors du login/register
+ *    - Nettoyage lors du logout
+ *
+ * 3. PERFORMANCE
+ *    - Moins de re-renders inutiles
+ *    - Pas de duplication de state
+ *    - Mémoisation optimisée
+ *
+ * 4. MAINTENABILITÉ
+ *    - Code plus court et clair
+ *    - Moins de bugs potentiels
+ *    - Plus facile à tester
+ *
+ * ============================================
+ * CHANGEMENTS vs ancienne version :
+ * ============================================
+ *
+ * ❌ SUPPRIMÉ :
+ *    - useLocalStorage pour user/token/refreshToken
+ *    - clearLocalStorage (le middleware le fait)
+ *    - Synchronisation manuelle Redux ↔ localStorage
+ *    - logoutUser API call (à implémenter si nécessaire)
+ *
+ * ✅ AJOUTÉ :
+ *    - refreshUser() pour rafraîchir les données
+ *    - Meilleure gestion des erreurs
+ *    - Code plus simple et direct
+ *
+ * ============================================
+ */

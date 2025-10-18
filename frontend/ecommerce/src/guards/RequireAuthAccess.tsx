@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useUserContext } from "../context/userContext";
 import React from "react";
+import PageLoader from "../components/LoaderPage/PageLoader";
 interface RequireAuthAccessProps {
   children: ReactNode;
 }
@@ -13,8 +14,11 @@ interface RequireAuthAccessProps {
 export const RequireAuthAccess: React.FC<RequireAuthAccessProps> = ({
   children,
 }) => {
-  const { user, isAuthenticated } = useUserContext();
+  const { user, isAuthenticated, loading } = useUserContext();
   const location = useLocation(); //Récupère l'URL actuelle
+  if (loading) {
+    return <PageLoader />;
+  }
 
   // Pas authentifié → Redirige vers login
   if (!isAuthenticated || !user) {
@@ -23,7 +27,7 @@ export const RequireAuthAccess: React.FC<RequireAuthAccessProps> = ({
         to="/login"
         replace
         state={{
-          from: location.pathname,
+          from: location.pathname, // url actuelle ou lutilisateur souhaite se rendre
           message: "Please log in to access this page",
         }}
       />

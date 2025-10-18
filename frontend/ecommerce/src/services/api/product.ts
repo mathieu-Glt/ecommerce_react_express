@@ -1,0 +1,172 @@
+import axios, {
+  AxiosError,
+  type AxiosInstance,
+  type AxiosResponse,
+} from "axios";
+import { useApi } from "../../hooks/useApi";
+import type { ProductListResponse } from "../../interfaces/responseProduct.interface";
+import { API_ROUTES } from "../constants/api-routes";
+
+// Define BASE_URL or import from your config
+const BASE_URL = process.env.VITE_API_BASE_URL || "http://localhost:5173";
+// eslint-disable-next-line react-hooks/rules-of-hooks
+const api: AxiosInstance = useApi();
+
+/**
+ * Fetches the list of products from the API.
+ *
+ * @returns A promise that resolves to the list of products.
+ * @throws {Error} If the request fails or the response indicates an error.
+ *
+ * @example
+ * const products = await getProducts();
+ */
+export async function getProducts(): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.LIST
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to fetch products"
+      );
+    }
+    throw new Error("Failed to fetch products");
+  }
+}
+
+/**
+ * Creates a new product in the API.
+ * @param body - Product information (name, description, price, etc.)
+ * @returns Created product data and success message
+ * @throws {Error} If data is invalid or creation fails
+ * @example
+ * const response = await createProduct({
+ *   name: "New Product",
+ *   description: "Product description",
+ *  price: 99.99
+ * });
+ */
+export async function createProduct(
+  body: Record<string, any> | FormData
+): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.post(
+      API_ROUTES.PRODUCTS.CREATE,
+      body
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to create product"
+      );
+    }
+    throw new Error("Failed to create product");
+  }
+}
+
+/**
+ * Retrieves a product by its ID from the API.
+ * @param id - Product ID to retrieve
+ * @returns Product data
+ * @throws {Error} If product is not found or request fails
+ * @example
+ * const product = await getProductById("productId");
+ * */
+export async function getProductById(id: string): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.DETAILS_ID(id)
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data?.error || "Failed to fetch product");
+    }
+    throw new Error("Failed to fetch product");
+  }
+}
+
+/**
+ * Retrieves a product by its LSUG from the API.
+ * @param slug - Product ID to retrieve
+ * @returns Product data
+ * @throws {Error} If product is not found or request fails
+ * @example
+ * const product = await getProductBySlug("productSlug");
+ * */
+export async function getProductBySlug(
+  slug: string
+): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.DETAILS_SLUG(slug)
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data?.error || "Failed to fetch product");
+    }
+    throw new Error("Failed to fetch product");
+  }
+}
+
+/**
+ * Updates an existing product in the API.
+ * @param id - Product ID to update
+ * @param body - Updated product information
+ * @returns Updated product data and success message
+ * @throws {Error} If data is invalid or update fails
+ * @example
+ * const response = await updateProduct("productId", {
+ *   name: "Updated Product Name",
+ *  price: 79.99
+ * });
+ * /
+ * */
+export async function updateProduct(
+  id: string,
+  body: Record<string, any> | FormData
+): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.put(
+      API_ROUTES.PRODUCTS.UPDATE(id),
+      body
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to update product"
+      );
+    }
+    throw new Error("Failed to update product");
+  }
+}
+
+/**
+ * Deletes a product from the API.
+ * @param id - Product ID to delete
+ * @returns Success message
+ * @throws {Error} If deletion fails
+ * @example
+ * const response = await deleteProduct("productId");
+ * */
+export async function deleteProduct(id: string): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.delete(
+      API_ROUTES.PRODUCTS.DELETE(id)
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to delete product"
+      );
+    }
+    throw new Error("Failed to delete product");
+  }
+}

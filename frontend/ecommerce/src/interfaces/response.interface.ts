@@ -85,6 +85,15 @@ export interface ResetPasswordResponse {
   message: string;
   results?: string; // Message de confirmation
 }
+export interface LoginApiResponse {
+  success: boolean;
+  results: {
+    user: User;
+    token?: string; // Token optionnel si pas fourni lors de l'inscription
+    refreshToken?: string;
+  };
+  message?: string;
+}
 
 /**
  * Type union pour toutes les réponses API possibles
@@ -143,8 +152,20 @@ export function isProfileResponse(
     response.success === true && "user" in response && !("token" in response)
   );
 }
+/**
+ * Type guard pour vérifier retour réponse succés générique current user
+ */
+export interface CurrentUserResponse {
+  success: true;
+  user: User;
+}
 
-// ✅ Alias pour compatibilité avec ton code existant
+export interface FetchCurrentUserResponse {
+  success: true;
+  user: User;
+}
+
+// Alias pour compatibilité avec ton code existant
 export interface SignUpResponse extends RegisterResponse {}
 export interface ResponseDataRegisterThunk extends RegisterResponse {}
 
