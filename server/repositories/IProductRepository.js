@@ -6,9 +6,23 @@ class IProductRepository {
   async findOrCreateProduct(productData) {
     throw new Error("Method findOrCreateProduct must be implemented");
   }
+  async getLatestProducts(limit) {
+    throw new Error("Method getLatestProducts must be implemented");
+  }
+
+  async findProduct(query) {
+    throw new Error("Method findProduct must be implemented");
+  }
+  async findProductBySlug(slug) {
+    throw new Error("Method findProductBySlug must be implemented");
+  }
 
   async updateProduct(productId, updateData) {
     throw new Error("Method updateProduct must be implemented");
+  }
+
+  async findProductsByPriceRange(minPrice, maxPrice) {
+    throw new Error("Method findProductsByPriceRange must be implemented");
   }
 
   async getProducts() {

@@ -21,6 +21,144 @@ const productService = ProductServiceFactory.createProductService(
 );
 
 /**
+ * Search products by price range
+ *
+ * @route GET /products/search/price
+ * @access Public
+ * @queryParam {number} min - Minimum price (optional)
+ * @queryParam {number} max - Maximum price (optional)
+ * @returns {Array} 200 - List of products within the price range
+ * @returns {Object} 400 - Invalid or missing parameters
+ * @returns {Object} 404 - No products found
+ * @returns {Object} 500 - Internal server error
+ */
+exports.searchProductByPriceRange = asyncHandler(async (req, res) => {
+  const { min, max } = req.query;
+
+  try {
+    const minPrice = min ? parseFloat(min) : undefined;
+    const maxPrice = max ? parseFloat(max) : undefined;
+
+    if (isNaN(minPrice) && isNaN(maxPrice)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide at least a valid min or max price.",
+      });
+    }
+
+    const products = await productService.getProductsByPriceRange(
+      minPrice,
+      maxPrice
+    );
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found within the given price range.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error searching products by price range:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Get 10 latest added products
+ *
+ * @route GET /products/latest
+ * @access Public
+ * @returns {Array} 200 - List of latest products
+ * @returns {Object} 404 - No products found
+ * @returns {Object} 500 - Internal server error
+ */
+exports.getLatestProducts = asyncHandler(async (req, res) => {
+  try {
+    const products = await productService.getLatestProducts(10);
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found" });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching latest products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Search products by query or slug
+ *
+ * @route GET /products/search
+ * @access Public
+ * @param {string} query - Search query or slug
+ * @returns {Array} 200 - List of matching products
+ * @returns {Object} 404 - No matching products found
+ * @returns {Object} 500 - Internal server error
+ * @queryParam {string} query - The search query or slug
+ */
+exports.searchProducts = asyncHandler(async (req, res) => {
+  const { query, slug } = req.query;
+  try {
+    if (!query && !slug) {
+      return res.status(400).json({
+        success: false,
+        message: "Query parameter is required",
+      });
+    }
+    if (slug) {
+      const product = await productService.getProductBySlug({ slug });
+
+      if (!product) {
+        return res
+          .status(404)
+          .json({ success: false, message: "No matching products found" });
+      }
+      return res.status(200).json({
+        success: true,
+        results: [product],
+      });
+    }
+
+    const searchRegex = new RegExp(query, "i");
+    const products = await productService.getProductByQuery(searchRegex);
+
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No matching products found" });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error searching products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+/**
  * Get all products
  *
  * @route GET /products
@@ -83,10 +221,18 @@ exports.getProductBySlug = asyncHandler(async (req, res) => {
 exports.getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const product = await productService.getProductById(id);
+
   if (!product) {
-    return res.status(404).json({ message: "Product not found" });
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
   }
-  res.status(200).json(product);
+
+  res.status(200).json({
+    success: true,
+    results: product, // note que c'est `results` comme les autres routes
+  });
 });
 
 /**

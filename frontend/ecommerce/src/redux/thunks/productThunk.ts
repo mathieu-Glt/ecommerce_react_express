@@ -6,6 +6,8 @@ import {
   getProductBySlug,
   updateProduct,
   deleteProduct,
+  searchProductsApi,
+  getLatestProducts,
 } from "../../services/api/product";
 import type { Product } from "../../interfaces/product.interface";
 
@@ -16,6 +18,7 @@ export const fetchProducts = createAsyncThunk<
 >("products/fetchAll", async (_, thunkAPI) => {
   try {
     const response = await getProducts();
+    console.log("Fetched products:", response);
 
     if (!response.success) {
       return thunkAPI.rejectWithValue(response.message);
@@ -34,6 +37,7 @@ export const fetchProductById = createAsyncThunk<
 >("products/fetchById", async (id, thunkAPI) => {
   try {
     const response = await getProductById(id);
+    console.log("Fetched product by ID:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -52,6 +56,54 @@ export const fetchProductBySlug = createAsyncThunk<
     return response.results;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.message || "Error fetching product");
+  }
+});
+
+/**
+ * Redux Thunk: searchProduct
+ *
+ * Recherche un ou plusieurs produits selon un titre (query)
+ * ou un slug unique.
+ *
+ * Exemple d'utilisation :
+ *  - dispatch(searchProduct({ query: "macbook" }))
+ *  - dispatch(searchProduct({ slug: "macbook-pro-2024" }))
+ */
+export const searchProducts = createAsyncThunk<
+  Product[],
+  { query?: string; slug?: string },
+  { rejectValue: string }
+>("products/search", async (params, thunkAPI) => {
+  try {
+    const response = await searchProductsApi(params);
+    if (!response.success) return thunkAPI.rejectWithValue(response.message);
+    return response.results;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      error.message || "Error searching products"
+    );
+  }
+});
+
+/**
+ *  Redux Thunk: getLatestProducts
+ *
+ *  Récupère les derniers produits ajoutés.
+ *
+ */
+export const fetchLatestProducts = createAsyncThunk<
+  Product[],
+  number,
+  { rejectValue: string }
+>("products/latest", async (limit, thunkAPI) => {
+  try {
+    const response = await getLatestProducts();
+    if (!response.success) return thunkAPI.rejectWithValue(response.message);
+    return response.results;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      error.message || "Error fetching latest products"
+    );
   }
 });
 

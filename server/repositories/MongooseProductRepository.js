@@ -17,6 +17,63 @@ class MongooseProductRepository extends IProductRepository {
   }
 
   /**
+   * Find products matching a query.
+   * @param {Object} query - Mongoose query object
+   * @returns {Promise<Array>} Array of matching product documents
+   */
+  async findProduct(query) {
+    return await this.Product.find(query)
+      .populate("category", "name slug") // Replace the category ID with an object containing only `name` and `slug` of Entity Category in related collection
+      .populate("sub", "name slug") // Same for the field `sub`
+      .exec();
+  }
+
+  /**
+   * Find last products 10 added.
+   * @param {number} limit - Number of products to retrieve
+   * @returns {Promise<Array>} Array of latest product documents
+   */
+  async getLatestProducts(limit) {
+    return await this.Product.find()
+      .populate("category", "name slug") // Replace the category ID with an object containing only `name` and `slug` of Entity Category in related collection
+      .populate("sub", "name slug") // Same for the field `sub`
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .exec();
+  }
+
+  /**
+   * Find products within a specified price range.
+   * @param {number} minPrice - Minimum price
+   * @param {number} maxPrice - Maximum price
+   */
+  async findProductsByPriceRange(minPrice, maxPrice) {
+    const priceQuery = {};
+    if (minPrice !== undefined) {
+      priceQuery.$gte = minPrice;
+    }
+    if (maxPrice !== undefined) {
+      priceQuery.$lte = maxPrice;
+    }
+    return await this.Product.find({ price: priceQuery })
+      .populate("category", "name slug")
+      .populate("sub", "name slug")
+      .exec();
+  }
+
+  /**
+   * Find a product by its slug.
+   * @param {string} slug - Product slug
+   * @returns {Promise<Object|null>} Product document or null if not found
+   */
+  async findProductBySlug(slug) {
+    return await this.Product.findOne({ slug })
+      .populate("category", "name slug")
+      .populate("sub", "name slug")
+      .exec();
+  }
+
+  /**
    * Retrieve all products from the database, populated with category and subcategory.
    * Also transforms image paths into complete URLs.
    * @returns {Promise<Array>} Array of product documents

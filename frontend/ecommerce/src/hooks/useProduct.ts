@@ -26,7 +26,7 @@ export const useProduct = () => {
 
   // Select state from Redux
   const { products, selectedProduct, loading, error } = useAppSelector(
-    (state) => state.product
+    (state) => state.products
   );
 
   // ============================================
@@ -47,8 +47,10 @@ export const useProduct = () => {
   // ============================================
   const getProductById = useCallback(
     async (id: string): Promise<Product | null> => {
+      console.log("Getting product by ID:", id);
       try {
         const result = await dispatch(fetchProductById(id)).unwrap();
+        console.log("Fetched product:", result);
         return result;
       } catch (err: any) {
         toast.showError(err?.message || "Failed to fetch product");

@@ -23,7 +23,7 @@ function useSessionManager(): SessionManagerReturn {
   const [sessionExpired, setSessionExpired] = useState<boolean>(false);
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [timeUntilExpiry, setTimeUntilExpiry] = useState<number>(0);
-  const { user, logout } = useUser();
+  // const { user, logout } = useUser();
   const [token] = useLocalStorage<string | null>("token", null);
 
   // Vérifier l'état de la session

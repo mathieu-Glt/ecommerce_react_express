@@ -66,3 +66,10 @@ export interface ProductState {
   loading: boolean;
   error: string | null;
 }
+
+export interface ProductDetail {
+  title?: string;
+  images?: string[];
+  description?: string;
+  price?: number | string;
+}

@@ -22,6 +22,7 @@ const HomePage = lazy(() =>
 const ProductPage = lazy(() =>
   import("../pages/ProductPage").then((m) => ({ default: m.ProductPage }))
 );
+
 const LoginPage = lazy(() =>
   import("../pages/LoginPage").then((m) => ({ default: m.LoginPage }))
 );
@@ -66,6 +67,11 @@ const AdminCouponPage = lazy(() =>
     default: m.AdminCouponPage,
   }))
 );
+const ProductDetailPage = lazy(() =>
+  import("../pages/productDetailPage").then((m) => ({
+    default: m.ProductDetailPage,
+  }))
+);
 
 // ==================== ROUTES CONFIGURATION ====================
 export const AppRoutes = () => {
@@ -77,7 +83,10 @@ export const AppRoutes = () => {
         // PUBLIC ROUTES
         { path: "/", element: SuspenseWrapper(HomePage) },
         { path: "/products", element: SuspenseWrapper(ProductPage) },
-        // { path: "/products/:id", element: SuspenseWrapper(ProductDetails) },
+        {
+          path: "/products/:productId",
+          element: SuspenseWrapper(ProductDetailPage),
+        },
         { path: "/cart", element: SuspenseWrapper(CartPage) },
         {
           path: "/order-confirmation",

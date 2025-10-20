@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction, Slice } from "@reduxjs/toolkit";
-import { fetchProducts } from "../thunks/productThunk";
+import {
+  fetchProducts,
+  searchProducts,
+  fetchProductById,
+} from "../thunks/productThunk";
 import type { ProductState } from "../../interfaces/product.interface";
 // import { loadProductStateFromLocalStorage } from "../middleware/localStorageMiddleware";
 
@@ -84,7 +88,7 @@ const productSlice: Slice<ProductState> = createSlice({
         console.log("✅ [productSlice] Produits récupérés:", action.payload);
 
         state.loading = false;
-        state.products = action.payload.results || [];
+        state.products = action.payload || [];
         state.error = null;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
@@ -95,6 +99,54 @@ const productSlice: Slice<ProductState> = createSlice({
 
         state.loading = false;
         state.error = (action.payload as string) || "Failed to fetch products";
+      });
+    // ==========================================
+    // SEARCH PRODUCTS
+    // ==========================================
+    builder
+      .addCase(searchProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchProducts.fulfilled, (state, action) => {
+        console.log("✅ [productSlice] Produits recherchés:", action.payload);
+        state.loading = false;
+        state.products = action.payload.results || [];
+        state.error = null;
+      })
+      .addCase(searchProducts.rejected, (state, action) => {
+        console.error(
+          "❌ [productSlice] Erreur recherche produits:",
+          action.payload
+        );
+        state.loading = false;
+        state.error = (action.payload as string) || "Failed to search products";
+      });
+    // ==========================================
+    // GET PRODUCT BY ID
+    // ==========================================
+    builder
+      .addCase(fetchProductById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductById.fulfilled, (state, action) => {
+        console.log(
+          "✅ [productSlice] Produit par ID récupéré:",
+          action.payload
+        );
+        state.loading = false;
+        state.selectedProduct = action.payload || null;
+        state.error = null;
+      })
+      .addCase(fetchProductById.rejected, (state, action) => {
+        console.error(
+          "❌ [productSlice] Erreur récupération produit par ID:",
+          action.payload
+        );
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Failed to fetch product by ID";
       });
   },
 });

@@ -16,12 +16,14 @@ export const API_ROUTES = {
     CURRENT_USER: "auth/current-user",
   },
   PRODUCTS: {
-    LIST: "product/products",
+    LIST: "products/products",
     DETAILS_ID: (id: string) => `products/id/${id}`,
     DETAILS_SLUG: (slug: string) => `products/slug/${slug}`,
-    CREATE: "product/products",
+    CREATE: "products/products",
     UPDATE: (id: string) => `products/${id}`,
     DELETE: (id: string) => `products/${id}`,
+    SEARCH: "products/search",
+    LATEST: "products/latest",
   },
   USERS: {
     LIST: "users",

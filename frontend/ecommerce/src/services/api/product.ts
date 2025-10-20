@@ -26,6 +26,7 @@ export async function getProducts(): Promise<ProductListResponse> {
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.LIST
     );
+    console.log("Response data:", response.data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -81,6 +82,7 @@ export async function getProductById(id: string): Promise<ProductListResponse> {
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.DETAILS_ID(id)
     );
+    console.log("Response data for product ID:", response.data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -91,7 +93,7 @@ export async function getProductById(id: string): Promise<ProductListResponse> {
 }
 
 /**
- * Retrieves a product by its LSUG from the API.
+ * Retrieves a product by its SLUG from the API.
  * @param slug - Product ID to retrieve
  * @returns Product data
  * @throws {Error} If product is not found or request fails
@@ -111,6 +113,63 @@ export async function getProductBySlug(
       throw new Error(error.response?.data?.error || "Failed to fetch product");
     }
     throw new Error("Failed to fetch product");
+  }
+}
+
+/**
+ * Searches for products by title (query) or slug.
+ *
+ * @param params - Object containing search parameters
+ * @param params.query - Optional search string for product title
+ * @param params.slug - Optional slug of the product
+ * @returns Promise resolving to the list of matching products
+ *
+ * @example
+ * const result = await searchProduct({ query: "macbook" });
+ * const result = await searchProduct({ slug: "macbook-pro-2024" });
+ */
+export async function searchProductsApi(params: {
+  query?: string;
+  slug?: string;
+}): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.SEARCH,
+      { params }
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to search products"
+      );
+    }
+    throw new Error("Failed to search products");
+  }
+}
+
+/**
+ * Fetches the 10 most recently added products from the API.
+ *
+ * @returns Promise resolving to the list of latest products
+ *
+ * @example
+ * const latestProducts = await getLatestProducts();
+ */
+export async function getLatestProducts(): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.post(
+      API_ROUTES.PRODUCTS.LATEST,
+      { limit: 10 } // You can adjust the limit as needed
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to fetch latest products"
+      );
+    }
+    throw new Error("Failed to fetch latest products");
   }
 }
 

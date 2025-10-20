@@ -52,12 +52,52 @@ class ProductService {
   }
 
   /**
+   * Retrieve products within a specified price range.
+   * @param {number} minPrice - Minimum price.
+   * @param {number} maxPrice - Maximum price.
+   * @returns {Promise<Array>} List of products within the price range.
+   */
+  async getProductsByPriceRange(minPrice, maxPrice) {
+    return await this.productRepository.getProductsByPriceRange(
+      minPrice,
+      maxPrice
+    );
+  }
+
+  /**
+   * Retrieve the latest added products.
+   * @param {number} limit - Number of latest products to retrieve.
+   * @returns {Promise<Array>} List of latest products.
+   */
+  async getLatestProducts(limit = 10) {
+    return await this.productRepository.getLatestProducts(limit);
+  }
+
+  /**
    * Create a new product.
    * @param {Object} productData - Product details (name, slug, price, description, etc.).
    * @returns {Promise<Object>} Created product object.
    */
   async createProduct(productData) {
     return await this.productRepository.createProduct(productData);
+  }
+
+  /**
+   * Find a product by query parameters.
+   * @param {Object} query - Query parameters to find the product.
+   * @returns {Promise<Object|null>} Found product object or null if not found.
+   */
+  async getProductByQuery(query) {
+    return await this.productRepository.findProduct(query);
+  }
+
+  /**
+   * Find a product by slug parameter.
+   * @param {string} slug - Slug parameter to find the product.
+   * @returns {Promise<Object|null>} Found product object or null if not found.
+   */
+  async getProductBySlug(slug) {
+    return await this.productRepository.findProductBySlug(slug);
   }
 
   /**

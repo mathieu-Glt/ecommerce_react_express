@@ -8,6 +8,9 @@ const {
   getProductById,
   updateProduct,
   deleteProduct,
+  searchProductByPriceRange,
+  getLatestProducts,
+  searchProducts,
 } = require("../controllers/product.controllers");
 
 // Middlewares
@@ -43,11 +46,32 @@ router.get("/products", getProducts);
 router.get("/products/slug/:slug", getProductBySlug);
 
 /**
- * @route GET /product/id/:id
+ * @route GET /product/search
+ * @desc Search products by query or slug
+ * @access Public
+ */
+router.get("/products/search", searchProducts);
+
+/**
+ * @route GET /product/search/price
+ * @desc Search products by price range
+ * @access Public
+ */
+router.get("/products/search/price", searchProductByPriceRange);
+
+/**
+ * @route GET /id/:id
  * @desc Get product details by ID
  * @access Public
  */
-router.get("/products/id/:id", getProductById);
+router.get("/id/:id", getProductById);
+
+/**
+ * @route POST /product/lastest
+ * @desc Get latest products
+ * @access Public
+ */
+router.post("/products/latest", getLatestProducts);
 
 /**
  * @route POST /product
