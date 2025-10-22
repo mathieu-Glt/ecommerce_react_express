@@ -1,0 +1,22 @@
+.container-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto; /* centre horizontalement */
+  box-sizing: border-box;
+}
+.banner {
+  width: 100%;
+  max-width: 1200px; /* largeur maximale */
+  background-color: #f5f5f5; /* couleur de fond */
+  border-radius: 8px; /* coins arrondis */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* ombre légère */
+  display: flex;
+  align-items: center; /* centre verticalement le texte */
+  justify-content: center; /* centre horizontalement le texte */
+  font-size: 24px; /* taille de la police */
+  color: #333; /* couleur du texte */
+}

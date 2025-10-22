@@ -3,6 +3,7 @@ import PageLoader from "../components/LoaderPage/PageLoader";
 import { ProductDetail } from "../components/productDetail/productDetail";
 import { useEffect } from "react";
 import { useProduct } from "../hooks/useProduct";
+import type { ProductDetailInterface } from "../interfaces/product.interface";
 
 export const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -24,7 +25,9 @@ export const ProductDetailPage = () => {
 
   return (
     <div>
-      <ProductDetail selectedProduct={selectedProduct} />
+      <ProductDetail
+        selectedProduct={selectedProduct as ProductDetailInterface}
+      />
     </div>
   );
 };

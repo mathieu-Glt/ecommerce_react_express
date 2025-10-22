@@ -24,6 +24,8 @@ const { ObjectId } = mongoose.Schema.Types;
  * @property {string} shipping - "Yes" or "No" indicating shipping availability
  * @property {string} color - Product color (enum: Black, Brown, Silver, Blue, White, Green)
  * @property {string} brand - Product brand (enum: Apple, Samsung, Microsoft, Lenovo, Asus, Dell, HP, Acer)
+ * @property {Array} rating - Array of rating objects containing star and postedBy (User reference)
+ * @property {Array} comments - Array of comment objects containing text, postedBy (User reference), and createdAt
  * @property {Date} createdAt - Auto-generated creation timestamp
  * @property {Date} updatedAt - Auto-generated update timestamp
  *
@@ -65,6 +67,19 @@ const productSchema = new mongoose.Schema(
         "Acer",
       ],
     },
+    rating: [
+      {
+        star: Number,
+        postedBy: { type: ObjectId, ref: "User" },
+      },
+    ],
+    comments: [
+      {
+        text: String,
+        postedBy: { type: ObjectId, ref: "User" },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -118,6 +133,34 @@ productSchema.pre("save", async function (next) {
     }
   }
   next();
+});
+/**
+ * Virtual property to calculate average rating
+ * - Computes the average star rating from the ratings array
+ */
+productSchema.virtual("averageRating").get(function () {
+  if (!this.rating) return 0;
+
+  if (Array.isArray(this.rating) && this.rating.length > 0) {
+    const total = this.rating.reduce((acc, item) => acc + (item.star || 0), 0);
+    return total / this.rating.length;
+  }
+
+  // Support temporaire pour les anciens produits où rating est un nombre
+  if (typeof this.rating === "number") {
+    return this.rating;
+  }
+
+  return 0;
+});
+
+/**
+ * Count comments virtual
+ * - Returns the number of comments on the product
+ *
+ */
+productSchema.virtual("commentsCount").get(function () {
+  return this.comments.length;
 });
 
 /**

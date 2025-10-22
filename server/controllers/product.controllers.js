@@ -73,7 +73,7 @@ exports.searchProductByPriceRange = asyncHandler(async (req, res) => {
 });
 
 /**
- * Get 10 latest added products
+ * Get 3 latest added products
  *
  * @route GET /products/latest
  * @access Public
@@ -83,7 +83,7 @@ exports.searchProductByPriceRange = asyncHandler(async (req, res) => {
  */
 exports.getLatestProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await productService.getLatestProducts(10);
+    const products = await productService.getLatestProducts(3);
     if (!products || products.length === 0) {
       return res
         .status(404)
@@ -335,4 +335,287 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
 
   const deletedProduct = await productService.deleteProduct(id);
   res.status(200).json(deletedProduct);
+});
+
+/**
+ * Add a rating to a product
+ *
+ * @route POST /products/:id/rate
+ * @access Protected
+ * @param {string} id - Product ID
+ * @param {Object} body - Rating data
+ * @param {number} body.star - Star rating (1-5)
+ * @param {string} body.postedBy - User ID of the rater
+ * @returns {Object} 200 - Updated product with new rating
+ * @returns {Object} 404 - Product not found
+ * @returns {Object} 400 - Invalid rating value
+ * @returns {Object} 401 - User not authenticated
+ * @returns {Object} 500 - Internal server error
+ */
+exports.rateProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { star } = req.body;
+  const userId = req.user?._id; // Assuming auth middleware sets req.user
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "User not authenticated",
+    });
+  }
+
+  if (star < 1 || star > 5) {
+    return res.status(400).json({
+      success: false,
+      message: "Star rating must be between 1 and 5",
+    });
+  }
+
+  try {
+    const updatedProduct = await productService.addRatingToProduct(
+      id,
+      star,
+      userId
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      results: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error adding rating to product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Update a rating on a product
+ * @route PUT /products/:id/rate
+ * @access Protected
+ * @param {string} id - Product ID
+ * @param {Object} body - Updated rating data
+ * @param {number} body.star - Updated star rating (1-5)
+ * @param {string} body.postedBy - User ID of the rater
+ * @returns {Object} 200 - Updated product with modified rating
+ * @returns {Object} 404 - Product not found
+ * @returns {Object} 400 - Invalid rating value
+ * @returns {Object} 401 - User not authenticated
+ * @returns {Object} 500 - Internal server error
+ */
+
+exports.updateProductRating = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { star } = req.body;
+  const userId = req.user?._id; // Assuming auth middleware sets req.user
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "User not authenticated",
+    });
+  }
+  if (star < 1 || star > 5) {
+    return res.status(400).json({
+      success: false,
+      message: "Star rating must be between 1 and 5",
+    });
+  }
+  try {
+    const updatedProduct = await productService.addRatingToProduct(
+      id,
+      star,
+      userId
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error updating rating on product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ *  Add a comment to a product
+ *  @route POST /products/:id/comment
+ *  @access Protected
+ *  @param {string} id - Product ID
+ * @param {string} userId - ID of the user posting the comment
+ * @param {Object} body - Comment data
+ * @param {string} body.text - Comment text
+ * @param {string} body.postedBy - User ID of the commenter
+ * @returns {Object} 200 - Updated product with new comment
+ * @returns {Object} 404 - Product not found
+ * @returns {Object} 400 - Invalid comment data
+ * @returns {Object} 401 - User not authenticated
+ * @returns {Object} 500 - Internal server error
+ */
+
+exports.commentProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { text } = req.body;
+  const userId = req.user?._id; // Assuming auth middleware sets req.user
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "User not authenticated",
+    });
+  }
+  if (!text || text.trim() === "") {
+    return res.status(400).json({
+      success: false,
+      message: "Comment text cannot be empty",
+    });
+  }
+  try {
+    const updatedProduct = await productService.addCommentToProduct(
+      id,
+      text,
+      userId
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error adding comment to product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Update a comment on a product
+ * @route PUT /products/:id/comment/:commentId
+ * @access Protected
+ * @param {string} id - Product ID
+ * @param {string} commentId - Comment ID
+ * @param {string} userId - ID of the user updating the comment
+ * @param {Object} body - Updated comment data
+ * @param {string} body.text - Updated comment text
+ * @returns {Object} 200 - Updated product with modified comment
+ * @returns {Object} 404 - Product or comment not found
+ * @returns {Object} 400 - Invalid comment data
+ * @returns {Object} 401 - User not authenticated
+ * @returns {Object} 500 - Internal server error
+ */
+
+exports.updateCommentProduct = asyncHandler(async (req, res) => {
+  const { id, commentId } = req.params;
+  const { text } = req.body;
+  const userId = req.user?._id; // Assuming auth middleware sets req.user
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "User not authenticated",
+    });
+  }
+  if (!text || text.trim() === "") {
+    return res.status(400).json({
+      success: false,
+      message: "Comment text cannot be empty",
+    });
+  }
+  try {
+    const updatedProduct = await productService.updateCommentOnProductService(
+      id,
+      commentId,
+      text,
+      userId
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product or comment not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error updating comment on product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ *  Delete a comment on a product
+ *  @route DELETE /products/:id/comment/:commentId
+ *  @access Protected
+ * @param {string} id - Product ID
+ * @param {string} commentId - Comment ID
+ * @param {string} userId - ID of the user deleting the comment
+ * @returns {Object} 200 - Updated product with comment removed
+ * @returns {Object} 404 - Product or comment not found
+ * @returns {Object} 401 - User not authenticated
+ * @returns {Object} 500 - Internal server error
+ */
+
+exports.deleteCommentProduct = asyncHandler(async (req, res) => {
+  const { id, commentId } = req.params;
+  const userId = req.user?._id; // Assuming auth middleware sets req.user
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "User not authenticated",
+    });
+  }
+  try {
+    const updatedProduct = await productService.deleteCommentOnProductService(
+      id,
+      commentId,
+      userId
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product or comment not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error deleting comment on product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
 });

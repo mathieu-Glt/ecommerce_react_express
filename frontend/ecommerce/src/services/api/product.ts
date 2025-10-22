@@ -149,18 +149,21 @@ export async function searchProductsApi(params: {
 }
 
 /**
- * Fetches the 10 most recently added products from the API.
+ * Fetches the latest products from the API.
  *
+ * @param limit - Number of latest products to retrieve (default: 3)
  * @returns Promise resolving to the list of latest products
  *
  * @example
- * const latestProducts = await getLatestProducts();
+ * const latestProducts = await getLatestProducts(3);
  */
-export async function getLatestProducts(): Promise<ProductListResponse> {
+export async function getLatestProducts(
+  limit: number
+): Promise<ProductListResponse> {
   try {
     const response: AxiosResponse<ProductListResponse> = await api.post(
       API_ROUTES.PRODUCTS.LATEST,
-      { limit: 10 } // You can adjust the limit as needed
+      { limit } // correspond au param attendu côté backend
     );
     return response.data;
   } catch (error) {

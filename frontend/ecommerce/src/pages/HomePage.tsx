@@ -1,5 +1,7 @@
+import BannerBestSelling from "../components/BannerBestSelling/bannerBestSelling";
 import { useUserContext } from "../context/userContext";
-
+import BannerLastProducts from "../components/BannerLastProduct/bannerLastProducts";
+import "./styles/homePage.css";
 export const HomePage = () => {
   // Use context for take user, token and refreshToken
   const { user, token, isAuthenticated, refreshToken } = useUserContext();
@@ -15,6 +17,10 @@ export const HomePage = () => {
       ) : (
         <p>Please log in.</p>
       )}
+      <div className="container-banner">
+        <BannerBestSelling />
+        <BannerLastProducts />
+      </div>
     </div>
   );
 };

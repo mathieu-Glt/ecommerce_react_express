@@ -69,7 +69,7 @@ class ProductService {
    * @param {number} limit - Number of latest products to retrieve.
    * @returns {Promise<Array>} List of latest products.
    */
-  async getLatestProducts(limit = 10) {
+  async getLatestProducts(limit) {
     return await this.productRepository.getLatestProducts(limit);
   }
 
@@ -135,6 +135,63 @@ class ProductService {
    */
   async deleteProduct(productId) {
     return await this.productRepository.deleteProduct(productId);
+  }
+
+  /**
+   * Add a rating to a product.
+   * @param {string} productId - Product ID.
+   * @param {Object} ratingData - Rating details (star, postedBy).
+   * @returns {Promise<Object|null>} Updated product object with new rating or null if not found.
+   */
+  async addRatingToProduct(productId, userId, star) {
+    return await this.productRepository.addRatingToProductRepo(
+      productId,
+      userId,
+      star
+    );
+  }
+
+  /**
+   *  Add a comment to a product.
+   * @param {string} productId - Product ID.
+   * @param {Object} commentData - Comment details (text, postedBy).
+   * @returns {Promise<Object|null>} Updated product object with new comment or null if not found.
+   */
+  async addCommentToProduct(productId, commentData) {
+    return await this.productRepository.addCommentToProductRepo(
+      productId,
+      commentData
+    );
+  }
+
+  /**
+   * Update comment on a product.
+   * @param {string} productId - Product ID.
+   * @param {string} commentId - Comment ID.
+   * @param {Object} updateData - Fields to update in the comment (e.g., text).
+   * @returns {Promise<Object|null>} Updated product object with updated comment or null if not found.
+   */
+  async updateCommentOnProductService(productId, commentId, updateData) {
+    return await this.productRepository.updateCommentOnProductRepo(
+      productId,
+      commentId,
+      updateData
+    );
+  }
+
+  /**
+   *  Delete comment from a product.
+   * @param {string} productId - Product ID.
+   * @param {string} commentId - Comment ID.
+   * @param {Object} updateData - Fields to update in the comment (e.g., text).
+   * @returns {Promise<Object|null>} Updated product object with deleted comment or null if not found.
+   */
+
+  async deleteCommentFromProductService(productId, commentId) {
+    return await this.productRepository.deleteCommentFromProductRepo(
+      productId,
+      commentId
+    );
   }
 }
 

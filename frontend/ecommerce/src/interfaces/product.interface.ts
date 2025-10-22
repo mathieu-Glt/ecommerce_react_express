@@ -54,6 +54,8 @@ export interface Product {
   /** Timestamps */
   createdAt?: string;
   updatedAt?: string;
+  rating?: number;
+  averageRating?: number;
 
   /** Virtual populated fields (optional) */
   categoryInfo?: Category;
@@ -72,4 +74,36 @@ export interface ProductDetail {
   images?: string[];
   description?: string;
   price?: number | string;
+}
+
+export interface ProductCard {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  images: string[];
+}
+export interface ProductProps {
+  product: Product;
+  getProductById: (id: string) => Promise<Product | null>;
+}
+
+export interface ProductDetailInterface {
+  _id: string;
+  id: string;
+  title: string;
+  slug: string;
+  price: number;
+  description: string;
+  brand: string;
+  category: string;
+  sub: string;
+  color: string;
+  images: string[];
+  quantity: number;
+  sold: number;
+  shipping: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }

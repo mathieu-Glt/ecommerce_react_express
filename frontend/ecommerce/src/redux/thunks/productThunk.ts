@@ -97,7 +97,7 @@ export const fetchLatestProducts = createAsyncThunk<
   { rejectValue: string }
 >("products/latest", async (limit, thunkAPI) => {
   try {
-    const response = await getLatestProducts();
+    const response = await getLatestProducts(limit);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {

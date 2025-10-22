@@ -11,6 +11,11 @@ const {
   searchProductByPriceRange,
   getLatestProducts,
   searchProducts,
+  rateProduct,
+  updateProductRating,
+  commentProduct,
+  updateCommentProduct,
+  deleteCommentProduct,
 } = require("../controllers/product.controllers");
 
 // Middlewares
@@ -71,7 +76,7 @@ router.get("/id/:id", getProductById);
  * @desc Get latest products
  * @access Public
  */
-router.post("/products/latest", getLatestProducts);
+router.post("/latest", getLatestProducts);
 
 /**
  * @route POST /product
@@ -108,5 +113,58 @@ router.put(
  * @middleware requireRole(["admin"])
  */
 router.delete("/products/:id", requireRole(["admin"]), deleteProduct);
+
+/**
+ * @route POST /product/:id/rate
+ * @desc Rate a product
+ * @access Protected (Authenticated users)
+ * @middleware requireRole(["user", "admin"])
+ */
+router.post("/products/:id/rate", requireRole(["user", "admin"]), rateProduct);
+
+/**
+ * @route PUT /product/:id/rate
+ * @desc Update a product rating
+ * @access Protected (Authenticated users)
+ * @middleware requireRole(["user", "admin"])
+ */
+router.put(
+  "/products/:id/rate",
+  requireRole(["user", "admin"]),
+  updateProductRating
+);
+
+/**
+ * @route POST /product/:id/comment
+ * @desc Comment on a product
+ * @access Protected (Authenticated users)
+ */
+router.post(
+  "/products/:id/comment",
+  requireRole(["user", "admin"]),
+  commentProduct
+);
+
+/**
+ * @route PUT /product/:id/comment/:commentId
+ * @desc Update a comment on a product
+ * @access Protected (Authenticated users)
+ */
+router.put(
+  "/products/:id/comment/:commentId",
+  requireRole(["user", "admin"]),
+  updateCommentProduct
+);
+
+/**
+ * @route DELETE /product/:id/comment/:commentId
+ * @desc Delete a comment on a product
+ * @access Protected (Authenticated users)
+ */
+router.delete(
+  "/products/:id/comment/:commentId",
+  requireRole(["user", "admin"]),
+  deleteCommentProduct
+);
 
 module.exports = router;

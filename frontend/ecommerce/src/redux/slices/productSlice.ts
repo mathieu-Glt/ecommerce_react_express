@@ -4,6 +4,7 @@ import {
   fetchProducts,
   searchProducts,
   fetchProductById,
+  fetchLatestProducts,
 } from "../thunks/productThunk";
 import type { ProductState } from "../../interfaces/product.interface";
 // import { loadProductStateFromLocalStorage } from "../middleware/localStorageMiddleware";
@@ -147,6 +148,32 @@ const productSlice: Slice<ProductState> = createSlice({
         state.loading = false;
         state.error =
           (action.payload as string) || "Failed to fetch product by ID";
+      });
+    // ==========================================
+    // FECTH LATEST PRODUCTS
+    // ==========================================
+    builder
+      .addCase(fetchLatestProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchLatestProducts.fulfilled, (state, action) => {
+        console.log(
+          "✅ [productSlice] Derniers produits récupérés:",
+          action.payload
+        );
+        state.loading = false;
+        state.products = action.payload || [];
+        state.error = null;
+      })
+      .addCase(fetchLatestProducts.rejected, (state, action) => {
+        console.error(
+          "❌ [productSlice] Erreur récupération derniers produits:",
+          action.payload
+        );
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Failed to fetch latest products";
       });
   },
 });

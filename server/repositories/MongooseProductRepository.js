@@ -29,7 +29,7 @@ class MongooseProductRepository extends IProductRepository {
   }
 
   /**
-   * Find last products 10 added.
+   * Find last products 3 added.
    * @param {number} limit - Number of products to retrieve
    * @returns {Promise<Array>} Array of latest product documents
    */
@@ -80,20 +80,39 @@ class MongooseProductRepository extends IProductRepository {
    */
   async getProducts() {
     const products = await this.Product.find()
-      .populate("category", "name slug") // Replace the category ID with an object containing only `name` and `slug` of Entity Category in related collection
-      .populate("sub", "name slug") // Same for the field `sub`
+      .populate("category", "name slug")
+      .populate("sub", "name slug")
       .sort({ createdAt: -1 });
 
     return products.map((product) => {
-      if (product.images && product.images.length > 0) {
-        product.images = product.images.map((image) => {
+      const prod = product.toJSON();
+      console.log("Processing product:", prod);
+
+      // Images : ajouter le préfixe si nécessaire
+      if (prod.images && prod.images.length > 0) {
+        prod.images = prod.images.map((image) => {
           if (!image.startsWith("/uploads/") && !image.startsWith("http")) {
             return `/uploads/${image}`;
           }
           return image;
         });
       }
-      return product;
+
+      // ⚡ Assurer que averageRating et commentsCount sont toujours des nombres
+      if (!prod.rating || prod.rating.length === 0) {
+        prod.averageRating = 0;
+      } else {
+        // Calculer la moyenne uniquement si item.star existe
+        const total = prod.rating.reduce(
+          (acc, item) => acc + (item.star || 0),
+          0
+        );
+        prod.averageRating = total / prod.rating.length;
+      }
+
+      prod.commentsCount = prod.commentsCount || 0;
+
+      return prod;
     });
   }
 
@@ -171,6 +190,95 @@ class MongooseProductRepository extends IProductRepository {
    */
   async deleteProduct(productId) {
     return await this.Product.findByIdAndDelete(productId);
+  }
+
+  /**
+   * Add a rating to a product.
+   * @param {string} productId - Product ID
+   * @param {Object} star - Rating data (star)
+   * @param {string} userId - ID of the user posting the rating
+   *
+   * @returns {Promise<Object|null>} Updated product document or null if not found
+   */
+  async addRatingToProductRepo(productId, userId, star) {
+    const product = await this.Product.findById(productId);
+    if (!product) {
+      return null;
+    }
+    const existingRating = product.ratings.find(
+      (r) => r.postedBy.toString() === userId.toString()
+    );
+
+    if (existingRating) {
+      existingRating.star = star; // update
+    } else {
+      product.ratings.push({ star, postedBy: userId });
+    }
+
+    await product.save();
+
+    // Recalcul automatique de la moyenne via le virtual "averageRating"
+    const productObj = product.toObject({ virtuals: true });
+    return productObj;
+  }
+
+  /**
+   * Add a comment to a product.
+   * @param {string} productId - Product ID
+   * @param {Object} commentData - Comment data (text, postedBy)
+   * @returns {Promise<Object|null>} Updated product document or null if not found
+   */
+  async addCommentToProductRepo(productId, commentData) {
+    const product = await this.Product.findById(productId);
+    if (!product) {
+      return null;
+    }
+    product.comments.push(commentData);
+    await product.save();
+    return product;
+  }
+
+  /**
+   * Update a comment on a product.
+   * @param {string} productId - Product ID
+   * @param {string} commentId - Comment ID
+   * @param {Object} updateData - Fields to update in the comment (e.g., text)
+   * @returns {Promise<Object|null>} Updated product document or null if not found
+   */
+  async updateCommentOnProductRepo(productId, commentId, updateData) {
+    const product = await this.Product.findById(productId);
+    if (!product) {
+      return null;
+    }
+    const comment = product.comments.id(commentId);
+    if (!comment) {
+      return null;
+    }
+    Object.assign(comment, updateData);
+    await product.save();
+    return product;
+  }
+
+  /**
+   * Delete a comment from a product.
+   * @param {string} productId - Product ID
+   * @param {string} commentId - Comment ID
+   * @param {Object} updateData - Fields to update in the comment (e.g., text)
+   * @returns {Promise<Object|null>} Updated product document with deleted comment or null if not found
+   */
+
+  async deleteCommentFromProductRepo(productId, commentId) {
+    const product = await this.Product.findById(productId);
+    if (!product) {
+      return null;
+    }
+    const comment = product.comments.id(commentId);
+    if (!comment) {
+      return null;
+    }
+    comment.remove();
+    await product.save();
+    return product;
   }
 }
 

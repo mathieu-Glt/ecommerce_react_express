@@ -9,6 +9,7 @@ import {
   createNewProduct,
   updateExistingProduct,
   deleteExistingProduct,
+  fetchLatestProducts,
 } from "../redux/thunks/productThunk";
 import type { Product } from "../interfaces/product.interface";
 
@@ -41,6 +42,23 @@ export const useProduct = () => {
       toast.showError(err?.message || "Failed to fetch products");
     }
   }, [dispatch, toast]);
+
+  // ============================================
+  // FETCH LATEST PRODUCTS
+  // ============================================
+
+  const getLatestProducts = useCallback(
+    async (limit: number): Promise<void> => {
+      try {
+        await dispatch(fetchLatestProducts(limit)).unwrap();
+        toast.showSuccess("Latest products loaded successfully");
+      } catch (err: any) {
+        console.error("❌ Failed to fetch latest products:", err);
+        toast.showError(err?.message || "Failed to fetch latest products");
+      }
+    },
+    [dispatch, toast]
+  );
 
   // ============================================
   // FETCH BY ID
@@ -139,7 +157,7 @@ export const useProduct = () => {
       selectedProduct,
       loading,
       error,
-
+      getLatestProducts,
       getAllProducts,
       getProductById,
       getProductBySlug,
@@ -153,6 +171,7 @@ export const useProduct = () => {
       loading,
       error,
       getAllProducts,
+      getLatestProducts,
       getProductById,
       getProductBySlug,
       createProduct,

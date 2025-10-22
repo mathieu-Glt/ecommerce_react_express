@@ -1,0 +1,12 @@
+.banner-best-products {
+  background-color: #8dd4f5; /* gris clair */
+  padding: 20px 40px; /* espace autour du texte */
+  text-align: center; /* centrer le texte */
+  border-radius: 8px; /* coins arrondis */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* légère ombre */
+  font-size: 1.5rem; /* taille du texte */
+  font-weight: 600; /* texte un peu plus épais */
+  color: #333; /* couleur du texte */
+  margin: 10px 0; /* espace vertical autour de la bannière */
+  width: 100%;
+}

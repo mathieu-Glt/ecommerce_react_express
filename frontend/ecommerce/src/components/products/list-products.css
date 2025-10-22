@@ -1,7 +1,6 @@
 /* Container principal avec dégradé bleu */
 .product-list-container {
-  min-height: 100vh;
-  padding: 2rem;
+  padding: 4rem 2rem 2rem 2rem;
   background: linear-gradient(
     to bottom,
     #bfdbfe,
@@ -16,6 +15,7 @@
   font-weight: bold;
   color: white;
   margin-bottom: 2rem;
+  z-index: 10;
 }
 
 /* Wrapper des cards en flex wrap */
@@ -28,12 +28,17 @@
 
 /* Card produit */
 .product-card {
-  background-color: rgb(134, 215, 253);
-  width: 16rem;
-  border-radius: 1rem;
+  background-color: rgb(233, 246, 252);
+  width: 20rem;
+  /* border-radius: 1rem; */
   overflow: hidden;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s;
+}
+
+.product-action {
+  background-color: #e4e5e6;
+  padding: 1rem;
 }
 
 .product-card:hover {
@@ -49,7 +54,7 @@
 
 /* Infos */
 .product-info {
-  padding: 1rem;
+  /* padding: 1rem; */
 }
 
 .product-title {
@@ -85,3 +90,51 @@
 .product-delete-button:hover {
   background-color: #b91c1c;
 }
+
+.pagination-wrapper .ant-pagination {
+  justify-content: center; /* centre la pagination */
+}
+
+.pagination-wrapper .ant-pagination-item {
+  border-radius: 50%; /* cercles */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+}
+
+.pagination-wrapper .ant-pagination-item-active {
+  background-color: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+}
+
+.product-cards-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+.product-cards-wrapper.fade-out {
+  opacity: 0;
+}
+
+/* .product-cards-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.product-cards-wrapper.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+} */
