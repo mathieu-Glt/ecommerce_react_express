@@ -32,11 +32,8 @@ class AuthService {
    */
   constructor(userRepository) {
     this.userRepository = userRepository;
-    this.jwtSecret =
-      process.env.JWT_SECRET || "your-secret-key-change-in-production";
-    this.jwtSecretRefresh =
-      process.env.REFRESH_TOKEN_SECRET ||
-      "your-secret-refresh-key-change-in-production";
+    this.jwtSecret = process.env.JWT_SECRET || "panzerfaust";
+    this.jwtSecretRefresh = process.env.REFRESH_TOKEN_SECRET || "k2rfaust";
     this.jwtExpiresIn = process.env.JWT_EXPIRES_IN || "24h";
     this.jwtExpiresRefreshTokenIn =
       process.env.JWT_EXPIRES_REFRESHTOKEN_IN || "7d";
@@ -79,6 +76,44 @@ class AuthService {
       return { success: true, user: userData };
     } catch (error) {
       return { success: false, error: "Error checking user existence" };
+    }
+  }
+
+  /**
+   * refreshToken
+   * @param {string} refreshToken - JWT refresh token.
+   * @returns {Promise<Object>} Result object containing:
+   *  - success {boolean} Whether refresh succeeded
+   *  - token {string} New JWT token (if success)
+   *  - refreshToken {string} New JWT refresh token (if success)
+   *  - error {string} Error message (if failure)
+   */
+  async refreshToken(refreshToken) {
+    try {
+      const decoded = jwt.verify(refreshToken, this.jwtSecretRefresh);
+      console.log("Decoded refresh token:", decoded);
+      const userId = decoded.userId;
+      console.log("User ID from refresh token:", userId);
+
+      const userResult = await this.userRepository.findUserById(userId);
+      console.log("User result from repository:", userResult);
+      if (!userResult.success || !userResult.user) {
+        return { success: false, error: "User not found" };
+      }
+
+      const user = userResult.user;
+      console.log("User found:", user);
+
+      const newToken = this.generateToken(user);
+      const newRefreshToken = this.generateRefreshToken(user);
+
+      return {
+        success: true,
+        token: newToken,
+        refreshToken: newRefreshToken,
+      };
+    } catch (error) {
+      return { success: false, error: "Invalid or expired refresh token" };
     }
   }
 
@@ -188,14 +223,20 @@ class AuthService {
    *  - error {string} Error message (if invalid/expired)
    */
   verifyToken(token) {
+    console.log("Secret used for sign:", this.jwtSecret);
+    console.log("Secret used for verify:", process.env.JWT_SECRET);
+    console.log("Equal?", this.jwtSecret === process.env.JWT_SECRET);
+
     try {
-      const decoded = jwt.verify(token, this.jwtSecret);
+      const cleanToken = token.replace(/^"|"$/g, "").trim();
+      const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
+      console.log("Decoded token:", decoded);
       return { success: true, user: decoded };
     } catch (error) {
+      console.error("JWT verification error:", error.message);
       return { success: false, error: "Invalid or expired token" };
     }
   }
-
   /**
    * Create a new user or update existing one if email already exists.
    * Automatically hashes password if needed and sends a welcome email.

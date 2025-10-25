@@ -173,7 +173,11 @@ app.use((req, res, next) => {
 
 // Parse URL-encoded bodies (formulaires HTML classiques)
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
+// Middleware pour logguer toutes les URLs
+app.use((req, res, next) => {
+  console.log(`📌 ${req.method} ${req.url}`);
+  next(); // Important pour passer à la route suivante
+});
 // ---------------------------------------------
 // Application Initialization
 // ---------------------------------------------

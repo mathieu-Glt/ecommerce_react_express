@@ -5,6 +5,7 @@ import {
   searchProducts,
   fetchProductById,
   fetchLatestProducts,
+  rateProduct,
 } from "../thunks/productThunk";
 import type { ProductState } from "../../interfaces/product.interface";
 // import { loadProductStateFromLocalStorage } from "../middleware/localStorageMiddleware";
@@ -174,6 +175,36 @@ const productSlice: Slice<ProductState> = createSlice({
         state.loading = false;
         state.error =
           (action.payload as string) || "Failed to fetch latest products";
+      });
+    // ==========================================
+    // ⭐ RATE PRODUCT
+    // ==========================================
+    builder
+      .addCase(rateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(rateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedProduct = action.payload;
+
+        // Met à jour le produit sélectionné
+        if (
+          state.selectedProduct &&
+          state.selectedProduct._id === updatedProduct._id
+        ) {
+          state.selectedProduct = updatedProduct;
+        }
+
+        // Met à jour la liste de produits si présente
+        state.products = state.products.map((p) =>
+          p._id === updatedProduct._id ? updatedProduct : p
+        );
+      })
+      .addCase(rateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Erreur lors de la notation du produit";
       });
   },
 });

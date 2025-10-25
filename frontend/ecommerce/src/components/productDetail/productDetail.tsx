@@ -1,55 +1,75 @@
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { useProduct } from "../../hooks/useProduct";
 import PageLoader from "../LoaderPage/PageLoader";
 import type { ProductDetail as ProductDetailType } from "../../interfaces/product.interface";
-import "./product-detail.css";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import RateComponent from "../rateComponent/RateComponent";
+import "./product-detail.css";
+
 export const ProductDetail = ({
   selectedProduct,
 }: {
   selectedProduct: ProductDetailType;
 }) => {
-  console.log("Product selectedProduct:", selectedProduct);
-  const onRatechange = async (newRating: number) => {
-    console.log(`New rating for product ${product._id}: ${newRating}`);
-    // try {
-    //   const prod = await getProductById(product._id);
-    //   if (prod) {
-    //     console.log(
-    //       `New rating for product ${prod._id} (${prod.title}): ${newRating}`
-    //     );
-    //   } else {
-    //     console.error("Product not found for rating update.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching product for rating update:", error);
-  };
+  const { rateProduct, checkRateProductByUser } = useProduct(); // ✅ récupère la méthode du hook
+
+  // Callback appelé quand l'utilisateur clique sur une étoile
+  const onRateChange = useCallback(
+    async (newRating: number) => {
+      try {
+        console.log(
+          `⭐ Nouvelle note pour le produit ${selectedProduct._id}: ${newRating}`
+        );
+        const hasRated = await checkRateProductByUser(product._id);
+        console.log("Has user rated this product before?", hasRated);
+        const isUpdate = hasRated ? true : false;
+
+        // Appelle la fonction du hook
+        const success = await rateProduct(
+          selectedProduct._id,
+          newRating,
+          isUpdate
+        );
+
+        if (success) {
+          console.log("✅ Note enregistrée avec succès !");
+        } else {
+          console.error("❌ Échec de la mise à jour de la note.");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la notation :", error);
+      }
+    },
+    [selectedProduct, rateProduct]
+  );
 
   if (!selectedProduct) return <PageLoader />;
+
   return (
     <div className="product-detail-text-container">
-      {selectedProduct.images && selectedProduct.images[0] && (
+      {selectedProduct.images?.[0] && (
         <img
           src={selectedProduct.images[0]}
           alt={selectedProduct.title}
           className="product-detail-image"
         />
-      )}{" "}
+      )}
+
       <div className="product-detail-container">
-        {" "}
         <RateComponent
           rate={Number(selectedProduct.averageRating) || 1}
           editable={true}
           starColor="#FFD700"
           emptyStarColor="#DDDDDD"
-          onRateChange={onRatechange}
+          onRateChange={onRateChange} // ✅ On passe le handler ici
         />
+
         <h1 className="product-detail-title">{selectedProduct.title}</h1>
         <p className="product-detail-description">
           {selectedProduct.description}
         </p>
         <p className="product-detail-price">{selectedProduct.price} €</p>
+
         <Link
           to={`/cart/add/${selectedProduct._id}`}
           className="add-to-cart-button"

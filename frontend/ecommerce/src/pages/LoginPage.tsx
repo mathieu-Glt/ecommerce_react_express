@@ -10,9 +10,16 @@ import type { FormikHelpers } from "../interfaces/formikHelpers.interface";
 import { useAuth } from "../hooks/useAuth";
 export const LoginPage = () => {
   const { login } = useAuth();
-  const { loading, error, user, token, refreshToken } = useAppSelector(
-    (state) => state.auth
-  );
+  const { loading, error, user } = useAppSelector((state) => state.auth);
+  const {
+    token,
+    refreshToken,
+    setToken,
+    setRefreshToken,
+    setUserStorage,
+    clearTokens,
+  } = useLocalStorage();
+
   console.log("LoginPage - auth state:", {
     loading,
     error,
@@ -20,18 +27,10 @@ export const LoginPage = () => {
     token,
     refreshToken,
   });
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [validated, setValidated] = useState(false);
-  const [userStorage, setUserStorage] = useLocalStorage<User | null>(
-    "user",
-    null
-  );
-  const [tokenStorage, setTokenStorage] = useLocalStorage<string>("token", "");
-  const [refreshTokenStorage, setRefreshTokenStorage] = useLocalStorage<string>(
-    "refreshToken",
-    ""
-  );
   const handleLogin = async (
     email: string,
     password: string,
@@ -46,8 +45,8 @@ export const LoginPage = () => {
         if (rememberMe) {
           // Stocke dans le localStorage via useLocalStorage
           setUserStorage(result.results.user);
-          setTokenStorage(result.results.token);
-          setRefreshTokenStorage(result.results.refreshToken);
+          setToken(result.results.token);
+          setRefreshToken(result.results.refreshToken);
         }
 
         console.log(

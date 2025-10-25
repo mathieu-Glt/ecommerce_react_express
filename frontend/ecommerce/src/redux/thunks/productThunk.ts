@@ -8,8 +8,10 @@ import {
   deleteProduct,
   searchProductsApi,
   getLatestProducts,
+  updateProductRating,
+  addProductRating,
 } from "../../services/api/product";
-import type { Product } from "../../interfaces/product.interface";
+import type { Product, Rating } from "../../interfaces/product.interface";
 
 export const fetchProducts = createAsyncThunk<
   Product[],
@@ -146,5 +148,27 @@ export const deleteExistingProduct = createAsyncThunk<
     return id;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.message || "Error deleting product");
+  }
+});
+
+export const rateProduct = createAsyncThunk<
+  Product,
+  { id: string; star: number; productRating?: Rating[] },
+  { rejectValue: string }
+>("products/rateProduct", async ({ id, star, productRating }, thunkAPI) => {
+  try {
+    const userId = "l'id utilisateur"; // à récupérer depuis ton store
+    const userAlreadyRated = productRating?.some(
+      (r) => r.postedBy?._id === userId
+    );
+    const isUpdate = !!userAlreadyRated;
+
+    const response = isUpdate
+      ? await updateProductRating(id, star)
+      : await addProductRating(id, star);
+
+    return response.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.message || "Erreur lors du rating");
   }
 });

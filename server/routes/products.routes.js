@@ -16,10 +16,11 @@ const {
   commentProduct,
   updateCommentProduct,
   deleteCommentProduct,
+  takeProductRating,
 } = require("../controllers/product.controllers");
 
 // Middlewares
-const { requireRole } = require("../middleware/auth");
+const { requireRole, authenticateToken } = require("../middleware/auth");
 const {
   upload,
   uploadToCloudinary,
@@ -37,11 +38,11 @@ const {
  */
 
 /**
- * @route GET /products
+ * @route GET /products/
  * @desc Get a list of all products
  * @access Public
  */
-router.get("/products", getProducts);
+router.get("/", getProducts);
 
 /**
  * @route GET /product/slug/:slug
@@ -72,11 +73,11 @@ router.get("/products/search/price", searchProductByPriceRange);
 router.get("/id/:id", getProductById);
 
 /**
- * @route POST /product/lastest
+ * @route GET /product/lastest
  * @desc Get latest products
  * @access Public
  */
-router.post("/latest", getLatestProducts);
+router.get("/latest", getLatestProducts);
 
 /**
  * @route POST /product
@@ -120,7 +121,12 @@ router.delete("/products/:id", requireRole(["admin"]), deleteProduct);
  * @access Protected (Authenticated users)
  * @middleware requireRole(["user", "admin"])
  */
-router.post("/products/:id/rate", requireRole(["user", "admin"]), rateProduct);
+router.post(
+  "/:id/rate",
+  authenticateToken,
+  requireRole(["user", "admin"]),
+  rateProduct
+);
 
 /**
  * @route PUT /product/:id/rate
@@ -129,42 +135,18 @@ router.post("/products/:id/rate", requireRole(["user", "admin"]), rateProduct);
  * @middleware requireRole(["user", "admin"])
  */
 router.put(
-  "/products/:id/rate",
+  "/:id/rate",
+  authenticateToken,
   requireRole(["user", "admin"]),
   updateProductRating
 );
 
 /**
- * @route POST /product/:id/comment
- * @desc Comment on a product
+ * @route GET /product/:id/rate/check
+ * @desc Check if user has rated the product
  * @access Protected (Authenticated users)
+ * @middleware requireRole(["user", "admin"])
  */
-router.post(
-  "/products/:id/comment",
-  requireRole(["user", "admin"]),
-  commentProduct
-);
-
-/**
- * @route PUT /product/:id/comment/:commentId
- * @desc Update a comment on a product
- * @access Protected (Authenticated users)
- */
-router.put(
-  "/products/:id/comment/:commentId",
-  requireRole(["user", "admin"]),
-  updateCommentProduct
-);
-
-/**
- * @route DELETE /product/:id/comment/:commentId
- * @desc Delete a comment on a product
- * @access Protected (Authenticated users)
- */
-router.delete(
-  "/products/:id/comment/:commentId",
-  requireRole(["user", "admin"]),
-  deleteCommentProduct
-);
+router.get("/:id/rate/check", authenticateToken, takeProductRating);
 
 module.exports = router;

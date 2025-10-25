@@ -8,7 +8,7 @@ import type { ProductListResponse } from "../../interfaces/responseProduct.inter
 import { API_ROUTES } from "../constants/api-routes";
 
 // Define BASE_URL or import from your config
-const BASE_URL = process.env.VITE_API_BASE_URL || "http://localhost:5173";
+const BASE_URL = process.env.VITE_API_BASE_URL || "http://localhost:8000";
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const api: AxiosInstance = useApi();
 
@@ -23,12 +23,22 @@ const api: AxiosInstance = useApi();
  */
 export async function getProducts(): Promise<ProductListResponse> {
   try {
+    console.log(
+      "🔧 [getProducts] API_ROUTES.PRODUCTS.LIST:",
+      API_ROUTES.PRODUCTS.LIST
+    );
+    console.log(
+      "🔧 [getProducts] Full URL will be:",
+      `${api.defaults.baseURL}/${API_ROUTES.PRODUCTS.LIST}`
+    );
+
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.LIST
     );
     console.log("Response data:", response.data);
     return response.data;
   } catch (error) {
+    console.error("❌ [getProducts] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error || "Failed to fetch products"
@@ -161,12 +171,22 @@ export async function getLatestProducts(
   limit: number
 ): Promise<ProductListResponse> {
   try {
-    const response: AxiosResponse<ProductListResponse> = await api.post(
+    console.log(
+      "🔧 [getLatestProducts] API_ROUTES.PRODUCTS.LATEST:",
+      API_ROUTES.PRODUCTS.LATEST
+    );
+    console.log(
+      "🔧 [getLatestProducts] Full URL will be:",
+      `${api.defaults.baseURL}/${API_ROUTES.PRODUCTS.LATEST}`
+    );
+
+    const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.LATEST,
       { limit } // correspond au param attendu côté backend
     );
     return response.data;
   } catch (error) {
+    console.error("❌ [getLatestProducts] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error || "Failed to fetch latest products"
@@ -230,5 +250,99 @@ export async function deleteProduct(id: string): Promise<ProductListResponse> {
       );
     }
     throw new Error("Failed to delete product");
+  }
+}
+
+/**
+ * Rates a product by adding a new rating.
+ * @param id - Product ID to rate
+ * @param star - Rating value (1-5)
+ * @returns Updated product data with new rating
+ * @throws {Error} If rating fails
+ * @example
+ * const response = await addProductRating("productId", 4);
+ * */
+export async function addProductRating(
+  id: string,
+  star: number,
+  isUpdate?: boolean
+): Promise<ProductListResponse> {
+  console.log(
+    `Adding - addProductRating - rating for product ${id} to ${star} stars. Is update: ${isUpdate}`
+  );
+
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.post(
+      API_ROUTES.PRODUCTS.RATE_ADD(id),
+      { star }
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data?.error || "Failed to rate product");
+    }
+    throw new Error("Failed to rate product");
+  }
+}
+
+/**
+ * Updates an existing product rating.
+ * @param id - Product ID to update rating
+ * @param star - New rating value (1-5)
+ * @returns Updated product data with updated rating
+ * @throws {Error} If update fails
+ * @example
+ * const response = await updateProductRating("productId", 5);
+ * */
+export async function updateProductRating(
+  id: string,
+  star: number,
+  isUpdate?: boolean
+): Promise<ProductListResponse> {
+  console.log(
+    `Updating - updateProductRating - rating for product ${id} to ${star} stars. Is update: ${isUpdate}`
+  );
+  try {
+    // Axios instance will automatically add the token from useApi
+    const response: AxiosResponse<ProductListResponse> = await api.put(
+      API_ROUTES.PRODUCTS.RATE_UPDATE(id),
+      { star }
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to update product rating"
+      );
+    }
+    throw new Error("Failed to update product rating");
+  }
+}
+
+/**
+ * Vérifie si l'utilisateur connecté a déjà noté un produit
+ * @param id - ID du produit
+ * @returns true si l'utilisateur a noté le produit, false sinon
+ * @throws {Error} Si la requête échoue
+ * @example
+ * const hasRated = await hasUserRatedProduct("productId");
+ */
+export async function hasUserRatedProduct(id: string): Promise<{}> {
+  try {
+    const response: AxiosResponse<{ success: boolean }> = await api.get(
+      API_ROUTES.PRODUCTS.RATE_CHECK(id)
+    );
+    console.log(`User has rated product ${id}:`, response.data);
+
+    // Le backend retourne true/false
+    return response.data;
+  } catch (error) {
+    console.error("❌ [hasUserRatedProduct] Error:", error);
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to check user rating"
+      );
+    }
+    throw new Error("Failed to check user rating");
   }
 }

@@ -29,6 +29,12 @@ export interface LoginResponse {
   user: User; // ✅ Obligatoire
   token: string; // ✅ Obligatoire
   refreshToken: string; // ✅ Obligatoire
+  data?: DataResponseAuth;
+}
+interface DataResponseAuth {
+  user: User;
+  token: string;
+  refreshToken: string;
 }
 
 /**

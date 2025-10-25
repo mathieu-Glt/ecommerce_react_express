@@ -73,16 +73,17 @@ const productSchema = new mongoose.Schema(
         postedBy: { type: ObjectId, ref: "User" },
       },
     ],
-    comments: [
-      {
-        text: String,
-        postedBy: { type: ObjectId, ref: "User" },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
   },
   { timestamps: true }
 );
+
+// Virtual pour les commentaires liés (depuis Comment model)
+productSchema.virtual("commentsInfo", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "product",
+  justOne: false,
+});
 
 // Virtuals for relational population
 productSchema.virtual("categoryInfo", {

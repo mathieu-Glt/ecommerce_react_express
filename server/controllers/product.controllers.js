@@ -83,7 +83,9 @@ exports.searchProductByPriceRange = asyncHandler(async (req, res) => {
  */
 exports.getLatestProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await productService.getLatestProducts(3);
+    const { limit } = req.body || {};
+    const limitNumber = limit && !isNaN(limit) ? parseInt(limit) : 3;
+    const products = await productService.getLatestProducts(limitNumber);
     if (!products || products.length === 0) {
       return res
         .status(404)
@@ -355,7 +357,7 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
 exports.rateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { star } = req.body;
-  const userId = req.user?._id; // Assuming auth middleware sets req.user
+  const userId = req.user?.userId;
   if (!userId) {
     return res.status(401).json({
       success: false,
@@ -373,8 +375,8 @@ exports.rateProduct = asyncHandler(async (req, res) => {
   try {
     const updatedProduct = await productService.addRatingToProduct(
       id,
-      star,
-      userId
+      userId,
+      star
     );
 
     if (!updatedProduct) {
@@ -416,7 +418,17 @@ exports.rateProduct = asyncHandler(async (req, res) => {
 exports.updateProductRating = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { star } = req.body;
-  const userId = req.user?._id; // Assuming auth middleware sets req.user
+  const { isUpdate } = req.body;
+  console.log("isUpdate received:", isUpdate);
+  const userId = req.user?.userId;
+  console.log(
+    "Updating rating for product:",
+    id,
+    "by user:",
+    userId,
+    "with star:",
+    star
+  );
   if (!userId) {
     return res.status(401).json({
       success: false,
@@ -430,10 +442,10 @@ exports.updateProductRating = asyncHandler(async (req, res) => {
     });
   }
   try {
-    const updatedProduct = await productService.addRatingToProduct(
+    const updatedProduct = await productService.updateRatingToProduct(
       id,
-      star,
-      userId
+      userId,
+      star
     );
     if (!updatedProduct) {
       return res.status(404).json({
@@ -454,168 +466,45 @@ exports.updateProductRating = asyncHandler(async (req, res) => {
     });
   }
 });
-
 /**
- *  Add a comment to a product
- *  @route POST /products/:id/comment
- *  @access Protected
- *  @param {string} id - Product ID
- * @param {string} userId - ID of the user posting the comment
- * @param {Object} body - Comment data
- * @param {string} body.text - Comment text
- * @param {string} body.postedBy - User ID of the commenter
- * @returns {Object} 200 - Updated product with new comment
- * @returns {Object} 404 - Product not found
- * @returns {Object} 400 - Invalid comment data
- * @returns {Object} 401 - User not authenticated
- * @returns {Object} 500 - Internal server error
- */
-
-exports.commentProduct = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { text } = req.body;
-  const userId = req.user?._id; // Assuming auth middleware sets req.user
-  if (!userId) {
-    return res.status(401).json({
-      success: false,
-      message: "User not authenticated",
-    });
-  }
-  if (!text || text.trim() === "") {
-    return res.status(400).json({
-      success: false,
-      message: "Comment text cannot be empty",
-    });
-  }
-  try {
-    const updatedProduct = await productService.addCommentToProduct(
-      id,
-      text,
-      userId
-    );
-    if (!updatedProduct) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-    res.status(200).json({
-      success: true,
-      results: updatedProduct,
-    });
-  } catch (error) {
-    console.error("Error adding comment to product:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
-
-/**
- * Update a comment on a product
- * @route PUT /products/:id/comment/:commentId
+ * Take a rate from user for a product
+ * @route GET /products/:id/rate
  * @access Protected
  * @param {string} id - Product ID
- * @param {string} commentId - Comment ID
- * @param {string} userId - ID of the user updating the comment
- * @param {Object} body - Updated comment data
- * @param {string} body.text - Updated comment text
- * @returns {Object} 200 - Updated product with modified comment
- * @returns {Object} 404 - Product or comment not found
- * @returns {Object} 400 - Invalid comment data
- * @returns {Object} 401 - User not authenticated
+ * @param {Object} body - Rating data
+ * @param {number} body.star - Star rating (1-5)
+ * @param {string} body.postedBy - User ID of the rater
+ * @returns {Boolean} true - User has rated the product
+ * @returns {Boolean} false - User has not rated the product
+ * @returns {Object} 404 - Product not found
+ * @returns {Object} 200 - hasRated status
  * @returns {Object} 500 - Internal server error
+ *
  */
 
-exports.updateCommentProduct = asyncHandler(async (req, res) => {
-  const { id, commentId } = req.params;
-  const { text } = req.body;
-  const userId = req.user?._id; // Assuming auth middleware sets req.user
-  if (!userId) {
-    return res.status(401).json({
-      success: false,
-      message: "User not authenticated",
-    });
-  }
-  if (!text || text.trim() === "") {
-    return res.status(400).json({
-      success: false,
-      message: "Comment text cannot be empty",
-    });
-  }
-  try {
-    const updatedProduct = await productService.updateCommentOnProductService(
-      id,
-      commentId,
-      text,
-      userId
-    );
-    if (!updatedProduct) {
-      return res.status(404).json({
-        success: false,
-        message: "Product or comment not found",
-      });
-    }
-    res.status(200).json({
-      success: true,
-      results: updatedProduct,
-    });
-  } catch (error) {
-    console.error("Error updating comment on product:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
+exports.takeProductRating = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user?.userId;
 
-/**
- *  Delete a comment on a product
- *  @route DELETE /products/:id/comment/:commentId
- *  @access Protected
- * @param {string} id - Product ID
- * @param {string} commentId - Comment ID
- * @param {string} userId - ID of the user deleting the comment
- * @returns {Object} 200 - Updated product with comment removed
- * @returns {Object} 404 - Product or comment not found
- * @returns {Object} 401 - User not authenticated
- * @returns {Object} 500 - Internal server error
- */
-
-exports.deleteCommentProduct = asyncHandler(async (req, res) => {
-  const { id, commentId } = req.params;
-  const userId = req.user?._id; // Assuming auth middleware sets req.user
-  if (!userId) {
-    return res.status(401).json({
-      success: false,
-      message: "User not authenticated",
-    });
-  }
   try {
-    const updatedProduct = await productService.deleteCommentOnProductService(
-      id,
-      commentId,
-      userId
-    );
-    if (!updatedProduct) {
-      return res.status(404).json({
-        success: false,
-        message: "Product or comment not found",
-      });
+    const product = await productService.takeRatingFromProduct(id, userId);
+    console.log(" Controoler - Product retrieved for rating check:", product);
+
+    if (!product)
+      return res.status(200).json({ success: false, hasRated: false });
+
+    const userRating =
+      product.postedBy._id.toString() === userId ? product : null;
+    console.log("Controller - User rating found:", userRating);
+
+    if (!userRating) {
+      return res.status(200).json({ success: true, hasRated: false });
+    } else {
+      return res
+        .status(200)
+        .json({ success: true, hasRated: true, rating: userRating });
     }
-    res.status(200).json({
-      success: true,
-      results: updatedProduct,
-    });
   } catch (error) {
-    console.error("Error deleting comment on product:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });

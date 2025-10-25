@@ -18,7 +18,9 @@ const {
   logout,
   handleOAuthCallback,
 } = require("../controllers/auth.controllers");
-
+const User = require("../models/User"); // 🟢 Ton modèle Mongoose User
+const MongooseUserRepository = require("../repositories/MongooseUserRepository");
+const AuthService = require("../services/authService");
 // Middlewares
 const { authenticateToken } = require("../middleware/auth");
 
@@ -107,6 +109,52 @@ router.post(
   register
 );
 
+/**
+ * @route GET /auth/refresh-token
+ * @desc Refresh JWT token using refresh token
+ * @access Public
+ * @returns 200 - New token and refresh token
+ * @returns 401 - Unauthorized if refresh token is invalid or expired
+ * /returns 400 - Bad request if refresh token is missing
+ */
+/**
+ * @route GET /auth/refresh-token
+ * @desc Refresh JWT token using refresh token
+ * @access Public
+ */
+router.get("/refresh-token", async (req, res) => {
+  try {
+    // Extraire le refresh token depuis les headers
+    const refreshToken = req.headers["authorization"]?.split(" ")[1];
+    if (!refreshToken) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Refresh token required" });
+    }
+
+    // 🟢 Instanciation correcte du repository avec le modèle User
+    const userRepository = new MongooseUserRepository(User);
+    const authSvc = new AuthService(userRepository);
+
+    // Appel du refresh token
+    const result = await authSvc.refreshToken(refreshToken);
+
+    if (!result.success) {
+      return res
+        .status(401)
+        .json({ success: false, error: result.error || "Unauthorized" });
+    }
+
+    res.json({
+      success: true,
+      token: result.token,
+      refreshToken: result.refreshToken,
+    });
+  } catch (error) {
+    console.error("Error in /auth/refresh-token:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
 /**
  * @route GET /auth/verify
  * @desc Verify JWT token

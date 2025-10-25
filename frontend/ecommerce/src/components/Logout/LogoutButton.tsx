@@ -1,20 +1,15 @@
 import { useAuth } from "../../hooks/useAuth";
-import { useMultipleLocalStorage } from "../../hooks/useLocalStorage";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 import "./logoutButton.css";
 
 export default function LogoutButton() {
   const { logout } = useAuth();
-  // use loaclStorage of useLocalStorage
-  const storage = useMultipleLocalStorage({
-    user: null,
-    token: "",
-    refreshToken: "",
-  });
-
+  const { setToken, setRefreshToken, clearTokens } = useLocalStorage();
+  // Initialize hooks for each localStorage key
   const handleLogout = async () => {
-    // 1️⃣ Supprime les clés du localStorage
-    storage.clearAll();
-    // 2️⃣ Déconnecte Redux / middleware
+    // Supprime les clés du localStorage
+    clearTokens();
+    // Déconnecte Redux / middleware
     await logout();
   };
 

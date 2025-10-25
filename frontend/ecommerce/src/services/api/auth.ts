@@ -80,6 +80,7 @@ export async function signIn(body: LoginCredentials): Promise<LoginResponse> {
       API_ROUTES.AUTH.LOGIN,
       body
     );
+    console.log("🚀 ~ file: auth.ts:100 ~ signIn ~ login:", login);
     return login.data;
   } catch (error: any) {
     // Vérifie la structure plutôt que l'instance
@@ -228,13 +229,13 @@ export async function refreshTokens() {
     );
     return refreshResponse;
   } catch (error) {
-    throw new Error("");
+    throw new Error(" Failed to refresh token");
   }
 }
 
 // function destroytoken && user
 export async function destroyTokenUser() {
-  localStorage.removeItem("accessToken");
+  localStorage.removeItem("token");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
 }

@@ -3,6 +3,9 @@
  * Définit les méthodes que toutes les implémentations doivent avoir
  */
 class IProductRepository {
+  async takeNoteOfUserForProductRepo(productId, userId, star) {
+    throw new Error("Method takeRatingFromProductRepo must be implemented");
+  }
   async findOrCreateProduct(productData) {
     throw new Error("Method findOrCreateProduct must be implemented");
   }

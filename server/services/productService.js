@@ -138,7 +138,36 @@ class ProductService {
   }
 
   /**
-   * Add a rating to a product.
+   * Upadate a rating to a product.
+   * @param {string} productId - Product ID.
+   * @param {Object} ratingData - Rating details (star, postedBy).
+   * @returns {Promise<Object|null>} Updated product object with new rating or null if not found.
+   */
+  async updateRatingToProduct(productId, userId, star) {
+    return await this.productRepository.updateRatingToProductRepo(
+      productId,
+      userId,
+      star
+    );
+  }
+
+  /**
+   * Take a rating from user for a product .
+   * @param {string} productId - Product ID.
+   * @param {Object} ratingData - Rating details (star, postedBy).
+   * @returns {Promise<Object|null>} Updated product object with new rating or null if not found.
+   */
+  async takeRatingFromProduct(productId, userId) {
+    const result = await this.productRepository.takeRatingFromProductRepo(
+      productId,
+      userId
+    );
+    console.log("Service result for takeRatingFromProduct:", result);
+    return result;
+  }
+
+  /**
+   * Post a rating to a product.
    * @param {string} productId - Product ID.
    * @param {Object} ratingData - Rating details (star, postedBy).
    * @returns {Promise<Object|null>} Updated product object with new rating or null if not found.
@@ -150,49 +179,5 @@ class ProductService {
       star
     );
   }
-
-  /**
-   *  Add a comment to a product.
-   * @param {string} productId - Product ID.
-   * @param {Object} commentData - Comment details (text, postedBy).
-   * @returns {Promise<Object|null>} Updated product object with new comment or null if not found.
-   */
-  async addCommentToProduct(productId, commentData) {
-    return await this.productRepository.addCommentToProductRepo(
-      productId,
-      commentData
-    );
-  }
-
-  /**
-   * Update comment on a product.
-   * @param {string} productId - Product ID.
-   * @param {string} commentId - Comment ID.
-   * @param {Object} updateData - Fields to update in the comment (e.g., text).
-   * @returns {Promise<Object|null>} Updated product object with updated comment or null if not found.
-   */
-  async updateCommentOnProductService(productId, commentId, updateData) {
-    return await this.productRepository.updateCommentOnProductRepo(
-      productId,
-      commentId,
-      updateData
-    );
-  }
-
-  /**
-   *  Delete comment from a product.
-   * @param {string} productId - Product ID.
-   * @param {string} commentId - Comment ID.
-   * @param {Object} updateData - Fields to update in the comment (e.g., text).
-   * @returns {Promise<Object|null>} Updated product object with deleted comment or null if not found.
-   */
-
-  async deleteCommentFromProductService(productId, commentId) {
-    return await this.productRepository.deleteCommentFromProductRepo(
-      productId,
-      commentId
-    );
-  }
 }
-
 module.exports = ProductService;

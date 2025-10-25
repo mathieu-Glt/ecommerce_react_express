@@ -31,7 +31,7 @@ export const loginUser = createAsyncThunk<
 >("auth/loginUser", async (credentials, thunkAPI) => {
   try {
     const response = await signIn(credentials);
-    const { user, token, refreshToken } = response as ResponseDataLogin;
+    const { user, token, refreshToken } = response;
     return { success: true, results: { user, token, refreshToken } };
   } catch (err: any) {
     return thunkAPI.rejectWithValue({

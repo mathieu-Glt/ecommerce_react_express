@@ -193,7 +193,43 @@ class MongooseProductRepository extends IProductRepository {
   }
 
   /**
-   * Add a rating to a product.
+   * Update a rating to a product.
+   * @param {string} productId - Product ID
+   * @param {Object} star - Rating data (star)
+   * @param {string} userId - ID of the user posting the rating
+   *
+   * @returns {Promise<Object|null>} Updated product document or null if not found
+   */
+  async updateRatingToProductRepo(productId, userId, star) {
+    const product = await this.Product.findById(productId);
+    if (!product) return null;
+
+    const existingRating = product.rating.find(
+      (r) => r.postedBy.toString() === userId.toString()
+    );
+
+    if (existingRating) {
+      existingRating.star = star; // Met à jour l'utilisateur seulement
+    } else {
+      // Si tu veux, tu peux aussi ajouter une nouvelle note si l'utilisateur n'a jamais noté
+      product.rating.push({ star, postedBy: userId });
+    }
+
+    await product.save();
+
+    const sanitizedRatings = product.rating.map((r) => ({
+      star: r.star,
+      postedBy: r.postedBy,
+    }));
+
+    return {
+      ...product.toObject(), // toObject() convertit le document Mongoose en objet JavaScript "pur"
+      rating: sanitizedRatings,
+    };
+  }
+
+  /**
+   * Post a rating to a product.
    * @param {string} productId - Product ID
    * @param {Object} star - Rating data (star)
    * @param {string} userId - ID of the user posting the rating
@@ -202,83 +238,57 @@ class MongooseProductRepository extends IProductRepository {
    */
   async addRatingToProductRepo(productId, userId, star) {
     const product = await this.Product.findById(productId);
-    if (!product) {
-      return null;
-    }
-    const existingRating = product.ratings.find(
-      (r) => r.postedBy.toString() === userId.toString()
-    );
+    if (!product) return null;
 
-    if (existingRating) {
-      existingRating.star = star; // update
-    } else {
-      product.ratings.push({ star, postedBy: userId });
-    }
+    // On pousse simplement la nouvelle note sans toucher aux anciennes
+    product.rating.push({ star, postedBy: userId });
 
     await product.save();
 
-    // Recalcul automatique de la moyenne via le virtual "averageRating"
-    const productObj = product.toObject({ virtuals: true });
-    return productObj;
+    // Retourner un objet avec rating "propre" si tu veux éviter les _id dans le front
+    const sanitizedRatings = product.rating.map((r) => ({
+      star: r.star,
+      postedBy: r.postedBy,
+    }));
+
+    return {
+      ...product.toObject(), // toObject() convertit le document
+      rating: sanitizedRatings,
+    };
   }
 
   /**
-   * Add a comment to a product.
+   * Take note of a user for a product.
    * @param {string} productId - Product ID
    * @param {Object} commentData - Comment data (text, postedBy)
    * @returns {Promise<Object|null>} Updated product document or null if not found
    */
-  async addCommentToProductRepo(productId, commentData) {
-    const product = await this.Product.findById(productId);
-    if (!product) {
-      return null;
-    }
-    product.comments.push(commentData);
-    await product.save();
-    return product;
-  }
+  async takeRatingFromProductRepo(productId, userId) {
+    console.log(
+      "Repository - takeRatingFromProductRepo called: ",
+      productId,
+      userId
+    );
 
-  /**
-   * Update a comment on a product.
-   * @param {string} productId - Product ID
-   * @param {string} commentId - Comment ID
-   * @param {Object} updateData - Fields to update in the comment (e.g., text)
-   * @returns {Promise<Object|null>} Updated product document or null if not found
-   */
-  async updateCommentOnProductRepo(productId, commentId, updateData) {
     const product = await this.Product.findById(productId);
-    if (!product) {
+    console.log("Repository - Product fetched: ", product);
+    if (!product || !product.rating) {
+      console.log("Repository - Product not found");
       return null;
     }
-    const comment = product.comments.id(commentId);
-    if (!comment) {
-      return null;
-    }
-    Object.assign(comment, updateData);
-    await product.save();
-    return product;
-  }
 
-  /**
-   * Delete a comment from a product.
-   * @param {string} productId - Product ID
-   * @param {string} commentId - Comment ID
-   * @param {Object} updateData - Fields to update in the comment (e.g., text)
-   * @returns {Promise<Object|null>} Updated product document with deleted comment or null if not found
-   */
+    // Cherche la note de l'utilisateur
+    const userRating = product.rating.find(
+      (r) => r.postedBy.toString() === userId
+    );
 
-  async deleteCommentFromProductRepo(productId, commentId) {
-    const product = await this.Product.findById(productId);
-    if (!product) {
-      return null;
+    if (!userRating) {
+      console.log("Repository - User has not rated this product yet");
+      return null; // Important pour éviter l'erreur 500
     }
-    const comment = product.comments.id(commentId);
-    if (!comment) {
-      return null;
-    }
-    comment.remove();
-    await product.save();
-    return product;
+
+    console.log("Repository - User rating found: ", userRating);
+    return userRating;
   }
 }
 

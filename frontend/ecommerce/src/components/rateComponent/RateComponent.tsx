@@ -1,5 +1,6 @@
 import React from "react";
 import StarRatings from "react-star-ratings";
+import "./rate.css";
 
 interface RateComponentProps {
   rate: number;
@@ -12,29 +13,33 @@ interface RateComponentProps {
 const RateComponent: React.FC<RateComponentProps> = ({
   rate,
   editable,
-  starColor = "#FFD700",
+  starColor = "#ffbb00",
   emptyStarColor = "#DDDDDD",
   onRateChange,
 }) => {
   const handleRatingChange = (newRating: number) => {
+    console.log("Rating changed to:", newRating);
     if (onRateChange) onRateChange(newRating);
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <StarRatings
-        rating={rate}
-        starRatedColor={starColor}
-        starEmptyColor={emptyStarColor}
-        numberOfStars={5}
-        name="rating"
-        changeRating={handleRatingChange}
-        isSelectable={editable}
-        starDimension="24px"
-      />
-      {/* <span className="text-sm text-gray-600">
+    <div className="rate-component">
+      <div className="flex flex-col items-center gap-2 ">
+        <StarRatings
+          rating={rate}
+          starRatedColor={starColor}
+          starEmptyColor={emptyStarColor}
+          numberOfStars={5}
+          name="rating"
+          changeRating={handleRatingChange}
+          isSelectable={editable}
+          starDimension="24px"
+          className="star-ratings"
+        />
+        {/* <span className="text-sm text-gray-600">
         {editable ? "Cliquez pour noter" : `${rate.toFixed(1)} / 5`}
       </span> */}
+      </div>
     </div>
   );
 };

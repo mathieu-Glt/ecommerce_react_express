@@ -76,6 +76,14 @@ export interface ProductDetail {
   price?: number | string;
 }
 
+export interface Rating {
+  star: number;
+  postedBy: {
+    _id: string;
+    id?: string;
+  };
+}
+
 export interface ProductCard {
   _id: string;
   title: string;

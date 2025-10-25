@@ -10,8 +10,10 @@ import {
   updateExistingProduct,
   deleteExistingProduct,
   fetchLatestProducts,
+  rateProduct,
 } from "../redux/thunks/productThunk";
-import type { Product } from "../interfaces/product.interface";
+import type { Product, Rating } from "../interfaces/product.interface";
+import { hasUserRatedProduct } from "../services/api/product";
 
 /**
  * Custom hook to manage product state and CRUD operations.
@@ -149,6 +151,47 @@ export const useProduct = () => {
   );
 
   // ============================================
+  // RATE PRODUCT
+  // ============================================
+  const rateProductHook = useCallback(
+    async (
+      id: string,
+      star: number,
+      productRating?: Rating[]
+    ): Promise<boolean> => {
+      try {
+        await dispatch(rateProduct({ id, star, productRating })).unwrap();
+        toast.showSuccess("Product rated successfully");
+        return true;
+      } catch (err: any) {
+        toast.showError(err?.message || "Failed to rate product");
+        return false;
+      }
+    },
+    [dispatch, toast]
+  );
+
+  // ============================================
+  // CHECK RATE PRODUCT BY USER AUTHENTICATED
+  // ============================================
+  const checkRateProductByUser = useCallback(
+    async (productId: string): Promise<{} | null> => {
+      try {
+        const checkRateProductByUser = await hasUserRatedProduct(productId);
+        console.log(
+          `Check if user has rated product ${productId}:`,
+          checkRateProductByUser
+        );
+        return checkRateProductByUser;
+      } catch (err: any) {
+        toast.showError(err?.message || "Failed to check product rating");
+        return null;
+      }
+    },
+    [toast]
+  );
+
+  // ============================================
   // MEMOIZED RETURN VALUE
   // ============================================
   const productContextValue = useMemo(
@@ -158,12 +201,14 @@ export const useProduct = () => {
       loading,
       error,
       getLatestProducts,
+      checkRateProductByUser,
       getAllProducts,
       getProductById,
       getProductBySlug,
       createProduct,
       updateProduct,
       deleteProduct,
+      rateProduct: rateProductHook,
     }),
     [
       products,
@@ -171,12 +216,14 @@ export const useProduct = () => {
       loading,
       error,
       getAllProducts,
+      checkRateProductByUser,
       getLatestProducts,
       getProductById,
       getProductBySlug,
       createProduct,
       updateProduct,
       deleteProduct,
+      rateProductHook,
     ]
   );
 

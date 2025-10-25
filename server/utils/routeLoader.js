@@ -16,6 +16,7 @@ const loadRoutes = (app) => {
       const route = require(path.join(routesPath, file));
       console.log("Loaded route module:", route);
       const routeName = file.replace(".routes.js", "");
+      // http:://localhost:8000/api/products
       app.use(`/api/${routeName}`, route);
     }
   });

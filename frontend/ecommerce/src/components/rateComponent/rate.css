@@ -1,0 +1,8 @@
+.rate-component {
+  padding: 1rem;
+  background-color: #1178df;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.star-ratings {
+  fill: #ffbb00;
+}
