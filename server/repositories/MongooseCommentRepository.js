@@ -10,6 +10,19 @@ class MongooseCommentRepository extends ICommentRepository {
   }
 
   /**
+   * Get comments by user ID.
+   * @param {String} userId - ID of the user
+   * @returns {Promise<Array>} List of comments made by the user
+   */
+
+  async getCommentByUserAndProduct(userId, productId) {
+    return await this.Comment.findOne({
+      user: userId,
+      product: productId,
+    }).exec();
+  }
+
+  /**
    * Get all comments.
    * @returns {Promise<Array>} List of comments.
    */
@@ -26,6 +39,7 @@ class MongooseCommentRepository extends ICommentRepository {
    * @returns {Promise<Object>} The created comment
    */
   async addComment(commentData) {
+    console.log("commentData dans repository :", commentData);
     const comment = new this.Comment(commentData);
     return await comment.save();
   }
@@ -69,7 +83,7 @@ class MongooseCommentRepository extends ICommentRepository {
    * @param {String} commentId - ID of the comment to delete
    * @returns {Promise<Object>} The deleted comment
    */
-  async deleteComment(commentId) {
+  async deleteCommentRepo(commentId) {
     return await this.Comment.findByIdAndDelete(commentId).exec();
   }
 }

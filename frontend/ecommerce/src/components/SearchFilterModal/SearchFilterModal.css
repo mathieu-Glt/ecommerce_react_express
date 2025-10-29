@@ -1,0 +1,147 @@
+/* ======== Overlay sombre ======== */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: flex-start; /* menu à gauche */
+  align-items: stretch;
+  z-index: 99999;
+  transition: opacity 0.3s ease;
+}
+
+/* ======== Panneau latéral ======== */
+.drawer-panel {
+  background: #fff;
+  width: 380px;
+  max-width: 90%;
+  height: 100%;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+  border-right: 3px solid #007bff;
+  padding: 25px 20px;
+  overflow-y: auto;
+  position: relative;
+
+  transform: translateX(-100%);
+  animation: slideIn 0.4s ease forwards;
+}
+
+/* ======== Animation d’ouverture ======== */
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ======== Bouton de fermeture ======== */
+.drawer-close {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #444;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.drawer-close:hover {
+  color: #007bff;
+}
+
+/* ======== Contenu ======== */
+.drawer-panel h2 {
+  margin-top: 10px;
+  margin-bottom: 25px;
+  font-size: 22px;
+  color: #111;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.form-group input[type="text"],
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* ======== Sliders ======== */
+.form-group input[type="range"] {
+  width: 100%;
+  appearance: none;
+  height: 5px;
+  border-radius: 4px;
+  background: #ddd;
+  margin: 5px 0;
+}
+
+.form-group input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #007bff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.form-group input[type="range"]::-webkit-slider-thumb:hover {
+  background: #0056b3;
+  transform: scale(1.1);
+}
+
+/* ======== Bouton Search ======== */
+.search-btn {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #007bff, #00c6ff);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.search-btn:hover {
+  background: linear-gradient(90deg, #0056b3, #00a6d6);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ======== Responsive ======== */
+@media (max-width: 600px) {
+  .drawer-panel {
+    width: 85%;
+  }
+}

@@ -27,3 +27,10 @@ export interface SubCategory {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface SubCategoryState {
+  subCategories: SubCategory[];
+  selectedSubCategory: SubCategory | null;
+  loading: boolean;
+  error: string | null;
+}

@@ -7,9 +7,11 @@ import "./NavBar.css";
 import { useUserContext } from "../../context/userContext";
 import { useAuth } from "../../hooks/useAuth";
 import LogoutButton from "../Logout/LogoutButton";
+import { useFilter } from "../../context/FilterSearchBarContext";
 
 export const Navigation: React.FC = () => {
   // const {user, isAuthenticated} = useUserContext();
+  const { toggleBarFilter } = useFilter();
   const { user, isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -47,6 +49,7 @@ export const Navigation: React.FC = () => {
         {/* Menu de navigation */}
         <div className={`navbar-menu ${isMenuOpen ? "active" : ""}`}>
           <div className="nav-links">
+            <button onClick={toggleBarFilter}>Recherche avancées</button>
             <Link to={ROUTES.HOME} className="nav-link" onClick={closeMenu}>
               Home
             </Link>

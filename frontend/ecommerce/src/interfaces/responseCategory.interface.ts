@@ -1,4 +1,4 @@
-import type { Product } from "./product.interface";
+import type { Category } from "./category.interface";
 
 export interface ApiSuccessResponse<T> {
   success: true;
@@ -14,4 +14,12 @@ export interface ApiErrorResponse {
 
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 
-export type ProductListResponse = ApiResponse<Product[]>;
+export type CategoryListResponse = ApiResponse<Category[]>;
+
+// export interface CategoryResponse {
+//   success: boolean;
+//   message: string;
+//   results: {
+//     categories: Category[];
+//   };
+// }

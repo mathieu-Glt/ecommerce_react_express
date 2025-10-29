@@ -160,9 +160,9 @@ productSchema.virtual("averageRating").get(function () {
  * - Returns the number of comments on the product
  *
  */
-productSchema.virtual("commentsCount").get(function () {
-  return this.comments.length;
-});
+// productSchema.virtual("commentsCount").get(function () {
+//   return this.comments.length;
+// });
 
 /**
  * Pre-remove hook

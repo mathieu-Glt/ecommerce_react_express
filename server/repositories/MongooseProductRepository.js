@@ -74,6 +74,89 @@ class MongooseProductRepository extends IProductRepository {
   }
 
   /**
+   * Find products by average rating range with pagination and sorting
+   * @param {number} minRate - Minimum average rating
+   * @param {number} maxRate - Maximum average rating
+   * @param {number} page - Page number (default 1)
+   * @param {number} limit - Number of products per page (default 10)
+   * @param {string} sortField - Field to sort by (default 'avgRating')
+   * @param {number} sortOrder - 1 for ascending, -1 for descending (default -1)
+   */
+  async findProductsByAverageRateRangeRepo({
+    minRate,
+    maxRate,
+    page = 1,
+    limit = 10,
+    sortField = "avgRating",
+    sortOrder = -1,
+  }) {
+    const matchStage = {};
+
+    if (minRate !== undefined) matchStage.avgRating = { $gte: minRate };
+    if (maxRate !== undefined)
+      matchStage.avgRating = { ...(matchStage.avgRating || {}), $lte: maxRate };
+
+    const skip = (page - 1) * limit;
+
+    const products = await this.Product.aggregate([
+      // Calculer la moyenne des notes
+      {
+        $addFields: {
+          avgRating: { $avg: "$rating.star" },
+        },
+      },
+      // Filtrer par min/max
+      { $match: matchStage },
+      // Lookup category
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryInfo",
+        },
+      },
+      { $unwind: "$categoryInfo" },
+      // Lookup sub-category
+      {
+        $lookup: {
+          from: "subs",
+          localField: "sub",
+          foreignField: "_id",
+          as: "subInfo",
+        },
+      },
+      { $unwind: "$subInfo" },
+      // Trier
+      { $sort: { [sortField]: sortOrder } },
+      // Pagination
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
+    return products;
+  }
+  /**
+   *
+   * Find products by category slug.
+   * @param {string} categorySlug - Category slug
+   * @returns {Promise<Array>} Array of matching product documents
+   */
+  async findProductsByCategorySlugRepo(categorySlug) {
+    // On récupère la catégorie par son slug
+    const category = await this.Category.findOne({ slug: categorySlug });
+    if (!category) return []; // Si la catégorie n'existe pas, on renvoie un tableau vide
+
+    // On récupère les produits liés à cette catégorie
+    const products = await this.Product.find({ category: category._id })
+      .populate("categoryInfo", "name slug") // virtual peupler category
+      .populate("subInfo", "name slug") // virtual pour sous-catégorie
+      .populate("commentsInfo") // si tu veux les commentaires
+      .exec();
+
+    return products;
+  }
+  /**
    * Retrieve all products from the database, populated with category and subcategory.
    * Also transforms image paths into complete URLs.
    * @returns {Promise<Array>} Array of product documents

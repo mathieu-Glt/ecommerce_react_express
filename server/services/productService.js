@@ -167,17 +167,44 @@ class ProductService {
   }
 
   /**
-   * Post a rating to a product.
-   * @param {string} productId - Product ID.
-   * @param {Object} ratingData - Rating details (star, postedBy).
-   * @returns {Promise<Object|null>} Updated product object with new rating or null if not found.
+   * Find products by its Category Slug.
+   * @param {string} categorySlug - Category Slug.
+   * @returns {Promise<Array>} List of products in the specified category.
    */
-  async addRatingToProduct(productId, userId, star) {
-    return await this.productRepository.addRatingToProductRepo(
-      productId,
-      userId,
-      star
+  async findProductsByCategorySlugService(categorySlug) {
+    return await this.productRepository.findProductsByCategorySlugRepo(
+      categorySlug
     );
   }
+
+  /**
+   * Find products by average rate min and max range.
+   * @param {Object} [params={}] - Parameters for finding products.
+   * @param {number} params.minRate - Minimum average rate.
+   * @param {number} params.maxRate - Maximum average rate.
+   * @param {number} [params.page=1] - Page number for pagination.
+   * @param {number} [params.limit=10] - Number of products per page.
+   * @param {string} [params.sortField='avgRating'] - Field to sort by.
+   * @param {number} [params.sortOrder=-1] - Sort order (1 for ascending, -1 for descending).
+   * @returns {Promise<Array>} List of products within the average rate range.
+   */
+  async findProductsByAverageRateRangeService({
+    minRate,
+    maxRate,
+    page = 1,
+    limit = 10,
+    sortField = "avgRating",
+    sortOrder = -1,
+  } = {}) {
+    return await this.productRepository.findProductsByAverageRateRangeRepo({
+      minRate,
+      maxRate,
+      page,
+      limit,
+      sortField,
+      sortOrder,
+    });
+  }
 }
+
 module.exports = ProductService;

@@ -2,23 +2,21 @@ import { combineReducers } from "@reduxjs/toolkit";
 import authSlice from "./authSlice";
 import productSlice from "./productSlice";
 import cartSlice from "./cartSlice";
+import commentSlice from "./commentSlice";
 import forgotPasswordReducer from "./forgotPasswordSlice";
-// import cartReducer from './cartSlice';
-// import categoryReducer from './categorySlice';
-// import subCategoryReducer from './subCategorySlice';
-// import productReducer from './productSlice';
-// import commentsReducer from './commentsSlice';
-// import usersReducer from './userSlice';
-// import orderReducer from './orderSlice';
+import categorySlice from "./categorySlice";
+import subCategorySlice from "./subCategorySlice";
+// import usersSlice from './userSlice';
+// import orderSlice from './orderSlice';
 export const rootReducer = combineReducers({
   cart: cartSlice,
-  // category: categoryReducer,
-  // sub: subCategoryReducer,
+  category: categorySlice,
+  sub: subCategorySlice,
   products: productSlice,
-  // comments: commentsReducer,
-  // users: usersReducer,
+  comments: commentSlice,
   auth: authSlice,
   forgotPassword: forgotPasswordReducer,
-  // orders: orderReducer,
+  // users: usersSlice,
+  // orders: orderSlice,
 });
 export type RootState = ReturnType<typeof rootReducer>;

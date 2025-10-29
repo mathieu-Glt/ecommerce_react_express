@@ -24,3 +24,10 @@ export interface Category {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface CategoryState {
+  categories: Category[];
+  selectedCategory: Category | null;
+  loading: boolean;
+  error: string | null;
+}

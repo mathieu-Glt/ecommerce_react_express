@@ -3,6 +3,7 @@ import React from "react";
 import { Navigation } from "../navigation/NavBar";
 import "./Header.css";
 import iphoneImage from "../../assets/videos/Untitled.mp4"; // Assurez-vous d'avoir cette image dans le dossier assets
+import { useFilter } from "../../context/FilterSearchBarContext";
 
 export const Header: React.FC = () => {
   return (

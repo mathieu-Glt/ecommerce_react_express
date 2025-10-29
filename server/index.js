@@ -133,7 +133,14 @@ app.use(
 // ---------------------------------------------
 
 // Serve public files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// app.use(
+//   "/uploads",
+//   cors({
+//     origin: "http://localhost:5173",
+//     credentials: true,
+//   }),
+//   express.static(path.join(__dirname, "uploads"))
+// );
 
 // ✅ Session middleware (UNE SEULE FOIS)
 app.use(sessionMiddleware);
@@ -142,8 +149,15 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/uploads", (req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
 // ✅ Serve uploaded images (version nettoyée)
-app.use("/api/uploads", express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
 
 // Apply less restrictive headers to allow images to display correctly
 app.use((req, res, next) => {

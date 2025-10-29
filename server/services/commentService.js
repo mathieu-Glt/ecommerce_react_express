@@ -42,7 +42,19 @@ class CommentService {
    *
    */
   async addComment(commentData) {
+    console.log("commentData dans service :", commentData);
     return await this.commentRepository.addComment(commentData);
+  }
+  /**
+   * Find a comment by user ID and product ID.
+   * @param {String} userId - ID of the user.
+   * @param {String} productId - ID of the product.
+   */
+  async getCommentByUserAndProduct(userId, productId) {
+    return await this.commentRepository.getCommentByUserAndProduct(
+      userId,
+      productId
+    );
   }
 
   /**
@@ -86,8 +98,8 @@ class CommentService {
    * @param {String} commentId - ID of the comment to delete
    * @returns {Promise<Object>} The deleted comment
    **/
-  async deleteComment(commentId) {
-    return await this.Comment.findByIdAndDelete(commentId).exec();
+  async deleteCommentService(commentId) {
+    return await this.commentRepository.deleteCommentRepo(commentId).exec();
   }
 }
 

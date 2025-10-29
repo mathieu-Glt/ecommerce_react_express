@@ -1,0 +1,57 @@
+.edit-comment-modal .ant-modal-content {
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  animation: fadeInUp 0.35s ease;
+}
+
+.edit-comment-modal .ant-modal-header {
+  background: linear-gradient(90deg, #f8fafc, #ffffff);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+  padding: 18px 24px;
+}
+
+.edit-comment-modal .ant-modal-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.edit-comment-body {
+  padding: 10px 4px;
+}
+
+.edit-comment-modal .btn-submit {
+  background: #2563eb;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.edit-comment-modal .btn-submit:hover {
+  background: #1d4ed8;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ✨ Smooth animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -30,7 +30,7 @@ const {
  * @desc Get a list of all categories
  * @access Public
  */
-router.get("/categories", getCategories);
+router.get("/", getCategories);
 
 /**
  * @route GET /category/slug/:slug

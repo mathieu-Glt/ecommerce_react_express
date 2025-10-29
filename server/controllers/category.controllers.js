@@ -43,14 +43,25 @@ exports.getCategories = asyncHandler(async (req, res) => {
  * @param {string} slug - Category slug
  * @returns {Object} 200 - Category details
  * @returns {Object} 404 - Category not found
+ * @returns {Object} 500 - Internal server error
  */
 exports.getCategoryBySlug = asyncHandler(async (req, res) => {
-  const { slug } = req.params;
-  const category = await categoryService.getCategoryBySlug(slug);
-  if (!category) {
-    return res.status(404).json({ message: "Category not found" });
+  try {
+    const { slug } = req.params;
+    const category = await categoryService.getCategoryBySlug(slug);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+    res.status(200).json({ success: true, results: category });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
-  res.status(200).json(category);
 });
 
 /**
@@ -61,14 +72,25 @@ exports.getCategoryBySlug = asyncHandler(async (req, res) => {
  * @param {string} id - Category ID
  * @returns {Object} 200 - Category details
  * @returns {Object} 404 - Category not found
+ * @returns {Object} 500 - Internal server error
  */
 exports.getCategoryById = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const category = await categoryService.getCategoryById(id);
-  if (!category) {
-    return res.status(404).json({ message: "Category not found" });
+  try {
+    const { id } = req.params;
+    const category = await categoryService.getCategoryById(id);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+    res.status(200).json({ success: true, results: category });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
-  res.status(200).json(category);
 });
 
 /**
@@ -79,13 +101,24 @@ exports.getCategoryById = asyncHandler(async (req, res) => {
  * @param {Object} body - Category data
  * @returns {Object} 201 - Created category
  * @returns {Object} 400 - Failed to create category
+ * @returns {Object} 500 - Internal server error
  */
 exports.createCategory = asyncHandler(async (req, res) => {
-  const category = await categoryService.createCategory(req.body);
-  if (!category) {
-    return res.status(400).json({ message: "Failed to create category" });
+  try {
+    const category = await categoryService.createCategory(req.body);
+    if (!category) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Failed to create category" });
+    }
+    res.status(201).json({ success: true, results: category });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
-  res.status(201).json(category);
 });
 
 /**
@@ -97,14 +130,25 @@ exports.createCategory = asyncHandler(async (req, res) => {
  * @param {Object} body - Updated category data
  * @returns {Object} 200 - Updated category
  * @returns {Object} 400 - Failed to update category
+ * @returns {Object} 500 - Internal server error
  */
 exports.updateCategory = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const category = await categoryService.updateCategory(id, req.body);
-  if (!category) {
-    return res.status(400).json({ message: "Failed to update category" });
+  try {
+    const { id } = req.params;
+    const category = await categoryService.updateCategory(id, req.body);
+    if (!category) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Failed to update category" });
+    }
+    res.status(200).json({ success: true, results: category });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
-  res.status(200).json(category);
 });
 
 /**
@@ -115,12 +159,25 @@ exports.updateCategory = asyncHandler(async (req, res) => {
  * @param {string} id - Category ID
  * @returns {Object} 204 - Category deleted successfully
  * @returns {Object} 400 - Failed to delete category
+ * @returns {Object} 500 - Internal server error
  */
 exports.deleteCategory = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const category = await categoryService.deleteCategory(id);
-  if (!category) {
-    return res.status(400).json({ message: "Failed to delete category" });
+  try {
+    const { id } = req.params;
+    const category = await categoryService.deleteCategory(id);
+    if (!category) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Failed to delete category" });
+    }
+    res
+      .status(204)
+      .send({ success: true, message: "Category deleted successfully" });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
-  res.status(204).send();
 });

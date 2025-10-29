@@ -1,10 +1,15 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useProduct } from "../../hooks/useProduct";
 import PageLoader from "../LoaderPage/PageLoader";
 import type { ProductDetail as ProductDetailType } from "../../interfaces/product.interface";
 import { Link } from "react-router-dom";
 import RateComponent from "../rateComponent/RateComponent";
 import "./product-detail.css";
+import avisVerified from "../../assets/avis-verifies.png";
+import CommentsModal from "../CommentModal/CommentModal";
+import { Button } from "antd";
+import AddCommentModal from "../AddCommentModal/AddCommentModal";
+import EditCommentModal from "../EditCommentModal/EditCommentModal";
 
 export const ProductDetail = ({
   selectedProduct,
@@ -12,7 +17,9 @@ export const ProductDetail = ({
   selectedProduct: ProductDetailType;
 }) => {
   const { rateProduct, checkRateProductByUser } = useProduct(); // ✅ récupère la méthode du hook
-
+  const [open, setOpen] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   // Callback appelé quand l'utilisateur clique sur une étoile
   const onRateChange = useCallback(
     async (newRating: number) => {
@@ -56,6 +63,16 @@ export const ProductDetail = ({
       )}
 
       <div className="product-detail-container">
+        <Button className="button-logo-verified">
+          <img
+            src={avisVerified}
+            alt="Logo"
+            width="50px"
+            className="logo-avis-verified"
+            onClick={() => setOpen(true)}
+          />
+          Voir les avis
+        </Button>
         <RateComponent
           rate={Number(selectedProduct.averageRating) || 1}
           editable={true}
@@ -63,20 +80,35 @@ export const ProductDetail = ({
           emptyStarColor="#DDDDDD"
           onRateChange={onRateChange} // ✅ On passe le handler ici
         />
-
         <h1 className="product-detail-title">{selectedProduct.title}</h1>
         <p className="product-detail-description">
           {selectedProduct.description}
         </p>
         <p className="product-detail-price">{selectedProduct.price} €</p>
-
         <Link
           to={`/cart/add/${selectedProduct._id}`}
           className="add-to-cart-button"
         >
           Add to Cart
         </Link>
+        <Button
+          type="primary"
+          onClick={() => setOpenCreate(true)}
+          className="view-comments-button"
+        >
+          Ajoute un commentaire
+        </Button>
       </div>
+      <CommentsModal
+        productId={selectedProduct._id}
+        open={open}
+        onClose={() => setOpen(false)}
+      />
+      <AddCommentModal
+        productId={selectedProduct._id}
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+      />
     </div>
   );
 };

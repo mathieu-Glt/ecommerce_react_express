@@ -33,19 +33,23 @@ exports.getAllComments = asyncHandler(async (req, res) => {
     const comments = await commentService.getAllComments();
 
     if (!comments && comments.length === 0) {
-      return res.status(404).json({ message: "No comments found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "No comments found" });
     }
 
     res.status(200).json({
       success: true,
-      data: {
+      results: {
         comments,
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });
 
@@ -63,20 +67,23 @@ exports.getCommentsByProduct = asyncHandler(async (req, res) => {
     const comments = await commentService.getCommentsByProduct(productId);
 
     if (!comments || comments.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No comments found for this product" });
+      return res.status(404).json({
+        success: false,
+        message: "No comments found for this product",
+      });
     }
     res.status(200).json({
       success: true,
-      data: {
+      results: {
         comments,
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });
 
@@ -96,18 +103,20 @@ exports.getCommentsByUser = asyncHandler(async (req, res) => {
     if (!comments || comments.length === 0) {
       return res
         .status(404)
-        .json({ message: "No comments found for this user" });
+        .json({ success: false, message: "No comments found for this user" });
     }
     res.status(200).json({
       success: true,
-      data: {
+      results: {
         comments,
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });
 
@@ -117,21 +126,75 @@ exports.getCommentsByUser = asyncHandler(async (req, res) => {
  * @access Protected (Authenticated users)
  */
 exports.createComment = asyncHandler(async (req, res) => {
-  const commentData = req.body;
+  const userId = req.user?.userId;
+  const { productId, text, rating } = req.body;
+  const dataComment = {
+    product: productId,
+    user: userId,
+    text,
+    rating,
+  };
+  console.log("dataComment dans controller :", dataComment);
   try {
-    const newComment = await commentService.addComment(commentData);
+    const existingCommentofUserForThisProduct =
+      await commentService.getCommentByUserAndProduct(userId, productId);
+    if (existingCommentofUserForThisProduct) {
+      return res
+        .status(400)
+        .json({ success: false, error: "You have already made a comment." });
+    }
+    const newComment = await commentService.addComment(dataComment);
     res.status(201).json({
       success: true,
-      data: {
+      results: {
         comment: newComment,
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    console.error("Error creating comment:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });
+
+/**
+ *  Get a comment by user ID and product ID
+ * @route GET /comments/user/:userId/product/:productId
+ * @access Public
+ * @returns {Object} 200 - Comment object
+ * @returns {Object} 404 - Comment not found
+ * @returns {Object} 500 - Internal server error
+ *
+ */
+// exports.getCommentByUserAndProduct = asyncHandler(async (req, res) => {
+//   const { userId, productId } = req.params;
+//   try {
+//     const comment = await commentService.getCommentByUserAndProduct(
+//       userId,
+//       productId
+//     );
+//     if (!comment) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Comment not found" });
+//     }
+//     res.status(200).json({
+//       success: true,
+//       results: {
+//         comment,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// });
 
 /**
  * Update a comment
@@ -150,18 +213,22 @@ exports.updateComment = asyncHandler(async (req, res) => {
       updateData
     );
     if (!updatedComment) {
-      return res.status(404).json({ message: "Comment not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Comment not found" });
     }
     res.status(200).json({
       success: true,
-      data: {
+      results: {
         comment: updatedComment,
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });
 
@@ -176,20 +243,23 @@ exports.updateComment = asyncHandler(async (req, res) => {
 exports.deleteComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
   try {
-    const deletedComment = await commentService.deleteComment(commentId);
+    const deletedComment = await commentService.deleteCommentService(commentId);
     if (!deletedComment) {
       return res.status(404).json({ message: "Comment not found" });
     }
 
     res.status(200).json({
       success: true,
-      data: {
+      results: {
         comment: deletedComment,
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    console.log("Error deleting comment:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });

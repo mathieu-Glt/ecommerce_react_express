@@ -466,6 +466,81 @@ exports.updateProductRating = asyncHandler(async (req, res) => {
     });
   }
 });
+
+/**
+ * Find products by Category Slug
+ * @route GET /products/category/:slug
+ * @access Public
+ * @param {string} slug - Category Slug
+ * @returns {Array} 200 - List of products in the specified category
+ * @returns {Object} 404 - No products found in the specified category
+ * @returns {Object} 500 - Internal server error
+ */
+exports.findProductsByCategorySlug = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+  try {
+    const products = await productService.findProductsByCategorySlugService(
+      slug
+    );
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found in the specified category",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products by category slug:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Find products list by average range min and max rate
+ * @route GET /products/average-rate
+ * @access Public
+ * @param {number} minRate - Minimum average rate
+ * @param {number} maxRate - Maximum average rate
+ * @returns {Array} 200 - List of products within the average rate range
+ * @returns {Object} 404 - No products found within the average rate range
+ * @returns {Object} 500 - Internal server error
+ */
+exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
+  const { minRate, maxRate } = req.body;
+  try {
+    const min = minRate ? parseFloat(minRate) : 0;
+    const max = maxRate ? parseFloat(maxRate) : 5;
+    const products = await productService.findProductsByAverageRateRangeService(
+      min,
+      max
+    );
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found within the average rate range",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products by average rate range:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
 /**
  * Take a rate from user for a product
  * @route GET /products/:id/rate
@@ -506,5 +581,51 @@ exports.takeProductRating = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * Find products list by average range min and max rate
+ * @route GET /products/average-rate
+ * @access Public
+ * @param {number} minRate - Minimum average rate
+ * @param {number} maxRate - Maximum average rate
+ * @param {number} page - Page number for pagination
+ * @param {number} limit - Number of items per page
+ * @returns {Array} 200 - List of products within the average rate range
+ * @returns {Object} 404 - No products found within the average rate range
+ * @returns {Object} 500 - Internal server error
+ */
+exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
+  const { minRate, maxRate, page, limit } = req.query;
+
+  try {
+    const products = await productService.findProductsByAverageRateRangeService(
+      {
+        minRate: minRate ? parseFloat(minRate) : 0,
+        maxRate: maxRate ? parseFloat(maxRate) : 5,
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+      }
+    );
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found within the average rate range",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products by average rate range:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 });

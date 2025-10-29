@@ -29,14 +29,14 @@ const { requireRole } = require("../middleware/auth");
  * @desc Get a list of all subs
  * @access Public
  */
-router.get("/subs", getSubs);
+router.get("/", getSubs);
 
 /**
  * @route GET /sub/:slug
  * @desc Get sub details by slug
  * @access Public
  */
-router.get("/subs/:slug", getSubBySlug);
+router.get("/:slug", getSubBySlug);
 
 /**
  * @route POST /sub
