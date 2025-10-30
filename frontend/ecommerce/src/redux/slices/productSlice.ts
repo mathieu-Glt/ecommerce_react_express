@@ -6,6 +6,9 @@ import {
   fetchProductById,
   fetchLatestProducts,
   rateProduct,
+  fetchProductsByCategoryId,
+  fetchProductsBySubsCategoryId,
+  fetchProductsByAverageRate,
 } from "../thunks/productThunk";
 import type { ProductState } from "../../interfaces/product.interface";
 // import { loadProductStateFromLocalStorage } from "../middleware/localStorageMiddleware";
@@ -205,6 +208,86 @@ const productSlice: Slice<ProductState> = createSlice({
         state.loading = false;
         state.error =
           (action.payload as string) || "Erreur lors de la notation du produit";
+      });
+    //=========================================
+    // FETCH PRODUCTS BY CATEGORY ID
+    // ==========================================
+    builder
+      .addCase(fetchProductsByCategoryId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductsByCategoryId.fulfilled, (state, action) => {
+        console.log(
+          "✅ [productSlice] Produits par catégorie récupérés:",
+          action.payload
+        );
+        state.loading = false;
+        state.products = action.payload || [];
+        state.error = null;
+      })
+      .addCase(fetchProductsByCategoryId.rejected, (state, action) => {
+        console.error(
+          "❌ [productSlice] Erreur récupération produits par catégorie:",
+          action.payload
+        );
+        state.loading = false;
+        state.error =
+          (action.payload as string) || "Failed to fetch products by category";
+      });
+    //=========================================
+    // FETCH PRODUCTS BY SUBS CATEGORY ID
+    // ==========================================
+    builder
+      .addCase(fetchProductsBySubsCategoryId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductsBySubsCategoryId.fulfilled, (state, action) => {
+        console.log(
+          "✅ [productSlice] Produits par sous-catégorie récupérés:",
+          action.payload
+        );
+        state.loading = false;
+        state.products = action.payload || [];
+        state.error = null;
+      })
+      .addCase(fetchProductsBySubsCategoryId.rejected, (state, action) => {
+        console.error(
+          "❌ [productSlice] Erreur récupération produits par sous-catégorie:",
+          action.payload
+        );
+        state.loading = false;
+        state.error =
+          (action.payload as string) ||
+          "Failed to fetch products by subs category";
+      });
+    //=========================================
+    // FETCH PRODUCTS BY AVERAGE RATE RATE MIN AND MAX
+    // ==========================================
+    builder
+      .addCase(fetchProductsByAverageRate.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductsByAverageRate.fulfilled, (state, action) => {
+        console.log(
+          "✅ [productSlice] Produits par moyenne de notation récupérés:",
+          action.payload
+        );
+        state.loading = false;
+        state.products = action.payload || [];
+        state.error = null;
+      })
+      .addCase(fetchProductsByAverageRate.rejected, (state, action) => {
+        console.error(
+          "❌ [productSlice] Erreur récupération produits par moyenne de notation:",
+          action.payload
+        );
+        state.loading = false;
+        state.error =
+          (action.payload as string) ||
+          "Failed to fetch products by average rate";
       });
   },
 });

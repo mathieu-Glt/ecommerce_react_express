@@ -7,15 +7,17 @@ import useSubCategory from "../../hooks/useSubCategory";
 interface SearchFilterDrawerProps extends BarFilter {
   onClose: () => void;
   onSubmit: (filters: any) => void;
+  getProducts: any;
 }
 
 const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const [slug, setSlug] = useState("");
+  const [title, setTitle] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [rateRange, setRateRange] = useState([0, 5]);
+  const [minRate, setMinRate] = useState(0);
+  const [maxRate, setMaxRate] = useState(5);
   const [categoryId, setCategoryId] = useState("");
   const [subcategoryId, setSubcategoryId] = useState("");
   const { categories, getAllCategories } = useCategory(); // Pour récupérer les catégories
@@ -28,8 +30,21 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
   console.log("Sous-catégories disponibles :", subCategories);
 
   const handleSearch = () => {
-    console.log("Filtres :", { slug, priceRange, rateRange, categoryId });
-    onSubmit({ slug, priceRange, rateRange, categoryId, subcategoryId });
+    console.log("Filtres :", {
+      title,
+      priceRange,
+      minRate,
+      maxRate,
+      categoryId,
+    });
+    onSubmit({
+      title,
+      priceRange,
+      minRate,
+      maxRate,
+      categoryId,
+      subcategoryId,
+    });
     onClose();
   };
 
@@ -45,12 +60,12 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
         <h2>🔍 Filtres produits</h2>
 
         <div className="form-group">
-          <label>Slug du produit</label>
+          <label>Titre du produit</label>
           <input
             type="text"
             placeholder="ex: nike-air-max"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
@@ -80,27 +95,23 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
 
         <div className="form-group">
           <label>
-            Note : {rateRange[0]} – {rateRange[1]}
+            Note : {minRate} – {maxRate}
           </label>
           <input
             type="range"
             min={0}
             max={5}
             step={0.1}
-            value={rateRange[0]}
-            onChange={(e) =>
-              setRateRange([Number(e.target.value), rateRange[1]])
-            }
+            value={minRate}
+            onChange={(e) => setMinRate(Number(e.target.value))}
           />
           <input
             type="range"
             min={0}
             max={5}
             step={0.1}
-            value={rateRange[1]}
-            onChange={(e) =>
-              setRateRange([rateRange[0], Number(e.target.value)])
-            }
+            value={maxRate}
+            onChange={(e) => setMaxRate(Number(e.target.value))}
           />
         </div>
 

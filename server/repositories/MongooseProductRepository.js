@@ -136,26 +136,35 @@ class MongooseProductRepository extends IProductRepository {
 
     return products;
   }
+
   /**
    *
-   * Find products by category slug.
-   * @param {string} categorySlug - Category slug
+   * Find products by category id.
+   * @param {string} categoryId - Category id
    * @returns {Promise<Array>} Array of matching product documents
    */
-  async findProductsByCategorySlugRepo(categorySlug) {
-    // On récupère la catégorie par son slug
-    const category = await this.Category.findOne({ slug: categorySlug });
-    if (!category) return []; // Si la catégorie n'existe pas, on renvoie un tableau vide
-
+  async findProductsByCategoryIdRepo(categoryId) {
     // On récupère les produits liés à cette catégorie
-    const products = await this.Product.find({ category: category._id })
-      .populate("categoryInfo", "name slug") // virtual peupler category
-      .populate("subInfo", "name slug") // virtual pour sous-catégorie
-      .populate("commentsInfo") // si tu veux les commentaires
-      .exec();
-
+    const products = await this.Product.find({ category: categoryId })
+      .populate("category", "name slug") // optionnel : pour avoir le nom et slug de la catégorie
+      .populate("sub", "name slug"); // optionnel : pour les sous-catégories
     return products;
   }
+
+  /**
+   *
+   * Find products by subs-category id.
+   * @param {string} categoryId - subsCategory id
+   * @returns {Promise<Array>} Array of matching product documents
+   */
+  async findProductsBySubCategoryIdRepo(subsCategoryId) {
+    // On récupère les produits liés à cette sous-catégorie
+    const products = await this.Product.find({ sub: subsCategoryId })
+      .populate("category", "name slug") // optionnel : pour avoir le nom et slug de la catégorie
+      .populate("sub", "name slug");
+    return products;
+  }
+
   /**
    * Retrieve all products from the database, populated with category and subcategory.
    * Also transforms image paths into complete URLs.
@@ -206,20 +215,66 @@ class MongooseProductRepository extends IProductRepository {
    * @returns {Promise<Object|null>} Product document or null if not found
    */
   async getProductBySlug(slug) {
-    const product = await this.Product.findOne({ slug })
+    console.log("Repository - getProductBySlug called with slug:", slug);
+
+    const products = await this.Product.find({
+      slug: { $regex: slug, $options: "i" },
+    })
       .populate("category", "name slug")
       .populate("sub", "name slug");
 
-    if (product?.images?.length > 0) {
-      product.images = product.images.map((image) => {
-        if (!image.startsWith("/uploads/") && !image.startsWith("http")) {
-          return `/uploads/${image}`;
-        }
-        return image;
-      });
+    if (!products || products.length === 0) {
+      return null;
     }
 
-    return product;
+    // Formater les images pour chaque produit
+    products.forEach((p) => {
+      if (p?.images?.length > 0) {
+        p.images = p.images.map((image) => {
+          if (!image.startsWith("/uploads/") && !image.startsWith("http")) {
+            return `/uploads/${image}`;
+          }
+          return image;
+        });
+      }
+    });
+
+    return products; // tableau de produits correspondant à la recherche
+  }
+
+  /**
+   * Retrieve a product by its title.
+   * Populates category and subcategory and formats image paths.
+   * @param {string} title - Product title
+   * @returns {Promise<Object|null>} Product document or null if not found
+   */
+
+  async getProductByTitle(title) {
+    console.log("Repository - getProductByTitle called with title:", title);
+
+    const products = await this.Product.find({
+      title: { $regex: title, $options: "i" },
+    })
+      .populate("category", "name slug")
+      .populate("sub", "name slug");
+
+    if (!products || products.length === 0) {
+      return null;
+    }
+
+    // Formater les images pour chaque produit
+    products.forEach((p) => {
+      if (p?.images?.length > 0) {
+        p.images = p.images.map((image) => {
+          if (!image.startsWith("/uploads/") && !image.startsWith("http")) {
+            return `/uploads/${image}`;
+          }
+          return image;
+        });
+      }
+    });
+
+    return products;
   }
 
   /**

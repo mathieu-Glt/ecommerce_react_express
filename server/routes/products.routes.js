@@ -17,8 +17,9 @@ const {
   updateCommentProduct,
   deleteCommentProduct,
   takeProductRating,
-  findProductsByCategorySlug,
+  findProductsByCategoryId,
   findProductsByAverageRateRange,
+  findProductsBySubsCategoryId,
 } = require("../controllers/product.controllers");
 
 // Middlewares
@@ -58,7 +59,7 @@ router.get("/products/slug/:slug", getProductBySlug);
  * @desc Search products by query or slug
  * @access Public
  */
-router.get("/products/search", searchProducts);
+router.get("/search", searchProducts);
 
 /**
  * @route GET /product/search/price
@@ -152,16 +153,19 @@ router.put(
 router.get("/:id/rate/check", authenticateToken, takeProductRating);
 
 /**
- * @route GET /product/:id/comment
- * @desc Comment on a product
- * @access Protected (Authenticated users)
+ * @route GET /product/:id/category
+ * @desc Category on a product
+ * @access Public
  */
-router.get(
-  "/:id/comment",
-  authenticateToken,
-  // requireRole(["user", "admin"]),
-  findProductsByCategorySlug
-);
+router.get("/:id/category", findProductsByCategoryId);
+
+/**
+ * @route GET /product/:id/subs-category
+ * @desc SubsCategory on a product
+ * @access Public
+ */
+router.get("/:id/subs-category", findProductsBySubsCategoryId);
+
 /**
  * @route GET /products/average-rate?minRate=3&maxRate=5&page=1&limit=10
  * @desc Find products by average rate range

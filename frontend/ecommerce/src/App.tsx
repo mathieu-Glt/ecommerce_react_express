@@ -10,12 +10,18 @@ import { FilterProvider, useFilter } from "./context/FilterSearchBarContext";
 import SearchFilterDrawer from "./components/SearchFilterModal/SearchFilterModal";
 
 function AppContent() {
-  const { openBarFilter, toggleBarFilter, onSubmitSearchBar } = useFilter();
+  const { openBarFilter, toggleBarFilter, onSubmitSearchBar  } =
+    useFilter()
 
   return (
     <>
       <AppRoutes />
-      {openBarFilter && <SearchFilterDrawer onClose={toggleBarFilter} onSubmit={onSubmitSearchBar ?? ((filters: any) => {})} />}
+      {openBarFilter && (
+        <SearchFilterDrawer
+          onClose={toggleBarFilter}
+          onSubmit={onSubmitSearchBar ?? ((filters: any) => {})}
+        />
+      )}
     </>
   );
 }

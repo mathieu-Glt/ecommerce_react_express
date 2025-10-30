@@ -11,6 +11,10 @@ import {
   deleteExistingProduct,
   fetchLatestProducts,
   rateProduct,
+  searchProducts,
+  fetchProductsByCategoryId,
+  fetchProductsBySubsCategoryId,
+  fetchProductsByAverageRate,
 } from "../redux/thunks/productThunk";
 import type { Product, Rating } from "../interfaces/product.interface";
 import { hasUserRatedProduct } from "../services/api/product";
@@ -192,6 +196,121 @@ export const useProduct = () => {
   );
 
   // ============================================
+  // SEARCH PRODUCTS (by title or slug)
+  // ============================================
+  const searchProductsHook = useCallback(
+    async (params: { title?: string; slug?: string }): Promise<Product[]> => {
+      try {
+        const results = await dispatch(searchProducts(params)).unwrap();
+        console.log("✅ Search products results:", results);
+        if (results.length === 0) {
+          toast.showInfo("No matching products found");
+        } else {
+          toast.showSuccess("Products found successfully");
+        }
+        return results;
+      } catch (err: any) {
+        console.error("❌ Failed to search products:", err);
+        toast.showError(err?.message || "Failed to search products");
+        return [];
+      }
+    },
+    [dispatch, toast]
+  );
+  // ============================================
+  // SEARCH PRODUCTS by CATEGORY ID
+  // ============================================
+  const searchProductsByCategoryIdHook = useCallback(
+    async (categoryId: string): Promise<Product[]> => {
+      try {
+        const results = await dispatch(
+          fetchProductsByCategoryId(categoryId)
+        ).unwrap();
+        console.log("✅ Search products by category ID results:", results);
+        if (results.length === 0) {
+          toast.showInfo("No matching products found for this category");
+        } else {
+          toast.showSuccess("Products found successfully for this category");
+        }
+        return results;
+      } catch (err: any) {
+        console.error("❌ Failed to search products by category ID:", err);
+        toast.showError(
+          err?.message || "Failed to search products by category ID"
+        );
+        return [];
+      }
+    },
+    [dispatch, toast]
+  );
+  // ============================================
+  // SEARCH PRODUCTS by SUBS CATEGORY ID
+  // ============================================
+  const searchProductsBySubsCategoryIdHook = useCallback(
+    async (subsCategoryId: string): Promise<Product[]> => {
+      try {
+        const results = await dispatch(
+          fetchProductsBySubsCategoryId(subsCategoryId)
+        ).unwrap();
+        console.log("✅ Search products by sub-category ID results:", results);
+        if (results.length === 0) {
+          toast.showInfo("No matching products found for this sub-category");
+        } else {
+          toast.showSuccess(
+            "Products found successfully for this sub-category"
+          );
+        }
+        return results;
+      } catch (err: any) {
+        console.error("❌ Failed to search products by sub-category ID:", err);
+        toast.showError(
+          err?.message || "Failed to search products by sub-category ID"
+        );
+        return [];
+      }
+    },
+    [dispatch, toast]
+  );
+
+  // ============================================
+  // SEARCH PRODUCTS by rate average rate max and min
+  // ============================================
+  const searchProductsByAverageRateHook = useCallback(
+    async (minRate: number, maxRate: number): Promise<Product[]> => {
+      console.log(
+        " useProdcut - Searching products by average rate with minRate:",
+        minRate,
+        "and maxRate:",
+        maxRate
+      );
+      try {
+        const results = await dispatch(
+          fetchProductsByAverageRate({ minRate, maxRate })
+        ).unwrap();
+        console.log(
+          "✅ Search products by average rate results useProduct:",
+          results
+        );
+        if (results.length === 0) {
+          toast.showInfo("No matching products found for this average rate");
+        } else {
+          toast.showSuccess(
+            "Products found successfully for this average rate"
+          );
+        }
+        return results;
+      } catch (err: any) {
+        console.error("❌ Failed to search products by average rate:", err);
+        toast.showError(
+          err?.message || "Failed to search products by average rate"
+        );
+        return [];
+      }
+    },
+    [dispatch, toast]
+  );
+
+  // ============================================
   // MEMOIZED RETURN VALUE
   // ============================================
   const productContextValue = useMemo(
@@ -201,6 +320,10 @@ export const useProduct = () => {
       loading,
       error,
       getLatestProducts,
+      searchProductsHook,
+      searchProductsByCategoryIdHook,
+      searchProductsBySubsCategoryIdHook,
+      searchProductsByAverageRateHook,
       checkRateProductByUser,
       getAllProducts,
       getProductById,
@@ -216,6 +339,10 @@ export const useProduct = () => {
       loading,
       error,
       getAllProducts,
+      searchProductsHook,
+      searchProductsByCategoryIdHook,
+      searchProductsBySubsCategoryIdHook,
+      searchProductsByAverageRateHook,
       checkRateProductByUser,
       getLatestProducts,
       getProductById,

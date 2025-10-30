@@ -117,16 +117,33 @@ exports.getLatestProducts = asyncHandler(async (req, res) => {
  * @queryParam {string} query - The search query or slug
  */
 exports.searchProducts = asyncHandler(async (req, res) => {
-  const { query, slug } = req.query;
+  const { title, slug } = req.query;
+  console.log("Search parameters received:", { title, slug });
   try {
-    if (!query && !slug) {
+    if (!title && !slug) {
       return res.status(400).json({
         success: false,
         message: "Query parameter is required",
       });
     }
     if (slug) {
-      const product = await productService.getProductBySlug({ slug });
+      console.log("Searching product by slug:", slug);
+      const product = await productService.getProductBySlug(slug);
+      console.log("Product found by slug:", product);
+
+      if (!product) {
+        return res
+          .status(404)
+          .json({ success: false, message: "No matching products found" });
+      }
+      return res.status(200).json({
+        success: true,
+        results: [product],
+      });
+    } else if (title) {
+      console.log("Searching products by title:", title);
+      const product = await productService.getProductByTitle(title);
+      console.log("Product found by slug:", product);
 
       if (!product) {
         return res
@@ -160,6 +177,7 @@ exports.searchProducts = asyncHandler(async (req, res) => {
     });
   }
 });
+
 /**
  * Get all products
  *
@@ -468,20 +486,19 @@ exports.updateProductRating = asyncHandler(async (req, res) => {
 });
 
 /**
- * Find products by Category Slug
- * @route GET /products/category/:slug
+ * Find products by Category Id
+ * @route GET /products/:id/category
  * @access Public
- * @param {string} slug - Category Slug
+ * @param {string} id - Category Id
  * @returns {Array} 200 - List of products in the specified category
  * @returns {Object} 404 - No products found in the specified category
  * @returns {Object} 500 - Internal server error
  */
-exports.findProductsByCategorySlug = asyncHandler(async (req, res) => {
-  const { slug } = req.params;
+exports.findProductsByCategoryId = asyncHandler(async (req, res) => {
+  const { id } = req.params;
   try {
-    const products = await productService.findProductsByCategorySlugService(
-      slug
-    );
+    const products = await productService.findProductsByCategorySlugService(id);
+    console.log("Products found for category ID", id, ":", products);
     if (!products || products.length === 0) {
       return res.status(404).json({
         success: false,
@@ -503,6 +520,42 @@ exports.findProductsByCategorySlug = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Find products by subsCategory Id
+ * @route GET /products/:id/subs-category
+ * @access Public
+ * @param {string} id - subsCategory Id
+ * @returns {Array} 200 - List of products in the specified subs category
+ * @returns {Object} 404 - No products found in the specified subs category
+ * @returns {Object} 500 - Internal server error
+ */
+exports.findProductsBySubsCategoryId = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const products = await productService.findProductsBySubCategoryIdService(
+      id
+    );
+    console.log("Products found for subsCategory ID", id, ":", products);
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found in the specified subs category",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products by subs category id:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
  * Find products list by average range min and max rate
  * @route GET /products/average-rate
  * @access Public
@@ -512,34 +565,36 @@ exports.findProductsByCategorySlug = asyncHandler(async (req, res) => {
  * @returns {Object} 404 - No products found within the average rate range
  * @returns {Object} 500 - Internal server error
  */
-exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
-  const { minRate, maxRate } = req.body;
-  try {
-    const min = minRate ? parseFloat(minRate) : 0;
-    const max = maxRate ? parseFloat(maxRate) : 5;
-    const products = await productService.findProductsByAverageRateRangeService(
-      min,
-      max
-    );
-    if (!products || products.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No products found within the average rate range",
-      });
-    }
-    res.status(200).json({
-      success: true,
-      results: products,
-    });
-  } catch (error) {
-    console.error("Error fetching products by average rate range:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-});
+// exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
+//   const { minRate, maxRate } = req.body;
+//   try {
+//     const min = minRate ? parseFloat(minRate) : 0;
+//     const max = maxRate ? parseFloat(maxRate) : 5;
+//     const products = await productService.findProductsByAverageRateRangeService(
+//       min,
+//       max
+//     );
+//     console.log("Products found by average rate range B:", products);
+
+//     if (!products || products.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "No products found within the average rate range",
+//       });
+//     }
+//     res.status(200).json({
+//       success: true,
+//       results: products,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching products by average rate range:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//       error: error.message,
+//     });
+//   }
+// });
 
 /**
  * Take a rate from user for a product
@@ -608,7 +663,7 @@ exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
         limit: limit ? parseInt(limit) : 10,
       }
     );
-
+    console.log("Products found by average rate range A:", products);
     if (!products || products.length === 0) {
       return res.status(404).json({
         success: false,

@@ -139,7 +139,7 @@ export async function getProductBySlug(
  * const result = await searchProduct({ slug: "macbook-pro-2024" });
  */
 export async function searchProductsApi(params: {
-  query?: string;
+  title?: string;
   slug?: string;
 }): Promise<ProductListResponse> {
   try {
@@ -147,6 +147,7 @@ export async function searchProductsApi(params: {
       API_ROUTES.PRODUCTS.SEARCH,
       { params }
     );
+    console.log("Search products response data:", response.data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -344,5 +345,113 @@ export async function hasUserRatedProduct(id: string): Promise<{}> {
       );
     }
     throw new Error("Failed to check user rating");
+  }
+}
+
+/**
+ * Retrieves products by category ID.
+ *
+ * @param categoryIdOrSlug - The category ID (MongoDB _id).
+ * @returns List of products belonging to the specified .
+ * @throws {Error} If the request fails.
+ *
+ * @example
+ * const products = await getProductsByCategory("68af1360ad37cf7ede6bd1ea");
+ * const products = await getProductsByCategory("smartphones");
+ */
+export async function getProductsByCategoryId(
+  categoryId: string
+): Promise<ProductListResponse> {
+  try {
+    console.log(
+      "🔧 [getProductsByCategory] Fetching products for category ID:",
+      categoryId
+    );
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.BY_CATEGORY_ID(categoryId)
+    );
+    console.log("🔧 [getProductsByCategory] Response data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ [getProductsByCategory] Error:", error);
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to fetch products by category"
+      );
+    }
+    throw new Error("Failed to fetch products by category");
+  }
+}
+
+/**
+ * Retrieves products by subs category ID.
+ *
+ * @param categoryIdOrSlug - The subs category ID (MongoDB _id).
+ * @returns List of products belonging to the specified .
+ * @throws {Error} If the request fails.
+ *
+ * @example
+ * const products = await getProductsByCategory("68af1360ad37cf7ede6bd1ea");
+ * const products = await getProductsByCategory("samsung");
+ */
+export async function getProductsBySubsCategoryIdApi(
+  subsCategoryId: string
+): Promise<ProductListResponse> {
+  try {
+    console.log(
+      "🔧 [getProductsBySubsCategory] Fetching products for subs category ID:",
+      subsCategoryId
+    );
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.BY_SUBS_CATEGORY_ID(subsCategoryId)
+    );
+    console.log("🔧 [getProductsBySubsCategory] Response data:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ [getProductsBySubsCategory] Error:", error);
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error ||
+          "Failed to fetch products by subs category"
+      );
+    }
+    throw new Error("Failed to fetch products by subs category");
+  }
+}
+
+/**
+ * Fetch products filtered by average rating range
+ *
+ * @param {number} [minRate=0] - Minimum average rating (inclusive)
+ * @param {number} [maxRate=5] - Maximum average rating (inclusive)
+ * @returns {Promise<Product[]>} List of products within the average rating range
+ *
+ * @example
+ * const products = await getProductsByAverageRateRange(3, 5, 1, 10);
+ */
+export async function getProductsByAverageRateRange(
+  minRate: number = 0,
+  maxRate: number = 5
+): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.BY_AVERAGE_RATE,
+      {
+        params: { minRate, maxRate },
+      }
+    );
+    console.log(
+      "🔧 [getProductsByAverageRateRange] Response data:",
+      response.data
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error ||
+          "Failed to fetch products by average rate range"
+      );
+    }
+    throw new Error("Failed to fetch products by average rate range");
   }
 }

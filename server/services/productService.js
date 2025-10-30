@@ -48,7 +48,18 @@ class ProductService {
    * @returns {Promise<Object|null>} Product object or null if not found.
    */
   async getProductBySlug(slug) {
+    console.log("Service - getProductBySlug called with slug:", slug);
     return await this.productRepository.getProductBySlug(slug);
+  }
+
+  /**
+   * Retrieve a product by its title.
+   * @param {string} title - Unique title identifier for the product.
+   * @returns {Promise<Object|null>} Product object or null if not found.
+   */
+  async getProductByTitle(title) {
+    console.log("Service - getProductByTitle called with title:", title);
+    return await this.productRepository.getProductByTitle(title);
   }
 
   /**
@@ -168,12 +179,23 @@ class ProductService {
 
   /**
    * Find products by its Category Slug.
-   * @param {string} categorySlug - Category Slug.
+   * @param {string} categoryId - Category Id.
    * @returns {Promise<Array>} List of products in the specified category.
    */
-  async findProductsByCategorySlugService(categorySlug) {
-    return await this.productRepository.findProductsByCategorySlugRepo(
-      categorySlug
+  async findProductsByCategorySlugService(categoryId) {
+    return await this.productRepository.findProductsByCategoryIdRepo(
+      categoryId
+    );
+  }
+
+  /**
+   * Find products by its subs-Category Slug.
+   * @param {string} subCategoryId - subsCategory Id.
+   * @returns {Promise<Array>} List of products in the specified category.
+   */
+  async findProductsBySubCategoryIdService(subCategoryId) {
+    return await this.productRepository.findProductsBySubCategoryIdRepo(
+      subCategoryId
     );
   }
 
