@@ -13,6 +13,7 @@ import {
   getProductsByCategoryId,
   getProductsBySubsCategoryIdApi,
   getProductsByAverageRateRange,
+  getProductsByPriceRangeApi,
 } from "../../services/api/product";
 import type { Product, Rating } from "../../interfaces/product.interface";
 
@@ -252,6 +253,34 @@ export const fetchProductsByAverageRate = createAsyncThunk<
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       error.message || "Error fetching products by average rate"
+    );
+  }
+});
+
+/**
+ * Fetch products filtered by price range min price and max price
+ * Example of use:
+ *  - dispatch(fetchProductsByPriceRange({ minPrice: 100, maxPrice: 500 }))
+ */
+export const fetchProductsByPriceRangeThunk = createAsyncThunk<
+  Product[],
+  { minPrice: number; maxPrice: number },
+  { rejectValue: string }
+>("products/fetchByPriceRange", async ({ minPrice, maxPrice }, thunkAPI) => {
+  console.log(
+    "Thunk - Fetching products by price range with minPrice:",
+    minPrice,
+    "and maxPrice:",
+    maxPrice
+  );
+  try {
+    const response = await getProductsByPriceRangeApi(minPrice, maxPrice);
+    console.log("Fetch products by price range response thunk:", response);
+    if (!response.success) return thunkAPI.rejectWithValue(response.message);
+    return response.results;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      error.message || "Error fetching products by price range"
     );
   }
 });

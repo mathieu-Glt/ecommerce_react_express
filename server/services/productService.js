@@ -227,6 +227,26 @@ class ProductService {
       sortOrder,
     });
   }
+
+  /**
+   * Finf  product by price range service
+   * @typedef {Object} FindProductsByPriceRangeService
+   * @property {function(number, number): Promise<Array>} findProductsByPriceRangeService - Finds products within a specified price range.
+   * @param {number} minPrice - Minimum price.
+   * @param {number} maxPrice - Maximum price.
+   * @returns {Promise<Array>} List of products within the price range.
+   */
+  async findProductsByPriceRangeService(minPrice, maxPrice) {
+    const results = await this.productRepository.findProductsByPriceRangeRepo(
+      minPrice,
+      maxPrice
+    );
+    console.log(
+      "Service - findProductsByPriceRangeService results Service:",
+      results
+    );
+    return results;
+  }
 }
 
 module.exports = ProductService;

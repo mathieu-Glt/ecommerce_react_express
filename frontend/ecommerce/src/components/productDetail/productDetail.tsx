@@ -10,16 +10,44 @@ import CommentsModal from "../CommentModal/CommentModal";
 import { Button } from "antd";
 import AddCommentModal from "../AddCommentModal/AddCommentModal";
 import EditCommentModal from "../EditCommentModal/EditCommentModal";
+import { useCart } from "../../hooks/useCart";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 export const ProductDetail = ({
   selectedProduct,
 }: {
   selectedProduct: ProductDetailType;
 }) => {
-  const { rateProduct, checkRateProductByUser } = useProduct(); // ✅ récupère la méthode du hook
+  const {
+    cart,
+    loading,
+    error,
+    getUserCart,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+    addToCart,
+  } = useCart();
+  const { rateProduct, checkRateProductByUser } = useProduct();
+  const { user } = useLocalStorage();
+
   const [open, setOpen] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  // Callback appelé quand l'utilisateur clique sur ajouter au panier
+  const onAddToCart = useCallback(async () => {
+    const datasCart = {
+      productId: selectedProduct,
+      quantity: 1,
+      ordersBy: user?._id || "",
+    };
+    try {
+      await addToCart(datasCart);
+      console.log("✅ Produit ajouté au panier !");
+    } catch (error) {
+      console.error("❌ Erreur lors de l'ajout au panier :", error);
+    }
+  }, [selectedProduct, addToCart]);
   // Callback appelé quand l'utilisateur clique sur une étoile
   const onRateChange = useCallback(
     async (newRating: number) => {
@@ -85,12 +113,15 @@ export const ProductDetail = ({
           {selectedProduct.description}
         </p>
         <p className="product-detail-price">{selectedProduct.price} €</p>
-        <Link
+        {/* <Link
           to={`/cart/add/${selectedProduct._id}`}
           className="add-to-cart-button"
         >
           Add to Cart
-        </Link>
+        </Link> */}
+        <button className="add-to-cart-button" onClick={onAddToCart}>
+          Add to cart
+        </button>
         <Button
           type="primary"
           onClick={() => setOpenCreate(true)}

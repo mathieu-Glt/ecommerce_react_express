@@ -9,6 +9,7 @@ import {
   fetchProductsByCategoryId,
   fetchProductsBySubsCategoryId,
   fetchProductsByAverageRate,
+  fetchProductsByPriceRangeThunk,
 } from "../thunks/productThunk";
 import type { ProductState } from "../../interfaces/product.interface";
 // import { loadProductStateFromLocalStorage } from "../middleware/localStorageMiddleware";
@@ -288,6 +289,33 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error =
           (action.payload as string) ||
           "Failed to fetch products by average rate";
+      });
+    //=========================================
+    // FETCH PRODUCTS BY PRICE MIN AND MAX
+    // ==========================================
+    builder
+      .addCase(fetchProductsByPriceRangeThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductsByPriceRangeThunk.fulfilled, (state, action) => {
+        console.log(
+          "✅ [productSlice] Produits par fourchette de prix récupérés:",
+          action.payload
+        );
+        state.loading = false;
+        state.products = action.payload || [];
+        state.error = null;
+      })
+      .addCase(fetchProductsByPriceRangeThunk.rejected, (state, action) => {
+        console.error(
+          "❌ [productSlice] Erreur récupération produits par fourchette de prix:",
+          action.payload
+        );
+        state.loading = false;
+        state.error =
+          (action.payload as string) ||
+          "Failed to fetch products by price range";
       });
   },
 });

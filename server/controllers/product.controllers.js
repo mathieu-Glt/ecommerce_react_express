@@ -684,3 +684,41 @@ exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
     });
   }
 });
+
+/**
+ * Find products by price range
+ * @route GET /products/price-range
+ * @access Public
+ * @param {number} min - Minimum price
+ * @param {number} max - Maximum price
+ * @returns {Array} 200 - List of products within the price range
+ * @returns {Object} 404 - No products found within the price range
+ * @returns {Object} 500 - Internal server error
+ */
+exports.findProductsByPriceRange = asyncHandler(async (req, res) => {
+  const { minPrice, maxPrice } = req.query;
+  try {
+    const products = await productService.findProductsByPriceRangeService(
+      minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice ? parseFloat(maxPrice) : undefined
+    );
+    console.log("Products found by price range Controller:", products);
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found within the price range",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products by price range:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});

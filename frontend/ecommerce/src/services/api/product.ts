@@ -455,3 +455,38 @@ export async function getProductsByAverageRateRange(
     throw new Error("Failed to fetch products by average rate range");
   }
 }
+
+/**
+ * Fetch products filtered by price range
+ *
+ * @param {number} [minPrice=0] - Minimum price (inclusive)
+ * @param {number} [maxPrice=Infinity] - Maximum price (inclusive)
+ * @returns {Promise<Product[]>} List of products within the price range
+ * * @example
+ * const products = await getProductsByPriceRange(100, 500);
+ */
+export async function getProductsByPriceRangeApi(
+  minPrice: number = 0,
+  maxPrice: number = Infinity
+): Promise<ProductListResponse> {
+  try {
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.BY_PRICE_RANGE,
+      {
+        params: { minPrice, maxPrice },
+      }
+    );
+    console.log(
+      "🔧 [getProductsByPriceRange] Response data product API:",
+      response.data
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to fetch products by price range"
+      );
+    }
+    throw new Error("Failed to fetch products by price range");
+  }
+}

@@ -47,18 +47,24 @@ class MongooseProductRepository extends IProductRepository {
    * @param {number} minPrice - Minimum price
    * @param {number} maxPrice - Maximum price
    */
-  async findProductsByPriceRange(minPrice, maxPrice) {
-    const priceQuery = {};
-    if (minPrice !== undefined) {
-      priceQuery.$gte = minPrice;
+  async findProductsByPriceRangeRepo(minPrice, maxPrice) {
+    const query = {};
+
+    // Ne construire la clé price que si on a des valeurs
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      const priceQuery = {};
+      if (minPrice !== undefined) priceQuery.$gte = Number(minPrice);
+      if (maxPrice !== undefined) priceQuery.$lte = Number(maxPrice);
+      query.price = priceQuery;
     }
-    if (maxPrice !== undefined) {
-      priceQuery.$lte = maxPrice;
-    }
-    return await this.Product.find({ price: priceQuery })
+
+    const results = await this.Product.find(query)
       .populate("category", "name slug")
       .populate("sub", "name slug")
       .exec();
+
+    console.log("Products found in price range - mongoose repo:", results);
+    return results;
   }
 
   /**

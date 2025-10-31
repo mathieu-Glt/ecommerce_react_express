@@ -17,6 +17,7 @@ export const ListProduct = () => {
     getProductsByCategory,
     getProductsBySubsCategory,
     getProductsByAverageRate,
+    getProductsByPriceRange,
   } = useFilter();
   const [categoryTitle, setCategoryTitle] = useState<string>("");
   const [listProducts, setListProducts] = useState<boolean>(false);
@@ -30,7 +31,7 @@ export const ListProduct = () => {
   // console.log("Products in ListProduct : ", getProducts);
   // console.log("listProducts state : ", listProducts);
   // console.log("products state : ", products);
-  // console.log("searchProducts state : ", searchProducts);
+  console.log("searchProducts state : ", searchProducts);
   if (backList) {
     window.location.reload();
   }
@@ -65,6 +66,13 @@ export const ListProduct = () => {
       setClicked(!clicked);
     }
   }, [getProductsByAverageRate]);
+
+  useEffect(() => {
+    if (getProductsByPriceRange && getProductsByPriceRange.length > 0) {
+      setSearchProducts(getProductsByPriceRange);
+      setClicked(!clicked);
+    }
+  }, [getProductsByPriceRange]);
 
   useEffect(() => {
     if (!searchProducts || searchProducts.length === 0) {

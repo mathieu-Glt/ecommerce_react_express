@@ -15,6 +15,7 @@ import {
   fetchProductsByCategoryId,
   fetchProductsBySubsCategoryId,
   fetchProductsByAverageRate,
+  fetchProductsByPriceRangeThunk,
 } from "../redux/thunks/productThunk";
 import type { Product, Rating } from "../interfaces/product.interface";
 import { hasUserRatedProduct } from "../services/api/product";
@@ -309,6 +310,41 @@ export const useProduct = () => {
     },
     [dispatch, toast]
   );
+  //===========================================
+  // SEARCH PRODUCTS by PRICE RANGE
+  //===========================================
+  const searchProductsByPriceRangeHook = useCallback(
+    async (minPrice: number, maxPrice: number): Promise<Product[]> => {
+      console.log(
+        " useProdcut - Searching products by price range with minPrice:",
+        minPrice,
+        "and maxPrice:",
+        maxPrice
+      );
+      try {
+        const results = await dispatch(
+          fetchProductsByPriceRangeThunk({ minPrice, maxPrice })
+        ).unwrap();
+        console.log(
+          "✅ Search products by price range results useProduct:",
+          results
+        );
+        if (results.length === 0) {
+          toast.showInfo("No matching products found for this price range");
+        } else {
+          toast.showSuccess("Products found successfully for this price range");
+        }
+        return results;
+      } catch (err: any) {
+        console.error("❌ Failed to search products by price range:", err);
+        toast.showError(
+          err?.message || "Failed to search products by price range"
+        );
+        return [];
+      }
+    },
+    [dispatch, toast]
+  );
 
   // ============================================
   // MEMOIZED RETURN VALUE
@@ -324,6 +360,7 @@ export const useProduct = () => {
       searchProductsByCategoryIdHook,
       searchProductsBySubsCategoryIdHook,
       searchProductsByAverageRateHook,
+      searchProductsByPriceRangeHook,
       checkRateProductByUser,
       getAllProducts,
       getProductById,
@@ -343,6 +380,7 @@ export const useProduct = () => {
       searchProductsByCategoryIdHook,
       searchProductsBySubsCategoryIdHook,
       searchProductsByAverageRateHook,
+      searchProductsByPriceRangeHook,
       checkRateProductByUser,
       getLatestProducts,
       getProductById,

@@ -31,6 +31,7 @@ export const API_ROUTES = {
     BY_SUBS_CATEGORY_ID: (id: string) => `products/${id}/subs-category`,
     BY_CATEGORY_SLUG: (slug: string) => `products/category/${slug}`,
     BY_AVERAGE_RATE: "products/average-rate",
+    BY_PRICE_RANGE: "products/price-range",
   },
   USERS: {
     LIST: "users",

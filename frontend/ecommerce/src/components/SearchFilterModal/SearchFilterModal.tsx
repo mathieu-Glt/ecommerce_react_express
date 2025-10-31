@@ -15,9 +15,10 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
   onSubmit,
 }) => {
   const [title, setTitle] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
   const [minRate, setMinRate] = useState(0);
   const [maxRate, setMaxRate] = useState(5);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1500);
   const [categoryId, setCategoryId] = useState("");
   const [subcategoryId, setSubcategoryId] = useState("");
   const { categories, getAllCategories } = useCategory(); // Pour récupérer les catégories
@@ -32,14 +33,16 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
   const handleSearch = () => {
     console.log("Filtres :", {
       title,
-      priceRange,
+      minPrice,
+      maxPrice,
       minRate,
       maxRate,
       categoryId,
     });
     onSubmit({
       title,
-      priceRange,
+      minPrice,
+      maxPrice,
       minRate,
       maxRate,
       categoryId,
@@ -71,25 +74,22 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
 
         <div className="form-group">
           <label>
-            Prix : {priceRange[0]} € – {priceRange[1]} €
+            Prix : {minPrice} € – {maxPrice} €
           </label>
           <input
             type="range"
             min={0}
-            max={1000}
-            value={priceRange[0]}
-            onChange={(e) =>
-              setPriceRange([Number(e.target.value), priceRange[1]])
-            }
+            max={1500}
+            step={10}
+            value={minPrice}
+            onChange={(e) => setMinPrice(Number(e.target.value))}
           />
           <input
             type="range"
             min={0}
-            max={1000}
-            value={priceRange[1]}
-            onChange={(e) =>
-              setPriceRange([priceRange[0], Number(e.target.value)])
-            }
+            max={1500}
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
           />
         </div>
 

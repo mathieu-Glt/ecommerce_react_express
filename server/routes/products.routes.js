@@ -20,6 +20,7 @@ const {
   findProductsByCategoryId,
   findProductsByAverageRateRange,
   findProductsBySubsCategoryId,
+  findProductsByPriceRange,
 } = require("../controllers/product.controllers");
 
 // Middlewares
@@ -172,5 +173,12 @@ router.get("/:id/subs-category", findProductsBySubsCategoryId);
  * @access Public
  */
 router.get("/average-rate", findProductsByAverageRateRange);
+
+/**
+ * @route POST /produccts/price-range?minPrice=100&maxPrice=500
+ * @desc Search products by price range
+ * @access Public
+ */
+router.get("/price-range", findProductsByPriceRange);
 
 module.exports = router;

@@ -15,6 +15,7 @@ interface FilterContextType {
   getProductsByCategory: Product[];
   getProductsBySubsCategory: Product[];
   getProductsByAverageRate: Product[];
+  getProductsByPriceRange: Product[];
   searchProductsByCategoryIdHook: (categoryId: string) => Promise<Product[]>;
   searchProductsBySubsCategoryIdHook: (
     subsCategoryId: string
@@ -22,6 +23,10 @@ interface FilterContextType {
   searchProductsByAverageRateHook: (
     minRate: number,
     maxRate: number
+  ) => Promise<Product[]>;
+  searchProductsByPriceRangeHook: (
+    minPrice: number,
+    maxPrice: number
   ) => Promise<Product[]>;
 }
 
@@ -35,11 +40,13 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
   const [getProductsByCategory, setProductsByCategory] = useState([]);
   const [getProductsBySubsCategory, setProductsBySubsCategory] = useState([]);
   const [getProductsByAverageRate, setProductsByAverageRate] = useState([]);
+  const [getProductsByPriceRange, setProductsByPriceRange] = useState([]);
   const {
     searchProductsHook,
     searchProductsByCategoryIdHook,
     searchProductsBySubsCategoryIdHook,
     searchProductsByAverageRateHook,
+    searchProductsByPriceRangeHook,
   } = useProduct();
   const toggleBarFilter = () => setOpenBarFilter((prev) => !prev);
   const onSubmitSearchBar = async (filters: any) => {
@@ -67,7 +74,7 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
         resultBySubsCategory
       );
       setProductsBySubsCategory(resultBySubsCategory);
-    } else if (filters.minRate !== undefined && filters.maxRate !== undefined) {
+    } else if (filters.minRate !== 0 && filters.maxRate !== 5) {
       console.log(
         "Filtering by rate with minRate:",
         filters.minRate,
@@ -83,6 +90,22 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
         resultByRate
       );
       setProductsByAverageRate(resultByRate);
+    } else if (filters.minPrice !== 0 && filters.maxPrice !== 1500) {
+      console.log(
+        "Filtering by price with minPrice:",
+        filters.minPrice,
+        "and maxPrice:",
+        filters.maxPrice
+      );
+      const resultByPrice = await searchProductsByPriceRangeHook(
+        filters.minPrice,
+        filters.maxPrice
+      );
+      console.log(
+        "Search by Price Range result - FilterSearchBarContext : ",
+        resultByPrice
+      );
+      setProductsByPriceRange(resultByPrice);
     }
   };
   console.log("FilterProvider rendered : ", openBarFilter);
@@ -102,6 +125,8 @@ export const FilterProvider: React.FC<{ children: React.ReactNode }> = ({
         getProductsBySubsCategory,
         getProducts,
         getProductsByAverageRate,
+        getProductsByPriceRange,
+        searchProductsByPriceRangeHook,
       }}
     >
       {children}
