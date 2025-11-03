@@ -8,6 +8,7 @@ import { useUserContext } from "../../context/userContext";
 import { useAuth } from "../../hooks/useAuth";
 import LogoutButton from "../Logout/LogoutButton";
 import { useFilter } from "../../context/FilterSearchBarContext";
+import CartCount from "../CartCount/CartCount";
 
 export const Navigation: React.FC = () => {
   // const {user, isAuthenticated} = useUserContext();
@@ -56,9 +57,12 @@ export const Navigation: React.FC = () => {
             <Link to={ROUTES.PRODUCTS} className="nav-link" onClick={closeMenu}>
               Products
             </Link>
-            <Link to={ROUTES.CART} className="nav-link" onClick={closeMenu}>
-              Cart
-            </Link>
+            <div className="container-count">
+              <Link to={ROUTES.CART} className="nav-link" onClick={closeMenu}>
+                Cart
+              </Link>
+              <CartCount />
+            </div>
             <Link to={ROUTES.PROFILE} className="nav-link" onClick={closeMenu}>
               Profile
             </Link>

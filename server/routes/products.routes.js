@@ -21,6 +21,9 @@ const {
   findProductsByAverageRateRange,
   findProductsBySubsCategoryId,
   findProductsByPriceRange,
+  getBestSoldProducts,
+  getProductsByCategoryAcesories,
+  getProductsByCategoryOutillage,
 } = require("../controllers/product.controllers");
 
 // Middlewares
@@ -180,5 +183,26 @@ router.get("/average-rate", findProductsByAverageRateRange);
  * @access Public
  */
 router.get("/price-range", findProductsByPriceRange);
+
+/**
+ * @route POST /product/sold/best
+ * @desc Get top sold products
+ * @access Public
+ */
+router.get("/sold-best", getBestSoldProducts);
+
+/**
+ * @route POST /product/category/acesories
+ * @desc Get top accessories products
+ * @access Public
+ */
+router.get("/category/accessories", getProductsByCategoryAcesories);
+
+/**
+ * @route POST /product/category/outillage
+ * @desc Get top outillage products
+ * @access Public
+ */
+router.get("/category/outillage", getProductsByCategoryOutillage);
 
 module.exports = router;

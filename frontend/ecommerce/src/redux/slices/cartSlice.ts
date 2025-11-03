@@ -1,19 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { Product } from "../../interfaces/product.interface";
+import type { AddToCartPayload } from "../../interfaces/cart.interface";
 
-interface CartItem extends Product {
+interface CartItem {
+  product: Product;
   quantity: number;
+  orderBy: string;
 }
 
 interface CartState {
   items: CartItem[];
-  orderedBy?: string | null; // ID de l'utilisateur ayant ajouté au panier
 }
 
 const initialState: CartState = {
   items: JSON.parse(localStorage.getItem("cart") || "[]"),
-  orderedBy: localStorage.getItem("orderedBy") || null,
 };
 
 const cartSlice = createSlice({
@@ -23,13 +24,28 @@ const cartSlice = createSlice({
     // ===========================================
     // ➕ Ajouter un produit
     // ===========================================
-    addToCart: (state, action: PayloadAction<Product>) => {
-      const existing = state.items.find((i) => i._id === action.payload._id);
+    addToCart: (
+      state,
+      action: PayloadAction<{
+        product: Product;
+        quantity: number;
+        orderBy: string;
+      }>
+    ) => {
+      const { product, quantity, orderBy } = action.payload;
+
+      // On cherche si ce produit est déjà dans le panier pour ce user
+      const existing = state.items.find(
+        (item) => item.product._id === product._id && item.orderBy === orderBy
+      );
+
       if (existing) {
-        existing.quantity += 1;
+        existing.quantity += quantity;
       } else {
-        state.items.push({ ...action.payload, quantity: 1 });
+        // ✅ Ici, on pousse un vrai CartItem (product + quantity + orderBy)
+        state.items.push({ product, quantity, orderBy });
       }
+
       localStorage.setItem("cart", JSON.stringify(state.items));
     },
 
@@ -40,7 +56,10 @@ const cartSlice = createSlice({
       state,
       action: PayloadAction<{ productId: string; quantity: number }>
     ) => {
-      const item = state.items.find((i) => i._id === action.payload.productId);
+      console.log("updateToCart action payload:", action.payload);
+      const item = state.items.find(
+        (i) => i.product._id === action.payload.productId
+      );
       if (item) {
         item.quantity = action.payload.quantity;
         localStorage.setItem("cart", JSON.stringify(state.items));
@@ -51,7 +70,7 @@ const cartSlice = createSlice({
     // ❌ Supprimer un produit
     // ===========================================
     removeFromCart: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((i) => i._id !== action.payload);
+      state.items = state.items.filter((i) => i.product._id !== action.payload);
       localStorage.setItem("cart", JSON.stringify(state.items));
     },
 

@@ -21,6 +21,13 @@ export function useLocalStorage() {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
+  //cart
+  const [cart, setCartState] = useState<[]>(() => {
+    const storedCart = localStorage.getItem("cart");
+    console.log("useLocalStorage - cart loaded:", storedCart);
+    return storedCart ? JSON.parse(storedCart) : [];
+  });
+
   const setUserStorage = useCallback((newUser: User | null) => {
     if (newUser) {
       localStorage.setItem("user", JSON.stringify(newUser));
@@ -73,6 +80,8 @@ export function useLocalStorage() {
     token,
     refreshToken,
     user,
+    cart,
+    setCartState,
     setToken,
     setRefreshToken,
     setUserStorage,

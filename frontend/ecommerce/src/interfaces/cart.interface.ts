@@ -25,7 +25,7 @@ export interface Cart {
 }
 
 export interface AddToCartPayload {
-  productId: string;
+  product: {};
   quantity: number;
-  ordersBy: string;
+  orderBy: string;
 }

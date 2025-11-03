@@ -46,6 +46,7 @@ export const useCart = () => {
   const addToCart = useCallback(
     // async (productId: string, quantity = 1): Promise<void> => {
     async (datasCart: AddToCartPayload): Promise<void> => {
+      console.log("useCart - addToCart called with:", datasCart);
       try {
         await dispatch(addItemToCartThunk(datasCart)).unwrap();
         toast.showSuccess("Product added to cart");
@@ -79,6 +80,7 @@ export const useCart = () => {
   const updateCartItem = useCallback(
     async (productId: string, quantity: number): Promise<void> => {
       try {
+        console.log("Updating cart item:", productId, "to quantity:", quantity);
         await dispatch(updateCartItemThunk({ productId, quantity })).unwrap();
         toast.showSuccess("Cart updated successfully");
       } catch (err: any) {

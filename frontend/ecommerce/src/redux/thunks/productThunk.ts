@@ -14,6 +14,9 @@ import {
   getProductsBySubsCategoryIdApi,
   getProductsByAverageRateRange,
   getProductsByPriceRangeApi,
+  getBestSoldProducts,
+  getProductsByCategoryAcesories,
+  getProductsByCategoryOutillage,
 } from "../../services/api/product";
 import type { Product, Rating } from "../../interfaces/product.interface";
 
@@ -48,6 +51,21 @@ export const fetchProductById = createAsyncThunk<
     return response.results;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.message || "Error fetching product");
+  }
+});
+
+export const fetchProductsTopRated = createAsyncThunk<
+  Product[],
+  void,
+  { rejectValue: string }
+>("products/fetchTopRated", async (_, thunkAPI) => {
+  try {
+    const response = await getBestSoldProducts();
+    console.log("Fetched top-rated products:", response);
+    if (!response.success) return thunkAPI.rejectWithValue(response.message);
+    return response.results;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.message || "Error fetching products");
   }
 });
 
@@ -281,6 +299,56 @@ export const fetchProductsByPriceRangeThunk = createAsyncThunk<
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
       error.message || "Error fetching products by price range"
+    );
+  }
+});
+
+/**
+ * Fetch products by category acesories
+ * Example of use:
+ *  - dispatch(fetchProductsByPriceRange({ minPrice: 100, maxPrice: 500 }))
+ */
+export const fetchProductsByCategoryAcesories = createAsyncThunk<
+  Product[],
+  void,
+  { rejectValue: string }
+>("products/fetchByCategoryAcesories", async (_, thunkAPI) => {
+  try {
+    const response = await getProductsByCategoryAcesories();
+    console.log(
+      "Fetch products by category acesories response thunk:",
+      response
+    );
+    if (!response.success) return thunkAPI.rejectWithValue(response.message);
+    return response.results;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      error.message || "Error fetching products by category acesories"
+    );
+  }
+});
+
+/**
+ * Fetch products by category outillage
+ * Example of use:
+ *  - dispatch(fetchProductsByPriceRange({ minPrice: 100, maxPrice: 500 }))
+ */
+export const fetchProductsByCategoryOutillage = createAsyncThunk<
+  Product[],
+  void,
+  { rejectValue: string }
+>("products/fetchByCategoryOutillage", async (_, thunkAPI) => {
+  try {
+    const response = await getProductsByCategoryOutillage();
+    console.log(
+      "Fetch products by category outillage response thunk:",
+      response
+    );
+    if (!response.success) return thunkAPI.rejectWithValue(response.message);
+    return response.results;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(
+      error.message || "Error fetching products by category outillage"
     );
   }
 });

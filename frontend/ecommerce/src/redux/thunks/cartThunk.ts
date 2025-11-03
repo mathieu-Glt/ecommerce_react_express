@@ -10,6 +10,8 @@ import {
   updateToCart as updateToCartAction, // corrected: 'update' instead of 'upodate'
   removeFromCart as removeFromCartAction,
   clearCart as clearCartAction,
+  addToCart,
+  updateToCart,
 } from "../slices/cartSlice";
 
 /**
@@ -52,12 +54,11 @@ export const addItemToCartThunk = createAsyncThunk<
     );
     try {
       // Dispatch the synchronous addToCart reducer with the product payload.
-      // Ici on envoie uniquement le product (le reducer gère la logique quantity par défaut).
-      //   for (let i = 0; i < quantity; i++) {
-      //     dispatch(addToCartAction(product));
-      //   }
+      // Ici on envoie les valeurs déjà destructurées (quantity a une valeur par défaut ici).
+      dispatch(addToCart({ product, quantity, orderBy }));
 
       const state = getState() as RootState;
+      console.log("Updated cart items after add:", state.cart.items);
       return state.cart.items;
     } catch (err: any) {
       console.error("❌ addItemToCartThunk error:", err);
@@ -73,9 +74,15 @@ export const updateCartItemThunk = createAsyncThunk<
 >(
   "cart/updateCartItem",
   async ({ productId, quantity }, { dispatch, getState, rejectWithValue }) => {
+    console.log(
+      "Updating cart item - productId:",
+      productId,
+      "to quantity:",
+      quantity
+    );
     try {
       // On dispatch l'action syncro du slice qui met à jour la quantité et écrit le localStorage
-      dispatch(updateToCartAction({ productId, quantity }));
+      dispatch(updateToCart({ productId, quantity }));
       const state = getState() as RootState;
       return state.cart.items;
     } catch (err: any) {

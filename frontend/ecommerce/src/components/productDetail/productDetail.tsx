@@ -37,9 +37,9 @@ export const ProductDetail = ({
   // Callback appelé quand l'utilisateur clique sur ajouter au panier
   const onAddToCart = useCallback(async () => {
     const datasCart = {
-      productId: selectedProduct,
+      product: selectedProduct,
       quantity: 1,
-      ordersBy: user?._id || "",
+      orderBy: user?._id || "",
     };
     try {
       await addToCart(datasCart);

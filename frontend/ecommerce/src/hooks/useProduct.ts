@@ -16,6 +16,9 @@ import {
   fetchProductsBySubsCategoryId,
   fetchProductsByAverageRate,
   fetchProductsByPriceRangeThunk,
+  fetchProductsTopRated,
+  fetchProductsByCategoryAcesories,
+  fetchProductsByCategoryOutillage,
 } from "../redux/thunks/productThunk";
 import type { Product, Rating } from "../interfaces/product.interface";
 import { hasUserRatedProduct } from "../services/api/product";
@@ -310,13 +313,13 @@ export const useProduct = () => {
     },
     [dispatch, toast]
   );
-  //===========================================
+  // ============================================
   // SEARCH PRODUCTS by PRICE RANGE
-  //===========================================
+  // ============================================
   const searchProductsByPriceRangeHook = useCallback(
     async (minPrice: number, maxPrice: number): Promise<Product[]> => {
       console.log(
-        " useProdcut - Searching products by price range with minPrice:",
+        "useProduct - Searching products by price range with minPrice:",
         minPrice,
         "and maxPrice:",
         maxPrice
@@ -347,6 +350,64 @@ export const useProduct = () => {
   );
 
   // ============================================
+  // GET PRODUCTS TOP RATED
+  // ============================================
+  const fetchTopRatedProductsHook = useCallback(async (): Promise<
+    Product[]
+  > => {
+    try {
+      const results = await dispatch(fetchProductsTopRated()).unwrap();
+      console.log("✅ Top rated products results useProduct:", results);
+      toast.showSuccess("Top rated products loaded successfully");
+      return results;
+    } catch (err: any) {
+      console.error("❌ Failed to get top rated products:", err);
+      toast.showError(err?.message || "Failed to get top rated products");
+      return [];
+    }
+  }, [dispatch, toast]);
+
+  // ============================================
+  // GET PRODUCTS BY CATEGORY ACESORIES
+  // ============================================
+  const fetchProductsByCategoryAcesoriesHook = useCallback(async (): Promise<
+    Product[]
+  > => {
+    try {
+      const results = await dispatch(
+        fetchProductsByCategoryAcesories()
+      ).unwrap();
+      console.log("✅ Acesories products results useProduct:", results);
+      toast.showSuccess("Acesories products loaded successfully");
+      return results;
+    } catch (err: any) {
+      console.error("❌ Failed to get acesories products:", err);
+      toast.showError(err?.message || "Failed to get acesories products");
+      return [];
+    }
+  }, [dispatch, toast]);
+
+  // ============================================
+  // GET PRODUCTS BY CATEGORY OUTILLAGE
+  // ============================================
+  const fetchProductsByCategoryOutillageHook = useCallback(async (): Promise<
+    Product[]
+  > => {
+    try {
+      const results = await dispatch(
+        fetchProductsByCategoryOutillage()
+      ).unwrap();
+      console.log("✅ Outillage products results useProduct:", results);
+      toast.showSuccess("Outillage products loaded successfully");
+      return results;
+    } catch (err: any) {
+      console.error("❌ Failed to get outillage products:", err);
+      toast.showError(err?.message || "Failed to get outillage products");
+      return [];
+    }
+  }, [dispatch, toast]);
+
+  // ============================================
   // MEMOIZED RETURN VALUE
   // ============================================
   const productContextValue = useMemo(
@@ -361,6 +422,8 @@ export const useProduct = () => {
       searchProductsBySubsCategoryIdHook,
       searchProductsByAverageRateHook,
       searchProductsByPriceRangeHook,
+      fetchProductsByCategoryAcesoriesHook,
+      fetchProductsByCategoryOutillageHook,
       checkRateProductByUser,
       getAllProducts,
       getProductById,
@@ -369,6 +432,7 @@ export const useProduct = () => {
       updateProduct,
       deleteProduct,
       rateProduct: rateProductHook,
+      fetchTopRatedProductsHook,
     }),
     [
       products,
@@ -379,6 +443,8 @@ export const useProduct = () => {
       searchProductsHook,
       searchProductsByCategoryIdHook,
       searchProductsBySubsCategoryIdHook,
+      fetchProductsByCategoryAcesoriesHook,
+      fetchProductsByCategoryOutillageHook,
       searchProductsByAverageRateHook,
       searchProductsByPriceRangeHook,
       checkRateProductByUser,
@@ -389,6 +455,7 @@ export const useProduct = () => {
       updateProduct,
       deleteProduct,
       rateProductHook,
+      fetchTopRatedProductsHook,
     ]
   );
 

@@ -8,7 +8,7 @@ interface CartContextType {
   loading: boolean;
   error: string | null;
   getUserCart: () => Promise<void>;
-  addToCart: (productId: string, quantity: number) => Promise<void>;
+  addToCart: (product: {}) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
   updateCartItem: (productId: string, quantity: number) => Promise<void>;
@@ -22,7 +22,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const {
     cart,
     loading,
-    error,
     getUserCart,
     addToCart,
     removeFromCart,
@@ -41,7 +40,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         cart,
         loading,
-        error,
         getUserCart,
         addToCart,
         removeFromCart,

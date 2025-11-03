@@ -198,6 +198,41 @@ export async function getLatestProducts(
 }
 
 /**
+ * Fetches the  products  better sold from the API.
+ *
+ * @param limit - Number of latest products to retrieve (default: 3)
+ * @returns Promise resolving to the list of latest products
+ *
+ * @example
+ * const latestProducts = await getLatestProducts(3);
+ */
+export async function getBestSoldProducts(): Promise<ProductListResponse> {
+  try {
+    console.log(
+      "🔧 [getBestSoldProducts] API_ROUTES.PRODUCTS.BEST_SOLD:",
+      API_ROUTES.PRODUCTS.BEST_SOLD
+    );
+    console.log(
+      "🔧 [getBestSoldProducts] Full URL will be:",
+      `${api.defaults.baseURL}/${API_ROUTES.PRODUCTS.BEST_SOLD}`
+    );
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.BEST_SOLD
+      // { limit }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ [getBestSoldProducts] Error:", error);
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error || "Failed to fetch best sold products"
+      );
+    }
+    throw new Error("Failed to fetch best sold products");
+  }
+}
+
+/**
  * Updates an existing product in the API.
  * @param id - Product ID to update
  * @param body - Updated product information
@@ -488,5 +523,78 @@ export async function getProductsByPriceRangeApi(
       );
     }
     throw new Error("Failed to fetch products by price range");
+  }
+}
+
+/**
+ * Retrieves products by category acesories.
+ *
+ * @param categoryIdOrSlug - The category ID (MongoDB _id).
+ * @returns List of products belonging to the specified .
+ * @throws {Error} If the request fails.
+ *
+ * @example
+ * const products = await getProductsByCategory("68af1360ad37cf7ede6bd1ea");
+ * const products = await getProductsByCategory("smartphones");
+ */
+
+export async function getProductsByCategoryAcesories(): Promise<ProductListResponse> {
+  try {
+    console.log(
+      "🔧 [getProductsByCategoryAcesories] Fetching products for category Acesories"
+    );
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.BY_CATEGORY_SLUG("accessories")
+    );
+    console.log(
+      "🔧 [getProductsByCategoryAcesories] Response data:",
+      response.data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ [getProductsByCategoryAcesories] Error:", error);
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error ||
+          "Failed to fetch products by category Acesories"
+      );
+    }
+    throw new Error("Failed to fetch products by category Acesories");
+  }
+}
+
+/**
+ * Retrieves products by category acesories.
+ *
+ * @param categoryIdOrSlug - The category ID (MongoDB _id).
+ * @returns List of products belonging to the specified .
+ * @throws {Error} If the request fails.
+ *
+ * @example
+ * const products = await getProductsByCategory("68af1360ad37cf7ede6bd1ea");
+ * const products = await getProductsByCategory("smartphones");
+ */
+export async function getProductsByCategoryOutillage(): Promise<ProductListResponse> {
+  try {
+    console.log(
+      "🔧 [getProductsByCategoryOutillage] Fetching products for category Outillage"
+    );
+    const response: AxiosResponse<ProductListResponse> = await api.get(
+      API_ROUTES.PRODUCTS.BY_CATEGORY_SLUG("outillage")
+    );
+    console.log(
+      "🔧 [getProductsByCategoryOutillage] Response data:",
+      response.data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("❌ [getProductsByCategoryOutillage] Error:", error);
+    if (error instanceof AxiosError) {
+      throw new Error(
+        error.response?.data?.error ||
+          "Failed to fetch products by category Outillage"
+      );
+    }
+    throw new Error("Failed to fetch products by category Outillage");
   }
 }

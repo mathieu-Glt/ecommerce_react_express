@@ -26,6 +26,27 @@
   height: 70px;
 }
 
+.container-count {
+  position: relative;
+  display: inline-block;
+}
+
+.container-count .cart-badge {
+  position: absolute;
+  top: -4px; /* ajuste la position verticale */
+  right: -8px; /* ajuste la position horizontale */
+  width: 24px;
+  height: 24px;
+  background-color: red; /* badge rouge */
+  border-radius: 50%; /* cercle parfait */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: blue; /* texte bleu */
+  font-weight: bold;
+  font-size: 14px;
+}
+
 /* Logo / Brand */
 .navbar-brand {
   font-size: 1.5rem;

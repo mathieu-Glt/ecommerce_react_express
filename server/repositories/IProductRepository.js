@@ -12,6 +12,7 @@ class IProductRepository {
   async getLatestProducts(limit) {
     throw new Error("Method getLatestProducts must be implemented");
   }
+
   async getProductByTitle(title) {
     throw new Error("Method getProductByTitle must be implemented");
   }
@@ -64,6 +65,22 @@ class IProductRepository {
   async findProductsByAverageRateRangeRepo(minRate, maxRate) {
     throw new Error(
       "Method findProductsByAverageRateRangeRepo must be implemented"
+    );
+  }
+
+  async getTopRatedProductsRepo() {
+    throw new Error("Method getTopRatedProductsRepo must be implemented");
+  }
+
+  async getProductsByCategoryAccessories() {
+    throw new Error(
+      "Method getProductsByCategoryAccessories must be implemented"
+    );
+  }
+
+  async getProductsByCategoryOutillage() {
+    throw new Error(
+      "Method getProductsByCategoryOutillage must be implemented"
     );
   }
 }

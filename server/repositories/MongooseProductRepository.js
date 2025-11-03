@@ -43,6 +43,44 @@ class MongooseProductRepository extends IProductRepository {
   }
 
   /**
+   * Find top-rated products.
+   * @returns {Promise<Array>} Array of top-rated product documents
+   */
+  async getTopRatedProductsRepo(limit) {
+    return await this.Product.find()
+      .populate("category", "name slug")
+      .populate("sub", "name slug")
+      .sort({ "rating.average": -1 })
+      .limit(limit)
+      .exec();
+  }
+  /**
+   * Find products limit 3 by category accessories
+   * @param {number} limit - Number of products to retrieve
+   * @returns {Promise<Array>} Array of matching product documents
+   */
+  async getProductsByCategoryAccessories(limit) {
+    return await this.Product.find({ category: "acesories" })
+      .populate("category", "name slug")
+      .populate("sub", "name slug")
+      .limit(limit)
+      .exec();
+  }
+
+  /**
+   * Find products limit 3 by category outillage
+   * @param {number} limit - Number of products to retrieve
+   * @returns {Promise<Array>} Array of matching product documents
+   */
+  async getProductsByCategoryOutillage(limit) {
+    return await this.Product.find({ category: "outillage" })
+      .populate("category", "name slug")
+      .populate("sub", "name slug")
+      .limit(limit)
+      .exec();
+  }
+
+  /**
    * Find products within a specified price range.
    * @param {number} minPrice - Minimum price
    * @param {number} maxPrice - Maximum price

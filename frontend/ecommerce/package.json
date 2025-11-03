@@ -29,6 +29,7 @@
     "react-slick": "^0.31.0",
     "react-star-rating": "^1.4.2",
     "react-star-ratings": "^2.3.0",
+    "react-stripe-checkout": "^2.6.3",
     "react-toastify": "^11.0.5",
     "slick-carousel": "^1.8.1",
     "typewriter-effect": "^2.22.0"

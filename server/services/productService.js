@@ -85,6 +85,31 @@ class ProductService {
   }
 
   /**
+   * Retrieve 3 top-rated products.
+   * @returns {Promise<Array>} List of top-rated products.
+   *
+   */
+  async getTopRatedProducts() {
+    return await this.productRepository.getTopRatedProductsRepo();
+  }
+
+  /**
+   * Retrieve 3 products by category acesories.
+   * @returns {Promise<Array>} List of products by category acesories.
+   */
+  async getProductsByCategoryAccessories(limit) {
+    return await this.productRepository.getProductsByCategoryAccessories(limit);
+  }
+
+  /**
+   * Retrieve 3 products by category outillage.
+   * @returns {Promise<Array>} List of products by category outillage.
+   */
+  async getProductsByCategoryOutillage(limit) {
+    return await this.productRepository.getProductsByCategoryOutillage(limit);
+  }
+
+  /**
    * Create a new product.
    * @param {Object} productData - Product details (name, slug, price, description, etc.).
    * @returns {Promise<Object>} Created product object.

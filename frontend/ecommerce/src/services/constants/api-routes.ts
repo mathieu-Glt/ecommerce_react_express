@@ -32,6 +32,9 @@ export const API_ROUTES = {
     BY_CATEGORY_SLUG: (slug: string) => `products/category/${slug}`,
     BY_AVERAGE_RATE: "products/average-rate",
     BY_PRICE_RANGE: "products/price-range",
+    BEST_SOLD: "products/sold-best",
+    ACCESSORIES: "products/category/accessories",
+    OUTILLAGE: "products/category/outillage",
   },
   USERS: {
     LIST: "users",

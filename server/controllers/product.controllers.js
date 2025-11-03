@@ -106,6 +106,138 @@ exports.getLatestProducts = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Get 3 products best sold
+ *
+ * @route GET /products/sell/best
+ * @access Public
+ * @returns {Array} 200 - List of best sold products
+ * @returns {Object} 404 - No products found
+ * @returns {Object} 500 - Internal server error
+ */
+exports.getBestSoldProducts = asyncHandler(async (req, res) => {
+  try {
+    // const { limit } = req.body || {};
+    const limitNumber = 3;
+    const products = await productService.getTopRatedProducts(limitNumber);
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found" });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching best sold products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+/**
+ * Get 3 products better rated
+ *
+ * @route GET /products/sell/latest
+ * @access Public
+ * @returns {Array} 200 - List of latest products
+ * @returns {Object} 404 - No products found
+ * @returns {Object} 500 - Internal server error
+ */
+exports.getBestRatedProducts = asyncHandler(async (req, res) => {
+  try {
+    const { limit } = req.body || {};
+    const limitNumber = limit && !isNaN(limit) ? parseInt(limit) : 3;
+    const products = await productService.getBestRatedProducts(limitNumber);
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found" });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching best rated products:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Get 3 products by category acesories
+ *
+ * @route GET /products/acesories
+ * @access Public
+ * @returns {Array} 200 - List of best sold products
+ * @returns {Object} 404 - No products found
+ * @returns {Object} 500 - Internal server error
+ */
+exports.getProductsByCategoryAcesories = asyncHandler(async (req, res) => {
+  try {
+    const limitNumber = 3;
+    const products = await productService.getProductsByCategoryAccessories(
+      limitNumber
+    );
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found" });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products by category acesories:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Find products by category outillage limit 3
+ * @route GET /products/outillage
+ * @access Public
+ * @returns {Array} 200 - List of products by category outillage
+ * @returns {Object} 404 - No products found
+ * @returns {Object} 500 - Internal server error
+ */
+exports.getProductsByCategoryOutillage = asyncHandler(async (req, res) => {
+  try {
+    const limitNumber = 3;
+    const products = await productService.getProductsByCategoryOutillage(
+      limitNumber
+    );
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found" });
+    }
+    res.status(200).json({
+      success: true,
+      results: products,
+    });
+  } catch (error) {
+    console.error("Error fetching products by category outillage:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+});
+
+/**
  * Search products by query or slug
  *
  * @route GET /products/search

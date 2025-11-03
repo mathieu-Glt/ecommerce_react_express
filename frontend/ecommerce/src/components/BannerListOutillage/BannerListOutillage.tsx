@@ -1,30 +1,34 @@
 import Typewriter from "typewriter-effect";
-import "./banner-best-product.css";
+import "./banner-last-products.css";
 import { useProduct } from "../../hooks/useProduct";
-import PageLoader from "../LoaderPage/PageLoader";
 import { useEffect } from "react";
+import PageLoader from "../LoaderPage/PageLoader";
 import { Carousel } from "antd";
 import "antd/dist/reset.css";
 
-export default function BannerBestSelling() {
-  const { products, loading, fetchTopRatedProductsHook } = useProduct();
+export default function BannerLastProductsOutillage() {
+  const {
+    products,
+    loading,
+    getLatestProducts,
+    fetchProductsByCategoryOutillageHook,
+  } = useProduct();
 
   useEffect(() => {
-    fetchTopRatedProductsHook();
-  }, [fetchTopRatedProductsHook]);
+    fetchProductsByCategoryOutillageHook();
+  }, [getLatestProducts]);
 
   if (loading) return <PageLoader />;
 
   return (
-    <div className="banner-best-products">
+    <div className="banner-last-products">
       <Typewriter
         options={{
-          strings: ["Best Selling Product "],
+          strings: ["New Arrival Products", "Last trend Products"],
           autoStart: true,
           loop: true,
         }}
       />
-      {/* affichage meilleur vente produit */}
 
       <Carousel autoplay dots>
         {products.map((product) => (

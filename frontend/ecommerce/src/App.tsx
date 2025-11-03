@@ -8,10 +8,10 @@ import { AppRoutes } from "./routes/index";
 import SearchFilterModal from "./components/SearchFilterModal/SearchFilterModal";
 import { FilterProvider, useFilter } from "./context/FilterSearchBarContext";
 import SearchFilterDrawer from "./components/SearchFilterModal/SearchFilterModal";
+import { CartProvider } from "./context/cartContext";
 
 function AppContent() {
-  const { openBarFilter, toggleBarFilter, onSubmitSearchBar  } =
-    useFilter()
+  const { openBarFilter, toggleBarFilter, onSubmitSearchBar } = useFilter();
 
   return (
     <>
@@ -30,13 +30,15 @@ function App() {
   return (
     <div className="App">
       <ToastContainer />
-      <FilterProvider>
-        <BrowserRouter>
-          <UserProvider>
-            <AppContent />
-          </UserProvider>
-        </BrowserRouter>
-      </FilterProvider>
+      <CartProvider>
+        <FilterProvider>
+          <BrowserRouter>
+            <UserProvider>
+              <AppContent />
+            </UserProvider>
+          </BrowserRouter>
+        </FilterProvider>
+      </CartProvider>
     </div>
   );
 }

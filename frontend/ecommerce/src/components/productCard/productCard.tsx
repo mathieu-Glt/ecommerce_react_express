@@ -3,9 +3,14 @@ import { EyeTwoTone, ShoppingCartOutlined } from "@ant-design/icons";
 import RateComponent from "../rateComponent/RateComponent";
 import type { ProductProps } from "../../interfaces/product.interface";
 import { useProduct } from "../../hooks/useProduct";
+import { useCallback } from "react";
+import { useCart } from "../../context/cartContext";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 export default function ProductCard({ product }: ProductProps) {
   const { rateProduct, checkRateProductByUser } = useProduct();
+  const { user } = useLocalStorage();
+  const { addToCart } = useCart();
 
   // Fonction appelée quand l'utilisateur change la notes
   const onRateChange = async (newRating: number) => {
@@ -24,6 +29,26 @@ export default function ProductCard({ product }: ProductProps) {
     }
   };
 
+  // Callback appelé quand l'utilisateur clique sur ajouter au panier
+  const onAddToCart = useCallback(async () => {
+    if (!user?._id) {
+      console.warn("❌ Aucun utilisateur connecté !");
+      return;
+    }
+
+    const datasCart = {
+      product,
+      quantity: 1,
+      orderBy: user._id,
+    };
+    console.log("🛒 addToCart datas:", datasCart);
+    try {
+      await addToCart(datasCart);
+      console.log("✅ Produit ajouté au panier !");
+    } catch (error) {
+      console.error("❌ Erreur lors de l'ajout au panier :", error);
+    }
+  }, [product, user]);
   return (
     <div key={String(product._id)} className="product-card">
       {/* ⭐ Composant de notation */}
@@ -66,16 +91,12 @@ export default function ProductCard({ product }: ProductProps) {
           }}
         >
           {/* 🛒 Ajouter au panier */}
-          <Link
-            to={`/cart/add/${product._id}`}
-            className="product-cart-button"
-            title="Ajouter au panier"
-          >
+          <button className="add-to-cart-button" onClick={onAddToCart}>
+            Ajouter au panier
             <ShoppingCartOutlined
               style={{ fontSize: "26px", color: "#f32400ff" }}
             />
-          </Link>
-
+          </button>
           {/* 👁️ Voir les détails */}
           <Link
             to={`/products/${product._id}`}

@@ -8,6 +8,7 @@ import "./list-products.css";
 import { useFilter } from "../../context/FilterSearchBarContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { API_ROUTES } from "../../services/constants/api-routes";
+import { useCart } from "../../context/cartContext";
 export const ListProduct = () => {
   const navigate = useNavigate();
   console.log("navigate : ", navigate);
@@ -19,6 +20,7 @@ export const ListProduct = () => {
     getProductsByAverageRate,
     getProductsByPriceRange,
   } = useFilter();
+
   const [categoryTitle, setCategoryTitle] = useState<string>("");
   const [listProducts, setListProducts] = useState<boolean>(false);
   const [backList, setBackList] = useState<boolean>(false);
