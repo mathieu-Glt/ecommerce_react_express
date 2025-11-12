@@ -1,0 +1,63 @@
+.paypal-cancel-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background-color: #f8f9fa;
+  padding: 2rem;
+}
+
+.cancel-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.cancel-card h1 {
+  color: #d9534f;
+  margin-bottom: 1rem;
+}
+
+.cancel-card p {
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.cancel-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btn-retry,
+.btn-cart {
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-retry {
+  background-color: #0070ba;
+  color: white;
+}
+
+.btn-cart {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-retry:hover {
+  background-color: #005c99;
+}
+
+.btn-cart:hover {
+  background-color: #5a6268;
+}

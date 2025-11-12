@@ -2,12 +2,19 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { RequireAdminRoleAccess } from "../../guards/RequireAdminRoleAccess";
+import { AdminHeader } from "../../components/backoffice/AdminHeader/AdminHeader";
 
 export const AdminLayout = () => {
   return (
-    <RequireAdminRoleAccess>
+    <div className="main-layout">
+      {/* Header en haut */}
+      <AdminHeader />
+
       {/* Outlet affiche les routes enfants */}
-      <Outlet />
-    </RequireAdminRoleAccess>
+      {/* Contenu dynamique (pages) */}
+      <main className="main-content">
+        <Outlet />
+      </main>
+    </div>
   );
 };

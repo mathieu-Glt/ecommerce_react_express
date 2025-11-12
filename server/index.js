@@ -95,8 +95,15 @@ app.use(
 
 // ✅ Logging & security middlewares (AVANT body parsers)
 app.use(morgan("dev"));
-app.use(helmet());
-
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://js.stripe.com"],
+      workerSrc: ["'self'", "blob:"],
+    },
+  })
+);
 // Content Security Policy (CSP) specifically adapted for Azure AD
 app.use(
   helmet.contentSecurityPolicy({
@@ -155,6 +162,9 @@ app.use("/uploads", (req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
+
+// ✅ Sert le dossier invoices comme fichiers statiques
+app.use("/invoices", express.static(path.join(__dirname, "invoices")));
 
 // ✅ Serve uploaded images (version nettoyée)
 app.use("/uploads", express.static("uploads"));

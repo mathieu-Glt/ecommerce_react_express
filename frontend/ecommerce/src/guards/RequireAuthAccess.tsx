@@ -32,8 +32,23 @@ export const RequireAuthAccess: React.FC<RequireAuthAccessProps> = ({
         }}
       />
     );
+  } else if (isAuthenticated && user.role === "admin") {
+    return (
+      <Navigate
+        to="/admin/dashboard"
+        replace
+        state={{
+          from: location.pathname,
+          message: "Admins cannot access user pages",
+        }}
+      />
+    );
+  } else {
+    // return <Navigate to={location.pathname} replace />
+    // location.pathname est la page actuelle, donc on reste sur la même page;
+    return <Navigate to="/products" replace />;
   }
 
   // Utilisateur connecté  → Affiche les enfants
-  return <>{children}</>;
+  // return <>{children}</>;
 };

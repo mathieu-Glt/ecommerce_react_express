@@ -1,0 +1,140 @@
+/* Container principal avec dégradé bleu */
+.product-list-container {
+  padding: 4rem 2rem 2rem 2rem;
+  background: linear-gradient(
+    to bottom,
+    #febfbf,
+    #da3c0c
+  ); /* bleu clair -> bleu foncé */
+  text-align: center;
+}
+
+/* Titre */
+.product-list-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 2rem;
+  z-index: 10;
+}
+
+/* Wrapper des cards en flex wrap */
+.product-cards-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+/* Card produit */
+.product-card {
+  background-color: rgb(233, 246, 252);
+  width: 20rem;
+  /* border-radius: 1rem; */
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s;
+}
+
+.product-action {
+  background-color: #1178df;
+  padding: 1rem;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
+}
+
+/* Image */
+.product-image {
+  width: 100%;
+  height: 10rem;
+  object-fit: cover;
+}
+
+/* Infos */
+.product-info {
+  /* padding: 1rem; */
+}
+
+.product-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.product-description {
+  font-size: 0.9rem;
+  color: #4b5563; /* gris foncé */
+  margin-bottom: 0.5rem;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #1d4ed8; /* bleu */
+  margin-bottom: 1rem;
+}
+
+/* Bouton supprimer */
+.product-delete-button {
+  background-color: #ff950a; /* rouge */
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.product-delete-button:hover {
+  background-color: #b91c1c;
+}
+
+.pagination-wrapper .ant-pagination {
+  justify-content: center; /* centre la pagination */
+}
+
+.pagination-wrapper .ant-pagination-item {
+  border-radius: 50%; /* cercles */
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+}
+
+.pagination-wrapper .ant-pagination-item-active {
+  background-color: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+}
+
+.product-cards-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+.product-cards-wrapper.fade-out {
+  opacity: 0;
+}
+
+/* .product-cards-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.product-cards-wrapper.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+} */

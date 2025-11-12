@@ -65,6 +65,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       .unwrap()
       .then(() => {
         console.log("✅ User authentication verified");
+        console.log("Current User:", authValue.user);
       })
       .catch((error) => {
         console.log("⚠️ No active session:", error);

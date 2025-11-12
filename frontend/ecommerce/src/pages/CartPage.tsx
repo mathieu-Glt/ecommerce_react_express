@@ -1,14 +1,17 @@
 import React, { useMemo } from "react";
 import { useCart } from "../hooks/useCart";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import "./styles/cartpage.css"; // Pour le CSS externe
+import { loadStripe } from "@stripe/stripe-js";
+import "./styles/cartpage.css";
+
+// ⚙️ Chargement asynchrone de Stripe avec la clé publique depuis .env
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export const CartPage = () => {
   const { cart, loading, error, updateCartItem, removeFromCart, clearCart } =
     useCart();
   const { user } = useLocalStorage();
 
-  // 🧮 Calcul du total et du nombre d'articles
   const { totalPrice, totalItems } = useMemo(() => {
     const total = cart?.reduce(
       (acc: any, item: any) => {
@@ -26,6 +29,75 @@ export const CartPage = () => {
   if (loading) return <p>Chargement du panier...</p>;
   if (error) return <p>Erreur : {error}</p>;
   if (!cart || cart.length === 0) return <p>Votre panier est vide</p>;
+
+  // ✅ Paiement Stripe
+  const handleStripePayment = async () => {
+    try {
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/payment/stripe/create-checkout-session`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: cart.map((item) => ({
+              name: item.name, // correspond au backend
+              price: Number(item.product.price), // s'assure que c'est un nombre
+              quantity: Number(item.quantity) || 1,
+            })),
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data?.url) {
+        // Redirection directe vers Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        console.error("Réponse Stripe invalide :", data);
+        alert("Erreur lors de la création de la session Stripe");
+      }
+    } catch (err) {
+      console.error("Erreur Stripe:", err);
+      alert("Erreur lors du paiement Stripe");
+    }
+  };
+
+  // ✅ Paiement PayPal
+  // ✅ Paiement PayPal - Frontend
+  const handlePaypalPayment = async () => {
+    try {
+      // 1️⃣ Appel à ton backend pour créer l'ordre PayPal
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/payment/paypal`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: totalPrice }), // totalPrice = montant à payer
+        }
+      );
+
+      const data = await res.json();
+      console.log("Réponse PayPal :", data);
+
+      // 2️⃣ Vérifier si l'ordre a bien été créé
+      if (data?.success && data?.id) {
+        // 3️⃣ Rediriger l'utilisateur vers PayPal pour payer
+        window.location.href = `https://www.sandbox.paypal.com/checkoutnow?token=${data.id}`;
+      } else {
+        console.error(
+          "Erreur création ordre PayPal :",
+          data?.error || "unknown"
+        );
+        alert("Impossible de lancer le paiement PayPal");
+      }
+    } catch (err) {
+      console.error("Erreur PayPal:", err);
+      alert("Erreur lors du paiement PayPal");
+    }
+  };
 
   return (
     <div className="cart-page">
@@ -77,7 +149,6 @@ export const CartPage = () => {
         ))}
       </div>
 
-      {/* 🧾 Section récapitulative */}
       <div className="cart-summary">
         <h2>🧾 Récapitulatif</h2>
         <p>
@@ -88,8 +159,12 @@ export const CartPage = () => {
         </p>
 
         <div className="payment-buttons">
-          <button className="btn-stripe">💳 Acheter avec Stripe</button>
-          <button className="btn-paypal">🅿️ Acheter avec PayPal</button>
+          <button className="btn-stripe" onClick={handleStripePayment}>
+            💳 Acheter avec Stripe
+          </button>
+          <button className="btn-paypal" onClick={handlePaypalPayment}>
+            🅿️ Acheter avec PayPal
+          </button>
         </div>
 
         <button className="btn-clear" onClick={clearCart}>

@@ -6,9 +6,7 @@ import { Pagination } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import "./list-products.css";
 import { useFilter } from "../../context/FilterSearchBarContext";
-import { useNavigate, useLocation } from "react-router-dom";
-import { API_ROUTES } from "../../services/constants/api-routes";
-import { useCart } from "../../context/cartContext";
+import { useNavigate } from "react-router-dom";
 export const ListProduct = () => {
   const navigate = useNavigate();
   console.log("navigate : ", navigate);

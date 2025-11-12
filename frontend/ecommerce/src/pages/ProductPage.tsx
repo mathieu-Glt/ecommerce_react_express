@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import PageLoader from "../components/LoaderPage/PageLoader";
-import { useProduct } from "../hooks/useProduct";
 import { ListProduct } from "../components/products/ListProduct";
 
 export const ProductPage = () => {

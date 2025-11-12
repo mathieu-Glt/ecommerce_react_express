@@ -13,13 +13,13 @@ export const HomePage = () => {
   console.log("✅ Authenticated:", isAuthenticated);
 
   return (
-    <div>
+    <div className="container-banner">
       {isAuthenticated ? (
         <p>Welcome, {user?.name || "User"}!</p>
       ) : (
         <p>Please log in.</p>
       )}
-      <div className="container-banner">
+      <div className="">
         <BannerBestSelling />
         <BannerLastProducts />
         {/* <BannerListAcessoriesProduct />

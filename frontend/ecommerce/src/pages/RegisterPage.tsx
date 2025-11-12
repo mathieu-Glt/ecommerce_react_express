@@ -20,10 +20,7 @@ export const RegisterPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [validated, setValidated] = useState(false);
-  const [userStorage, setUserStorage] = useLocalStorage<User | null>(
-    "user",
-    null
-  );
+  const { setUserStorage } = useLocalStorage<User | null>("user", null);
 
   const handleRegister = async (values: RegisterFormData): Promise<void> => {
     console.log("Starting registration with values:", values);

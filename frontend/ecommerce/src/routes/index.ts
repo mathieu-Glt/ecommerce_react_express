@@ -5,6 +5,8 @@ import { MainLayout } from "./layout/MainLayout";
 import { AdminLayout } from "./layout/AdminLayout";
 import PageLoader from "../components/LoaderPage/PageLoader";
 import React from "react";
+import { RequireAdminRoleAccess } from "../guards/RequireAdminRoleAccess";
+import create from "@ant-design/icons/lib/components/IconFont";
 
 // ==================== SUSPENSE WRAPPER ====================
 export function SuspenseWrapper(Component: React.ComponentType<any>) {
@@ -32,6 +34,11 @@ const RegisterPage = lazy(() =>
 const CartPage = lazy(() =>
   import("../pages/CartPage").then((m) => ({ default: m.CartPage }))
 );
+const PaypalSuccessPage = lazy(() =>
+  import("../pages/PaypalSuccessPage").then((m) => ({
+    default: m.default,
+  }))
+);
 const OrderConfirmationPage = lazy(() =>
   import("../pages/OrderConfirmationPage").then((m) => ({ default: m.default }))
 );
@@ -41,9 +48,13 @@ const NotFoundPage = lazy(() =>
 const ForgotPasswordPage = lazy(() =>
   import("../pages/ForgotPasswordPage").then((m) => ({ default: m.default }))
 );
-
 const ResetPasswordPage = lazy(() =>
   import("../pages/ResetPasswordPage").then((m) => ({ default: m.default }))
+);
+const MerciPagePaypal = lazy(() =>
+  import("../pages/PaypalSuccessPage").then((m) => ({
+    default: m.default,
+  }))
 );
 
 // ==================== PROTECTED PAGES (USER) ====================
@@ -59,9 +70,21 @@ const AdminDashboardPage = lazy(() =>
 );
 const AdminProductCreatePage = lazy(() =>
   import("../pages/backoffice/AdminProductCreatePage").then((m) => ({
+    default: m.default,
+  }))
+);
+const AdminProductEditPage = lazy(() =>
+  import("../pages/backoffice/AdminProductEditPage").then((m) => ({
+    default: m.default,
+  }))
+);
+
+const AdminPageProducts = lazy(() =>
+  import("../pages/backoffice/AdminPageProducts").then((m) => ({
     default: m.AdminProductPage,
   }))
 );
+
 const AdminCouponPage = lazy(() =>
   import("../pages/backoffice/AdminCouponPage").then((m) => ({
     default: m.AdminCouponPage,
@@ -72,13 +95,28 @@ const ProductDetailPage = lazy(() =>
     default: m.ProductDetailPage,
   }))
 );
+const ThankYouPaymentSuccess = lazy(() =>
+  import("../pages/ThankYouPaymentSuccess").then((m) => ({
+    default: m.default,
+  }))
+);
+
+const FailedTransctionPaypal = lazy(() =>
+  import("../pages/FailedTransctionPaypal").then((m) => ({
+    default: m.default,
+  }))
+);
 
 // ==================== ROUTES CONFIGURATION ====================
 export const AppRoutes = () => {
   const routes = useRoutes([
     // ==================== ROUTES AVEC HEADER + FOOTER ====================
     {
-      element: React.createElement(MainLayout),
+      element: React.createElement(
+        RequireAuthAccess,
+        null,
+        React.createElement(MainLayout)
+      ),
       children: [
         // PUBLIC ROUTES
         { path: "/", element: SuspenseWrapper(HomePage) },
@@ -89,8 +127,24 @@ export const AppRoutes = () => {
         },
         { path: "/cart", element: SuspenseWrapper(CartPage) },
         {
+          path: "/paypal/success",
+          element: SuspenseWrapper(PaypalSuccessPage),
+        },
+        {
+          path: "/cancel",
+          element: SuspenseWrapper(FailedTransctionPaypal),
+        },
+        {
           path: "/order-confirmation",
           element: SuspenseWrapper(OrderConfirmationPage),
+        },
+        {
+          path: "/merci",
+          element: SuspenseWrapper(ThankYouPaymentSuccess),
+        },
+        {
+          path: "/merci-paypal",
+          element: SuspenseWrapper(MerciPagePaypal),
         },
 
         // USER ROUTES (Protégées par RequireAuthAccess)
@@ -111,7 +165,6 @@ export const AppRoutes = () => {
           element: SuspenseWrapper(ResetPasswordPage),
         },
 
-        // ==================== ROUTES SANS HEADER/FOOTER (Auth) ====================
         { path: "/login", element: SuspenseWrapper(LoginPage) },
         { path: "/register", element: SuspenseWrapper(RegisterPage) },
       ],
@@ -120,12 +173,16 @@ export const AppRoutes = () => {
     // ==================== ADMIN ROUTES (Layout avec RequireAdminRoleAccess) ====================
     {
       path: "/admin",
-      element: React.createElement(AdminLayout),
+      element: React.createElement(
+        RequireAdminRoleAccess,
+        null,
+        React.createElement(AdminLayout)
+      ),
       children: [
         {
           path: "",
           element: React.createElement(Navigate, {
-            to: "/admin/dashboard",
+            to: "dashboard",
             replace: true,
           }),
         },
@@ -134,12 +191,20 @@ export const AppRoutes = () => {
           element: SuspenseWrapper(AdminDashboardPage),
         },
         {
-          path: "products",
+          path: "products/create",
           element: SuspenseWrapper(AdminProductCreatePage),
+        },
+        {
+          path: "products/edit/:id",
+          element: SuspenseWrapper(AdminProductEditPage),
         },
         {
           path: "coupons",
           element: SuspenseWrapper(AdminCouponPage),
+        },
+        {
+          path: "products",
+          element: SuspenseWrapper(AdminPageProducts),
         },
       ],
     },
@@ -165,7 +230,11 @@ export const ROUTES = {
   ADMIN: {
     ROOT: "/admin",
     DASHBOARD: "/admin/dashboard",
-    PRODUCTS: "/admin/products",
+    CREATE_PRODUCTS: "/admin/products/create",
+    EDIT_PRODUCTS: "/admin/products/edit",
+    LIST_PRODUCTS: "/admin/products",
+    // CREATE_PRODUCT: "/admin/products/create",
+    EDIT_PRODUCT: (id: string) => `/admin/products/edit/${id}`,
     COUPONS: "/admin/coupons",
   },
 };

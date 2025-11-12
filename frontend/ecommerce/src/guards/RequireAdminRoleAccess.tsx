@@ -11,6 +11,13 @@ export const RequireAdminRoleAccess: React.FC<RequireAdminRoleAccessProps> = ({
   children,
 }) => {
   const { user, isAuthenticated, loading } = useUserContext();
+  console.log("RequireAdminRoleAccess - user:", user.role);
+
+  console.log("🔍 GUARD DEBUG:");
+  console.log("  - loading:", loading);
+  console.log("  - isAuthenticated:", isAuthenticated);
+  console.log("  - user:", user);
+  console.log("  - user?.role:", user?.role);
 
   // Attente pendant le chargement
   if (loading) {

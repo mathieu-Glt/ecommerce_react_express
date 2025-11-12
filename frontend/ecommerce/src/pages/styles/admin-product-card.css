@@ -1,0 +1,107 @@
+/* Container principal */
+.product-detail-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+.product-detail-text-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #cce7ff, #ca2310);
+  /* border-radius: 15px; */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: #fff;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Titre du produit */
+.product-detail-title {
+  background-color: #be1000;
+  color: black;
+  display: block;
+  width: 100%;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Image principale */
+.product-detail-image {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Description du produit */
+.product-detail-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  text-align: justify;
+  max-width: 700px;
+}
+
+/* Prix */
+.product-detail-price {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+/* Bouton Add to Cart */
+.add-to-cart-button {
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #66b2ff;
+  background-color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-to-cart-button:hover {
+  background-color: #e0f0ff;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.product-edit-button {
+  margin-top: 15px;
+  text-align: center;
+  background-color: gold;
+  color: black;
+  padding: 10px;
+}
+.product-edit-button:hover {
+  background-color: #ff582a;
+  color: white;
+}
+.product-delete-button {
+  margin-top: 15px;
+  text-align: center;
+  background-color: rgb(255, 0, 0);
+  color: black;
+  padding: 10px;
+}
+.product-delete-button:hover {
+  background-color: #cf2727;
+  color: white;
+}
+
+.product-admin-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 20px;
+}

@@ -1,4 +1,5 @@
 const IProductRepository = require("./IProductRepository");
+const mongoose = require("mongoose");
 
 /**
  * Mongoose-based implementation of the Product Repository.
@@ -60,7 +61,10 @@ class MongooseProductRepository extends IProductRepository {
    * @returns {Promise<Array>} Array of matching product documents
    */
   async getProductsByCategoryAccessories(limit) {
-    return await this.Product.find({ category: "acesories" })
+    const accessoriesCategoryId = new mongoose.Types.ObjectId(
+      "68af139bad37cf7ede6bd1ef"
+    ); // Remplacez par l'ID réel de la catégorie "accessories"
+    return await this.Product.find({ category: accessoriesCategoryId })
       .populate("category", "name slug")
       .populate("sub", "name slug")
       .limit(limit)
@@ -73,7 +77,10 @@ class MongooseProductRepository extends IProductRepository {
    * @returns {Promise<Array>} Array of matching product documents
    */
   async getProductsByCategoryOutillage(limit) {
-    return await this.Product.find({ category: "outillage" })
+    const outillageCategoryId = new mongoose.Types.ObjectId(
+      "68b1a8a7ee346bc5b9809b51"
+    ); // Remplacez par l'ID réel de la catégorie "outillage"
+    return await this.Product.find({ category: outillageCategoryId })
       .populate("category", "name slug")
       .populate("sub", "name slug")
       .limit(limit)

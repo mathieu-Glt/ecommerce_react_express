@@ -1,0 +1,375 @@
+/* src/components/header/Header.css */
+
+/* Container principal */
+.site-header-admin,
+.hero-banner-admin {
+  width: 100%;
+  min-height: 500px;
+  height: auto;
+}
+
+/* Hero Banner */
+.hero-banner-admin {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background: linear-gradient(135deg, #ee711d 0%, #b71409 50%, #0f172a 100%);
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Effet de lumière animé */
+.hero-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(234, 51, 51, 0.2) 0%,
+    rgba(235, 37, 37, 0.2) 100%
+  );
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Container du contenu */
+.hero-container-admin {
+  position: relative;
+  height: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Grille 2 colonnes */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+/* Contenu texte (colonne gauche) */
+.hero-content-admin {
+  color: white;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Badge Nouveautés */
+.badge-promo-admin {
+  display: inline-block;
+  background: linear-gradient(90deg, #f7cc55 0%, #f6513b 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+/* Titre principal */
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  line-height: 1.1;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 3.75rem;
+  }
+}
+
+/* Texte dégradé */
+.hero-title-gradient-admin {
+  display: block;
+  background: linear-gradient(90deg, #f9b703 0%, #e21010 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Sous-titre */
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #d1d5db;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Boutons */
+.hero-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.btn-primary-hero-admin {
+  background-color: #e91616;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.125rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-primary-hero-admin:hover {
+  background-color: #f3f4f6;
+  color: #f6673b;
+  transform: scale(1.05);
+}
+
+.btn-secondary-hero-admin {
+  /* background-color: transparent; */
+  background-color: gold;
+  color: rgb(44, 26, 105);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.125rem;
+  border: 2px solid white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary-hero-admin:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Features / Avantages */
+.hero-features {
+  display: flex;
+  gap: 2rem;
+  padding-top: 1.5rem;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feature-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #ffd102;
+  flex-shrink: 0;
+}
+
+/* Section image (colonne droite) */
+.hero-image-section {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Effet lumineux derrière l'image */
+.image-glow-effect {
+  position: absolute;
+  top: 20;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #f02f25 0%, #fa560a 100%);
+  filter: blur(80px);
+  opacity: 0.3;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Vidéo iPhone */
+.iphone-video {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  display: block;
+  filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
+  z-index: 2;
+  border-radius: 20px; /* Optionnel : coins arrondis */
+}
+
+.iphone-video:hover {
+  transform: scale(1.05);
+}
+
+/* Image iPhone */
+.iphone-image {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  display: block;
+  filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+.iphone-image:hover {
+  transform: scale(1.05);
+}
+
+/* Badge réduction */
+.discount-badge {
+  position: absolute;
+  top: -60px;
+  right: 1rem;
+  background-color: #ef4444;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 1.125rem;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+  animation: bounce-badge 1s ease-in-out infinite;
+  z-index: 3;
+}
+
+@keyframes bounce-badge {
+  0%,
+  100% {
+    transform: translateY(-5px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}
+
+/* Dégradé du bas */
+.hero-bottom-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6rem;
+  background: linear-gradient(to top, #0f172a 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Navigation */
+.navigation-container {
+  width: 100%;
+  background-color: #f8f9fa;
+}
+
+/* Vidéo de fond */
+.hero-bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Overlay sombre */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+/* Contenu par-dessus */
+.hero-container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .hero-banner {
+    height: auto;
+    min-height: 600px;
+    padding: 2rem 0;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .btn-primary-hero,
+  .btn-secondary-hero {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero-features-admin {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .image-container {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-features-admin {
+    font-size: 0.75rem;
+  }
+
+  .feature-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .discount-badge {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+  }
+}

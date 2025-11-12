@@ -1,5 +1,5 @@
 import Typewriter from "typewriter-effect";
-import "./banner-last-products.css";
+// import "./banner-last-products.css";
 import { useProduct } from "../../hooks/useProduct";
 import { useEffect } from "react";
 import PageLoader from "../LoaderPage/PageLoader";
@@ -24,7 +24,10 @@ export default function BannerLastProductsOutillage() {
     <div className="banner-last-products">
       <Typewriter
         options={{
-          strings: ["New Arrival Products", "Last trend Products"],
+          strings: [
+            "New Arrival Products",
+            "Last trend Products for Outillage",
+          ],
           autoStart: true,
           loop: true,
         }}
