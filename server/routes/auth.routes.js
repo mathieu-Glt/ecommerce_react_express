@@ -93,6 +93,67 @@ router.get("/user", authenticateToken, getUserProfile);
  * @returns 401 - Unauthorized if credentials are invalid
  */
 router.post("/login", loginValidation, login);
+/**
+ * @route POST /auth/login
+ * @desc Local login with email and password with strategy Passport
+ * @access Public
+ */
+
+// Login avec Passport Local
+router.post("/login-passport", async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Validation simple côté serveur
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Email et mot de passe sont requis",
+    });
+  }
+
+  // Utilisation de passport.authenticate en callback pour gérer l'erreur
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err); // Erreur serveur
+    if (!user) {
+      // Auth échouée
+      return res.status(401).json({
+        success: false,
+        message: info?.message || "Échec de l'authentification",
+      });
+    }
+
+    // Crée la session Passport
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+
+      // Retourne l'utilisateur connecté (sans le password)
+      const {
+        _id,
+        email,
+        firstname,
+        lastname,
+        role,
+        picture,
+        createdAt,
+        updatedAt,
+      } = user;
+      res.json({
+        success: true,
+        message: "Connexion réussie",
+        user: {
+          _id,
+          email,
+          firstname,
+          lastname,
+          role,
+          picture,
+          createdAt,
+          updatedAt,
+        },
+      });
+    });
+  })(req, res, next);
+});
 
 /**
  * @route POST /auth/register

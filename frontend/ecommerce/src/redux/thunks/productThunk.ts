@@ -134,9 +134,10 @@ export const fetchLatestProducts = createAsyncThunk<
 
 export const createNewProduct = createAsyncThunk<
   Product,
-  Partial<Product>,
+  FormData | Record<string, any>,
   { rejectValue: string }
 >("products/create", async (productData, thunkAPI) => {
+  console.log("Thunk - Creating new product with data:", productData);
   try {
     const response = await createProduct(productData);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
@@ -148,7 +149,7 @@ export const createNewProduct = createAsyncThunk<
 
 export const updateExistingProduct = createAsyncThunk<
   Product,
-  { id: string; data: Partial<Product> },
+  { id: string; data: Partial<Product> | FormData }, // ✅ Accepter FormData
   { rejectValue: string }
 >("products/update", async ({ id, data }, thunkAPI) => {
   try {

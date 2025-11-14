@@ -94,6 +94,7 @@ export interface ProductCard {
 export interface ProductProps {
   product: Product;
   getProductById: (id: string) => Promise<Product | null>;
+  onDelete: (product: Product) => void;
 }
 
 export interface ProductDetailInterface {

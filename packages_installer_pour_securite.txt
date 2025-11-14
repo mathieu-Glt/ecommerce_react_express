@@ -1,0 +1,53 @@
+1️⃣ xss-clean
+
+Rôle : Nettoie les entrées utilisateurs pour enlever les scripts ou balises HTML dangereuses.
+
+Protège contre : XSS (Cross-Site Scripting), où un attaquant injecte du code malveillant dans les champs ou requêtes.
+
+2️⃣ helmet
+
+Rôle : Définit des headers HTTP sécurisés pour protéger contre des vulnérabilités web courantes.
+
+Protège contre : XSS, clickjacking, sniffing de MIME et certaines fuites d’informations via les headers.
+
+3️⃣ csurf
+
+Rôle : Génère un token CSRF unique que le client doit renvoyer pour valider les requêtes POST/PUT/DELETE.
+
+Protège contre : CSRF (Cross-Site Request Forgery), où un site malveillant force un utilisateur authentifié à effectuer une action.
+
+4️⃣ express-mongo-sanitize
+
+Rôle : Supprime les caractères spéciaux ($ et .) des objets JSON envoyés au serveur.
+
+Protège contre : NoSQL Injection, où un attaquant manipule les filtres MongoDB pour accéder ou modifier des données.
+
+5️⃣ hpp
+
+Rôle : Élimine les paramètres dupliqués dans les requêtes HTTP.
+
+Protège contre : HTTP Parameter Pollution, où un attaquant envoie plusieurs fois le même paramètre pour tromper la logique du serveur.
+
+6️⃣ express-rate-limit
+
+Rôle : Limite le nombre de requêtes qu’une IP peut envoyer sur une période donnée.
+
+Protège contre : Brute-force / DoS légers, comme les tentatives de connexion massives ou les pics de requêtes pour saturer le serveur.
+
+7️⃣ cors
+
+Rôle : Contrôle quels domaines peuvent accéder à ton API et avec quels headers/méthodes.
+
+Protège contre : CORS mal configuré, qui permettrait à n’importe quel site d’envoyer des requêtes malveillantes à ton API.
+
+8️⃣ express-validator
+
+Rôle : Valide et filtre les entrées utilisateur (types, longueur, format).
+
+Protège contre : Injections, XSS et autres erreurs liées à des entrées mal formées ou dangereuses.
+
+9️⃣ multer
+
+Rôle : Gère l’upload de fichiers et permet de contrôler le type et la taille des fichiers.
+
+Protège contre : Uploads malveillants, fichiers exécutables ou trop volumineux pouvant endommager le serveur.

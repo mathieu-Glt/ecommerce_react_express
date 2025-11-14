@@ -113,9 +113,10 @@ export const AppRoutes = () => {
     // ==================== ROUTES AVEC HEADER + FOOTER ====================
     {
       element: React.createElement(
-        RequireAuthAccess,
-        null,
-        React.createElement(MainLayout)
+        // RequireAuthAccess,
+        // null,
+        // React.createElement(MainLayout)
+        MainLayout
       ),
       children: [
         // PUBLIC ROUTES

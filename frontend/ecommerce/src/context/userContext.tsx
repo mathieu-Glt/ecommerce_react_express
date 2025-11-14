@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import type { ReactNode } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useAppDispatch } from "../hooks/useReduxHooks";
@@ -17,47 +23,25 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 /**
  * UserProvider Component
- *
- * ✅ Version améliorée avec hydratation automatique
- * ✅ Appelle fetchCurrentUser() au démarrage
- * ✅ Code simplifié et optimisé
- *
- * Wraps the application and provides authentication context to all child components.
- * Uses the useAuth hook internally to manage authentication state.
- *
- * @example
- * // In App.tsx or index.tsx
- * <UserProvider>
- *   <App />
- * </UserProvider>
  */
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const dispatch = useAppDispatch();
-
-  // ============================================
-  // AUTH STATE ET MÉTHODES
-  // ============================================
-
-  /**
-   * Récupère tout l'état d'authentification depuis useAuth
-   * useAuth utilise Redux comme source unique de vérité
-   */
   const authValue = useAuth();
+
+  // ✅ Utiliser useRef pour éviter d'appeler fetchCurrentUser plusieurs fois
+  const hasInitialized = useRef(false);
 
   // ============================================
   // HYDRATATION AU DÉMARRAGE
   // ============================================
 
-  /**
-   * Récupère l'utilisateur au démarrage de l'application
-   *
-   * Flux :
-   * 1. loadAuthStateFromLocalStorage() s'est déjà exécuté (import authSlice)
-   * 2. Redux est déjà hydraté avec localStorage
-   * 3. fetchCurrentUser() vérifie et valide les données
-   * 4. Si localStorage vide mais token présent → Appel API
-   */
   useEffect(() => {
+    // ✅ N'exécuter qu'une seule fois
+    if (hasInitialized.current) {
+      return;
+    }
+
+    hasInitialized.current = true;
     console.log("🚀 UserProvider mounted - checking authentication...");
 
     // Récupérer/vérifier l'utilisateur actuel
@@ -65,22 +49,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       .unwrap()
       .then(() => {
         console.log("✅ User authentication verified");
-        console.log("Current User:", authValue.user);
       })
       .catch((error) => {
         console.log("⚠️ No active session:", error);
-        // Pas d'erreur bloquante, l'utilisateur sera redirigé si nécessaire
       });
-  }, [dispatch]);
+  }, []); // ✅ Tableau vide - n'exécuter qu'une fois
 
   // ============================================
   // DEBUG LOGS (Development only)
   // ============================================
 
-  /**
-   * Logs l'état d'authentification en développement
-   * Aide au debugging
-   */
   useEffect(() => {
     if (DEBUG_AUTH) {
       console.group("🔐 UserContext Auth State");
@@ -95,25 +73,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       console.log("❌ Error:", authValue.error);
       console.groupEnd();
     }
-  }, [
-    authValue.user,
-    authValue.token,
-    authValue.refreshToken,
-    authValue.isAuthenticated,
-    authValue.loading,
-    authValue.error,
-  ]);
+  }); // ✅ Pas de dépendances - s'exécute à chaque render mais sans causer de boucle
 
   // ============================================
   // MEMOIZED CONTEXT VALUE
   // ============================================
 
-  /**
-   * Mémorise la valeur du contexte
-   * Normalise l'erreur en string
-   */
   const contextValue = useMemo(() => {
-    // Normalise l'erreur en string ou null
     let normalizedError: string | null = null;
 
     if (authValue.error) {
@@ -143,30 +109,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
 /**
  * Custom hook to access User Context
- *
- * ✅ Version simplifiée et type-safe
- *
- * Must be used within a UserProvider component.
- * Provides access to all authentication state and methods.
- *
- * @throws Error if used outside of UserProvider
- *
- * @returns {UserContextType} Authentication state and methods
- *
- * @example
- * // Dans n'importe quel composant
- * const { user, token, isAuthenticated, login, logout } = useUserContext();
- *
- * if (!isAuthenticated) {
- *   return <Navigate to="/login" />;
- * }
- *
- * return (
- *   <div>
- *     <h1>Bonjour {user?.firstname}!</h1>
- *     <button onClick={logout}>Déconnexion</button>
- *   </div>
- * );
  */
 export const useUserContext = (): UserContextType => {
   const context = useContext(UserContext);
@@ -181,83 +123,5 @@ export const useUserContext = (): UserContextType => {
   return context;
 };
 
-/**
- * Export the context itself for advanced use cases
- */
 export { UserContext };
-
-/**
- * Type export for use in other files
- */
 export type { UserContextType };
-
-/**
- * ============================================
- * NOTES D'UTILISATION
- * ============================================
- *
- * ✅ CHANGEMENTS vs ancienne version :
- *
- * 1. HYDRATATION AUTOMATIQUE
- *    - Appel à fetchCurrentUser() au démarrage
- *    - Vérifie localStorage + validation API si nécessaire
- *    - Gestion transparente pour l'utilisateur
- *
- * 2. SIMPLIFICATION
- *    - Plus de logique complexe de synchronisation
- *    - useAuth gère tout
- *    - Code plus court et clair
- *
- * 3. PERFORMANCE
- *    - Mémoisation optimisée
- *    - Moins de re-renders inutiles
- *    - useEffect avec bonnes dépendances
- *
- * ============================================
- * EXEMPLE D'UTILISATION DANS APP.TSX
- * ============================================
- *
- * import { UserProvider } from './contexts/userContext';
- * import { store } from './redux/store';
- * import { Provider } from 'react-redux';
- *
- * function App() {
- *   return (
- *     <Provider store={store}>
- *       <UserProvider>
- *         <Routes>
- *           <Route path="/login" element={<LoginPage />} />
- *           <Route path="/dashboard" element={
- *             <ProtectedRoute>
- *               <Dashboard />
- *             </ProtectedRoute>
- *           } />
- *         </Routes>
- *       </UserProvider>
- *     </Provider>
- *   );
- * }
- *
- * ============================================
- * EXEMPLE DE ROUTE PROTÉGÉE
- * ============================================
- *
- * import { useUserContext } from './contexts/userContext';
- * import { Navigate } from 'react-router-dom';
- *
- * function ProtectedRoute({ children }) {
- *   const { isAuthenticated, loading } = useUserContext();
- *
- *   if (loading) {
- *     return <LoadingScreen />;
- *   }
- *
- *   if (!isAuthenticated) {
- *     return <Navigate to="/login" replace />;
- *   }
- *
- *   return children;
- * }
- *
- * ============================================
- */

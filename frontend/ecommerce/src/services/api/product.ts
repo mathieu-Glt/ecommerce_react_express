@@ -63,6 +63,7 @@ export async function getProducts(): Promise<ProductListResponse> {
 export async function createProduct(
   body: Record<string, any> | FormData
 ): Promise<ProductListResponse> {
+  console.log("Creating product with body:", body);
   try {
     const response: AxiosResponse<ProductListResponse> = await api.post(
       API_ROUTES.PRODUCTS.CREATE,

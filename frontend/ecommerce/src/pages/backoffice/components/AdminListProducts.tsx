@@ -8,10 +8,12 @@ import "../../styles/admin-list-products.css";
 import { useFilter } from "../../../context/FilterSearchBarContext";
 import { useNavigate } from "react-router-dom";
 import AdminProductCard from "./AdminProductCard";
+import DeleteConfirmModal from "./modals/DeleteConfirmModal";
 export const AdminListProduct = () => {
   const navigate = useNavigate();
   console.log("navigate : ", navigate);
-  const { products, loading, getAllProducts, getProductById, deleteProduct } = useProduct();
+  const { products, loading, getAllProducts, getProductById, deleteProduct } =
+    useProduct();
   const {
     getProducts,
     getProductsByCategory,
@@ -28,6 +30,10 @@ export const AdminListProduct = () => {
   const [fade, setFade] = useState(true);
   const pageSize = 3;
   const [clicked, setClicked] = useState(false);
+
+  // ✅ State pour le modal de suppression
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<any>(null);
 
   console.log("Products in ListProduct : ", getProducts);
   console.log("listProducts state : ", listProducts);
@@ -89,6 +95,34 @@ export const AdminListProduct = () => {
     }, 200);
   };
 
+  // ✅ Ouvrir le modal de suppression
+  const handleOpenDeleteModal = (product: any) => {
+    console.log("Opening delete modal for:", product);
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
+
+  // ✅ Fermer le modal
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
+  };
+
+  // ✅ Confirmer la suppression
+  const handleConfirmDelete = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      // Recharger la liste des produits
+      await getAllProducts();
+      // Fermer le modal
+      handleCloseDeleteModal();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      // L'erreur est déjà gérée dans le modal
+      throw error;
+    }
+  };
+
   if (loading) return <PageLoader />;
 
   const startIndex = (currentPage - 1) * pageSize;
@@ -117,6 +151,7 @@ export const AdminListProduct = () => {
             key={product._id}
             product={product}
             getProductById={getProductById}
+            onDelete={handleOpenDeleteModal}
           />
         ))}
       </div>
@@ -141,6 +176,15 @@ export const AdminListProduct = () => {
           }}
         />
       </div>
+      {/* ✅ Modal de confirmation de suppression */}
+      {productToDelete && (
+        <DeleteConfirmModal
+          product={productToDelete}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCloseDeleteModal}
+          isOpen={showDeleteModal}
+        />
+      )}
     </div>
   );
 };

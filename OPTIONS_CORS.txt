@@ -1,0 +1,53 @@
+L’OPTIONS est une méthode HTTP spéciale utilisée principalement pour les requêtes CORS “preflight”. L’idée est que le navigateur vérifie d’abord avec le serveur si la vraie requête (POST, PUT, DELETE…) est autorisée avant de l’envoyer.
+
+1️⃣ Contexte : CORS et “preflight”
+
+Quand tu fais une requête cross-origin (front localhost:5173 → back localhost:8000) avec :
+
+un header personnalisé (X-CSRF-Token)
+
+ou un Content-Type autre que application/x-www-form-urlencoded, multipart/form-data ou text/plain)
+
+le navigateur fait d’abord une requête préliminaire avec la méthode OPTIONS vers le serveur.
+
+2️⃣ Que fait le serveur avec OPTIONS ?
+
+Le navigateur attend du serveur qu’il réponde avec des headers spéciaux indiquant :
+
+Access-Control-Allow-Origin → quelles origines sont autorisées
+
+Access-Control-Allow-Methods → quelles méthodes HTTP sont autorisées (POST, GET…)
+
+Access-Control-Allow-Headers → quels headers personnalisés sont acceptés (X-CSRF-Token, Authorization…)
+
+Access-Control-Allow-Credentials → si les cookies ou credentials sont acceptés
+
+Si la réponse n’inclut pas le header que le front veut envoyer (X-CSRF-Token dans ton cas), le navigateur bloque la requête réelle, même si le serveur pourrait la traiter correctement.
+
+3️⃣ Exemple simplifié
+
+Front (Axios) :
+
+axios.post("http://localhost:8000/api/products", data, {
+  headers: { "X-CSRF-Token": csrfToken },
+  withCredentials: true
+});
+
+
+Browser → envoie d’abord :
+
+OPTIONS /api/products
+Origin: http://localhost:5173
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: X-CSRF-Token, Content-Type
+
+
+Server → doit répondre avec :
+
+Access-Control-Allow-Origin: http://localhost:5173
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Access-Control-Allow-Headers: X-CSRF-Token, Content-Type, Authorization
+Access-Control-Allow-Credentials: true
+
+
+Si ce n’est pas le cas → erreur CORS et OPTIONS échoue, donc le POST n’est jamais envoyé.

@@ -109,6 +109,7 @@ export const useProduct = () => {
   // ============================================
   const createProduct = useCallback(
     async (data: Record<string, any> | FormData): Promise<Product | null> => {
+      console.log("Creating product with data:", data);
       try {
         const result = await dispatch(createNewProduct(data)).unwrap();
         toast.showSuccess("Product created successfully");

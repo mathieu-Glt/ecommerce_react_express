@@ -3,7 +3,7 @@ import type { ProductProps } from "../../../interfaces/product.interface";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { Link } from "react-router-dom";
 
-export default function AdminProductCard({ product }: ProductProps) {
+export default function AdminProductCard({ product, onDelete }: ProductProps) {
   //   const { rateProduct, checkRateProductByUser } = useProduct();
   const { user } = useLocalStorage();
 
@@ -53,12 +53,13 @@ export default function AdminProductCard({ product }: ProductProps) {
           {/* 📦 Bouton suppression du produit */}
           <div className="product-delete-info">
             {/* <button className="product-delete-button">Delete Product</button> */}
-            <Link
-              to={`/admin/products/create-edit?deleteId=${product._id}&userId=${user?._id}`}
+            <button
+              onClick={() => onDelete(product)}
               className="product-delete-button"
+              type="button"
             >
-              Delete Product
-            </Link>
+              🗑️ Delete Product
+            </button>{" "}
           </div>
         </div>
       </div>

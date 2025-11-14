@@ -11,16 +11,14 @@ import { useFilter } from "../../context/FilterSearchBarContext";
 import CartCount from "../CartCount/CartCount";
 
 export const Navigation: React.FC = () => {
-  // const {user, isAuthenticated} = useUserContext();
   const { toggleBarFilter } = useFilter();
   const { user, isAuthenticated } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
+  console.log("🔐 NavBar - isAuthenticated:", isAuthenticated, "user:", user);
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -34,7 +32,13 @@ export const Navigation: React.FC = () => {
     <nav className="navbar">
       <div className="navbar-container">
         {/* Logo */}
-        <img src={logo} alt="Logo" className="logo-loader_nav " />
+        {user && user?.role === "admin" ? (
+          <Link to={ROUTES.ADMIN.DASHBOARD} className="navbar-logo">
+            <img src={logo} alt="Logo" className="logo-loader_nav " />
+          </Link>
+        ) : (
+          <img src={logo} alt="Logo" className="logo-loader_nav " />
+        )}
 
         {/* Menu burger (mobile) */}
         <button

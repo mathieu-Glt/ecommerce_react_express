@@ -29,6 +29,36 @@ const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const LocalStrategy = require("passport-local").Strategy;
+
+/**
+ * @description
+ * Local Strategy for username/password authentication
+ * - Verifies user credentials against MongoDB
+ */
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async (email, password, done) => {
+      try {
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
+        if (!user) {
+          return done(null, false, { message: "Incorrect email." });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return done(null, false, { message: "Incorrect password." });
+        }
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
 
 /**
  * @description

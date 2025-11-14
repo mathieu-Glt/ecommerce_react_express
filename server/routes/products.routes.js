@@ -93,7 +93,8 @@ router.get("/latest", getLatestProducts);
  * @middleware requireRole(["admin"]), upload.array("images", 5), uploadToCloudinary
  */
 router.post(
-  "/products",
+  "/",
+  authenticateToken,
   requireRole(["admin"]),
   upload.array("images", 5),
   uploadToCloudinary,
@@ -107,7 +108,8 @@ router.post(
  * @middleware requireRole(["admin"]), upload.array("images", 5), uploadToCloudinary
  */
 router.put(
-  "/products/:id",
+  "/:id",
+  authenticateToken,
   requireRole(["admin"]),
   upload.array("images", 5),
   uploadToCloudinary,
@@ -120,7 +122,7 @@ router.put(
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.delete("/products/:id", requireRole(["admin"]), deleteProduct);
+router.delete("/:id", authenticateToken, requireRole(["admin"]), deleteProduct);
 
 /**
  * @route POST /product/:id/rate

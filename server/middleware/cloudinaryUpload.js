@@ -86,19 +86,40 @@ const upload = multer({
  */
 const uploadToCloudinary = async (req, res, next) => {
   try {
-    if (!req.files || req.files.length === 0) return next();
+    console.log("=== CLOUDINARY MIDDLEWARE START ===");
+    console.log("1. req.files:", req.files);
+    console.log("2. Number of files:", req.files?.length || 0);
+
+    if (!req.files || req.files.length === 0) {
+      console.log("⚠️ No files to upload");
+      req.cloudinaryImages = [];
+      return next();
+    }
 
     const isCloudinaryConfigured =
       process.env.CLOUDINARY_CLOUD_NAME &&
       process.env.CLOUDINARY_API_KEY &&
       process.env.CLOUDINARY_API_SECRET;
 
+    console.log("3. Cloudinary configured:", isCloudinaryConfigured);
+    console.log(
+      "4. CLOUDINARY_CLOUD_NAME:",
+      process.env.CLOUDINARY_CLOUD_NAME ? "EXISTS" : "MISSING"
+    );
+    console.log(
+      "5. CLOUDINARY_API_KEY:",
+      process.env.CLOUDINARY_API_KEY ? "EXISTS" : "MISSING"
+    );
+    console.log(
+      "6. CLOUDINARY_API_SECRET:",
+      process.env.CLOUDINARY_API_SECRET ? "EXISTS" : "MISSING"
+    );
+
     const uploadedImages = [];
 
     if (!isCloudinaryConfigured) {
-      console.log("Cloudinary not configured, using local storage");
+      console.log("📁 Using local storage (Cloudinary not configured)");
       for (const file of req.files) {
-        // Defines the destination folder for files (uploads to the parent folder of the current file).
         const uploadDir = path.join(__dirname, "../uploads");
         if (!fs.existsSync(uploadDir))
           fs.mkdirSync(uploadDir, { recursive: true });
@@ -106,7 +127,7 @@ const uploadToCloudinary = async (req, res, next) => {
         const fileName = `${Date.now()}-${file.originalname}`;
         const filePath = path.join(uploadDir, fileName);
 
-        fs.copyFileSync(file.path, filePath); // Synchronously copies src first param to destination second param
+        fs.copyFileSync(file.path, filePath);
         fs.unlinkSync(file.path);
 
         uploadedImages.push({
@@ -114,12 +135,16 @@ const uploadToCloudinary = async (req, res, next) => {
           url: `/uploads/${fileName}`,
           local: true,
         });
-        console.log("Image saved locally:", filePath);
+        console.log("✅ Image saved locally:", filePath);
       }
     } else {
+      console.log("☁️ Uploading to Cloudinary...");
       for (const file of req.files) {
-        console.log("Uploading to Cloudinary:", file.originalname);
+        console.log("📤 Uploading:", file.originalname);
+        console.log("📍 File path:", file.path);
+
         const result = await uploadImage(file.path);
+        console.log("📥 Upload result:", result);
 
         if (result.success) {
           uploadedImages.push({
@@ -129,21 +154,24 @@ const uploadToCloudinary = async (req, res, next) => {
             width: result.width,
             height: result.height,
           });
-          console.log("Image uploaded:", result.url);
+          console.log("✅ Image uploaded:", result.url);
         } else {
           throw new Error(
             `Upload error for ${file.originalname}: ${result.error}`
           );
         }
 
-        fs.unlinkSync(file.path); // remove temporary file
+        fs.unlinkSync(file.path);
       }
     }
-    // Attach uploaded image info to request object
+
     req.cloudinaryImages = uploadedImages;
+    console.log("7. req.cloudinaryImages created:", req.cloudinaryImages);
+    console.log("=== CLOUDINARY MIDDLEWARE END ===");
+
     next();
   } catch (error) {
-    console.error("Cloudinary middleware error:", error);
+    console.error("❌ Cloudinary middleware error:", error);
 
     if (req.files) {
       req.files.forEach((file) => {
@@ -158,7 +186,6 @@ const uploadToCloudinary = async (req, res, next) => {
     });
   }
 };
-
 /**
  * Delete images from Cloudinary
  *

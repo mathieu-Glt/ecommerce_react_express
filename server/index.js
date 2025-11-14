@@ -3,231 +3,197 @@
  * Sets up Express, middlewares, routes, database connection, and starts the server.
  */
 
-// Load environment variables from .env file
-const dotenv = require("dotenv");
-dotenv.config({ path: __dirname + "/.env" });
+require("dotenv").config({ path: __dirname + "/.env" });
 
-// Import express dependence framework HTTP server
 const express = require("express");
-// Handler for users sessions
 const session = require("express-session");
-// Enable CORS (politics security for cross-origin requests)
 const cors = require("cors");
-// HTTP request logger middleware
 const morgan = require("morgan");
-// Secure HTTP headers middleware
 const helmet = require("helmet");
-// Parse incoming request bodies
-const bodyParser = require("body-parser");
-// File and path utilities
-const fs = require("fs");
-// Path utilities
+const rateLimit = require("express-rate-limit");
+const csurf = require("csurf");
+const hpp = require("hpp");
+const cookieParser = require("cookie-parser");
 const path = require("path");
-// Passport for authentication
 const passport = require("./config/passport");
-// Socket.io for real-time communication
 const { initSocket } = require("./config/socket");
-// Load route files dynamically
 const { loadRoutes } = require("./utils/routeLoader");
-// Handler databases connections
 const { connectDB, validateDatabaseConfig } = require("./config/database");
-// Handler middleware for global errors
 const { errorHandler } = require("./utils/errorHandler");
-
-// ---------------------------------------------
-// Express Application Initialization
-// ---------------------------------------------
+const mongoSanitizeSafe = require("./middleware/mongoSanitizeSafe");
+const xssSanitizeMiddleware = require("./middleware/xssCleanSafe");
 
 const app = express();
 const httpServer = require("http").createServer(app);
-console.log("httpServer : ", httpServer);
 
-// ---------------------------------------------
-// Session Configuration
-// ---------------------------------------------
+// =============================================
+// 1. COOKIE PARSER - DOIT ÊTRE EN PREMIER
+// =============================================
+app.use(cookieParser());
 
-/**
- * Session configuration used by Express and Socket.io
- * Stores user sessions with cookies.
- */
+// =============================================
+// 2. CORS - EN PREMIER (avant les autres middlewares)
+// =============================================
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "X-CSRF-Token",
+  ],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+// ✅ Gérer explicitement les requêtes OPTIONS (preflight)
+// app.options("*", cors());
+
+// =============================================
+// 3. SECURITY
+// =============================================
+app.use(helmet());
+app.use(hpp());
+
+// =============================================
+// 4. RATE LIMITER - Augmenté pour le développement
+// =============================================
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // ✅ Augmenté temporairement pour debug
+  message: "Too many requests, please try again later.",
+});
+app.use(limiter);
+
+// =============================================
+// 5. BODY PARSERS
+// =============================================
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// =============================================
+// 6. SESSION
+// =============================================
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || "your-secret-key",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // set true in production with HTTPS
+    secure: false, // true en production HTTPS
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24, // 24h
+    maxAge: 1000 * 60 * 60 * 24,
+    sameSite: "lax", // ✅ CRITIQUE pour CSRF avec cookies
   },
 };
-
-// Apply session middleware to Express app
 const sessionMiddleware = session(sessionConfig);
-
-// Initialize Socket.io with session support
-initSocket(httpServer, sessionMiddleware);
-
-// ---------------------------------------------
-// Global Middlewares
-// ---------------------------------------------
-
-// ✅ DEBUG MIDDLEWARE (temporaire - pour déboguer)
-app.use((req, res, next) => {
-  if (req.url.includes("/register")) {
-    console.log("=== INCOMING REQUEST ===");
-    console.log("URL:", req.url);
-    console.log("Method:", req.method);
-    console.log("Content-Type:", req.headers["content-type"]);
-    console.log("========================");
-  }
-  next();
-});
-
-// ✅ CORS EN PREMIER - Configuration corrigée
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
-);
-
-// ✅ Logging & security middlewares (AVANT body parsers)
-app.use(morgan("dev"));
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "https://js.stripe.com"],
-      workerSrc: ["'self'", "blob:"],
-    },
-  })
-);
-// Content Security Policy (CSP) specifically adapted for Azure AD
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "https://*.microsoftonline.com",
-        "https://*.msauth.net",
-        "https://*.msidentity.com",
-        "https://*.msftauth.net",
-        "https://*.msftauthimages.net",
-      ],
-      workerSrc: ["'self'", "blob:"], // Required for Azure AD workers
-      frameSrc: ["'self'", "https://login.microsoftonline.com"],
-      connectSrc: [
-        "'self'",
-        "https://login.microsoftonline.com",
-        "https://*.msidentity.com",
-      ],
-      imgSrc: [
-        "'self'",
-        "data:",
-        "https://*.msidentity.com",
-        "https://*.microsoftonline.com",
-      ],
-    },
-  })
-);
-
-// ---------------------------------------------
-// Static files & uploads
-// ---------------------------------------------
-
-// Serve public files
-// app.use(
-//   "/uploads",
-//   cors({
-//     origin: "http://localhost:5173",
-//     credentials: true,
-//   }),
-//   express.static(path.join(__dirname, "uploads"))
-// );
-
-// ✅ Session middleware (UNE SEULE FOIS)
 app.use(sessionMiddleware);
 
-// Initialize Passport.js authentication
+// =============================================
+// 7. SOCKET.IO
+// =============================================
+initSocket(httpServer, sessionMiddleware);
+
+// =============================================
+// 8. CSRF PROTECTION
+// =============================================
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax", // ✅ CRITIQUE
+    secure: false, // false en dev, true en prod
+  },
+});
+
+// ✅ Route publique pour obtenir le token CSRF (SANS protection CSRF dessus)
+app.get("/api/csrf-token", csrfProtection, (req, res) => {
+  console.log("🔐 CSRF Token generated:", req.csrfToken());
+  console.log("🍪 Cookies in request:", req.cookies);
+  res.json({ csrfToken: req.csrfToken() });
+});
+
+// ✅ CSRF CONDITIONNEL : Appliquer SEULEMENT sur POST, PUT, DELETE, PATCH
+app.use((req, res, next) => {
+  // Skip CSRF pour GET et OPTIONS
+  if (req.method === "GET" || req.method === "OPTIONS") {
+    return next();
+  }
+
+  // Skip CSRF pour la route /api/csrf-token
+  if (req.path === "/api/csrf-token") {
+    return next();
+  }
+
+  // Appliquer CSRF pour POST, PUT, DELETE, PATCH
+  csrfProtection(req, res, next);
+});
+
+// =============================================
+// 9. XSS & MONGO SANITIZE
+// =============================================
+app.use(xssSanitizeMiddleware);
+app.use(mongoSanitizeSafe);
+
+// =============================================
+// 10. PASSPORT
+// =============================================
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/uploads", (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
-
-// ✅ Sert le dossier invoices comme fichiers statiques
+// =============================================
+// 11. STATIC FILES
+// =============================================
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/invoices", express.static(path.join(__dirname, "invoices")));
 
-// ✅ Serve uploaded images (version nettoyée)
-app.use("/uploads", express.static("uploads"));
+// =============================================
+// 12. REQUEST LOGGER
+// =============================================
+app.use(morgan("dev"));
 
-// Apply less restrictive headers to allow images to display correctly
+// Middleware pour logger toutes les URLs
 app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "unsafe-none");
-  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
+  console.log(`📌 ${req.method} ${req.url}`);
   next();
 });
 
-// ✅ IMPORTANT: Body parsers conditionnels
-// Parse JSON SEULEMENT si ce n'est PAS multipart/form-data
+// ✅ Debug CSRF (AVANT les routes)
 app.use((req, res, next) => {
-  // Si c'est multipart/form-data, ne pas parser (laisser multer s'en occuper)
-  if (req.is("multipart/form-data")) {
-    console.log("⏭️  Skipping JSON parser for multipart request");
-    return next();
+  if (req.method !== "GET") {
+    console.log("🔍 CSRF Debug:", {
+      method: req.method,
+      path: req.path,
+      csrfToken: req.csrfToken ? req.csrfToken() : "N/A",
+      cookies: req.cookies,
+      headerToken: req.headers["x-csrf-token"],
+    });
   }
-  // Sinon, parser en JSON
-  express.json({ limit: "10mb" })(req, res, next);
+  next();
 });
 
-app.use((req, res, next) => {
-  if (req.is("multipart/form-data")) {
-    return next();
-  }
-  bodyParser.json({ limit: "10mb" })(req, res, next);
-});
+// =============================================
+// 13. LOAD ROUTES
+// =============================================
+loadRoutes(app);
 
-// Parse URL-encoded bodies (formulaires HTML classiques)
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-// Middleware pour logguer toutes les URLs
-app.use((req, res, next) => {
-  console.log(`📌 ${req.method} ${req.url}`);
-  next(); // Important pour passer à la route suivante
-});
-// ---------------------------------------------
-// Application Initialization
-// ---------------------------------------------
+// =============================================
+// 14. ERROR HANDLER (DOIT ÊTRE À LA FIN)
+// =============================================
+app.use(errorHandler);
 
-/**
- * Initialize the application.
- * - Validate environment database configuration
- * - Connect to the database
- * - Load all routes
- * - Setup global error handler
- * - Start the HTTP server
- */
+// =============================================
+// 15. START SERVER
+// =============================================
 const initializeApp = async () => {
   try {
     validateDatabaseConfig();
     await connectDB();
 
-    // ✅ Load routes (multer middlewares sont dans les routes)
-    loadRoutes(app);
-
-    // Must be last: global error handler
-    app.use(errorHandler);
-
     const PORT = process.env.PORT || 8000;
     httpServer.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
       console.log(
         `📊 Database type: ${process.env.DATABASE_TYPE || "mongoose"}`
       );
@@ -238,7 +204,4 @@ const initializeApp = async () => {
   }
 };
 
-// ---------------------------------------------
-// Start the server
-// ---------------------------------------------
 initializeApp();

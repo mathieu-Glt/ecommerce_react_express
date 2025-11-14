@@ -31,11 +31,14 @@ export const useCategory = () => {
   // ============================================
   // 🔹 FETCH ALL CATEGORIES
   // ============================================
-  const getAllCategories = useCallback(async (): Promise<void> => {
+  const getAllCategories = useCallback(async (): Promise<
+    Category[] | undefined
+  > => {
     try {
       const results = await dispatch(fetchCategories()).unwrap();
       console.log("Fetched categories:", results);
       toast.showSuccess("Categories loaded successfully");
+      return results;
     } catch (err: any) {
       console.error("❌ Failed to fetch categories:", err);
       toast.showError(err?.message || "Failed to fetch categories");
