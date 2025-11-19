@@ -13,12 +13,6 @@ function ForgotPasswordPage() {
     // setLoading(true);
     // setLoading(false);
     await forgotResetPassword(email);
-
-    try {
-    } catch (error) {
-      console.error("Forgot password failed:", error);
-      //   setError(error as string);
-    }
   };
   return (
     <div className="login-container">

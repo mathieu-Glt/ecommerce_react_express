@@ -23,7 +23,7 @@ export const useCart = () => {
   const dispatch = useAppDispatch();
   const toast = useToast();
 
-  // Sélection du state depuis Redux
+  // SSelection of state from Redux
   // useCart.ts
   const { items: cart, orderedBy } = useAppSelector((state) => state.cart);
 
@@ -35,7 +35,6 @@ export const useCart = () => {
       await dispatch(fetchUserCartThunk()).unwrap();
       toast.showSuccess("Cart loaded successfully");
     } catch (err: any) {
-      console.error("❌ Failed to fetch cart:", err);
       toast.showError(err?.message || "Failed to fetch cart");
     }
   }, [dispatch, toast]);
@@ -46,12 +45,10 @@ export const useCart = () => {
   const addToCart = useCallback(
     // async (productId: string, quantity = 1): Promise<void> => {
     async (datasCart: AddToCartPayload): Promise<void> => {
-      console.log("useCart - addToCart called with:", datasCart);
       try {
         await dispatch(addItemToCartThunk(datasCart)).unwrap();
         toast.showSuccess("Product added to cart");
       } catch (err: any) {
-        console.error("❌ Failed to add product to cart:", err);
         toast.showError(err?.message || "Failed to add product to cart");
       }
     },
@@ -67,7 +64,6 @@ export const useCart = () => {
         await dispatch(removeItemFromCartThunk(productId)).unwrap();
         toast.showSuccess("Product removed from cart");
       } catch (err: any) {
-        console.error("❌ Failed to remove product from cart:", err);
         toast.showError(err?.message || "Failed to remove product from cart");
       }
     },
@@ -80,11 +76,9 @@ export const useCart = () => {
   const updateCartItem = useCallback(
     async (productId: string, quantity: number): Promise<void> => {
       try {
-        console.log("Updating cart item:", productId, "to quantity:", quantity);
         await dispatch(updateCartItemThunk({ productId, quantity })).unwrap();
         toast.showSuccess("Cart updated successfully");
       } catch (err: any) {
-        console.error("❌ Failed to update cart item:", err);
         toast.showError(err?.message || "Failed to update cart item");
       }
     },
@@ -99,7 +93,6 @@ export const useCart = () => {
       await dispatch(clearCartThunk()).unwrap();
       toast.showSuccess("Cart cleared successfully");
     } catch (err: any) {
-      console.error("❌ Failed to clear cart:", err);
       toast.showError(err?.message || "Failed to clear cart");
     }
   }, [dispatch, toast]);

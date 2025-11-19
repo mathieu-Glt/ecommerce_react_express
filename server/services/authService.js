@@ -57,7 +57,7 @@ class AuthService {
     try {
       const userResult = await this.userRepository.getUserByEmail(email);
       if (!userResult.success || !userResult.user) {
-        return { success: false };
+        return { success: false, error: "User not found" };
       }
       const user = userResult.user;
       const userData = {
@@ -91,18 +91,14 @@ class AuthService {
   async refreshToken(refreshToken) {
     try {
       const decoded = jwt.verify(refreshToken, this.jwtSecretRefresh);
-      console.log("Decoded refresh token:", decoded);
       const userId = decoded.userId;
-      console.log("User ID from refresh token:", userId);
 
       const userResult = await this.userRepository.findUserById(userId);
-      console.log("User result from repository:", userResult);
       if (!userResult.success || !userResult.user) {
         return { success: false, error: "User not found" };
       }
 
       const user = userResult.user;
-      console.log("User found:", user);
 
       const newToken = this.generateToken(user);
       const newRefreshToken = this.generateRefreshToken(user);
@@ -131,27 +127,30 @@ class AuthService {
     try {
       const userResult = await this.userRepository.getUserByEmail(email);
 
-      // Vérifier si l'utilisateur existe
+      // Verify if the user exists
       if (!userResult.success || !userResult.user) {
-        return { success: false, error: "Email or password incorrect" };
+        return {
+          success: false,
+          error: "Email or password incorrect or You need to register first",
+        };
       }
 
       const user = userResult.user;
 
-      // Vérifier si l'utilisateur a un mot de passe (cas OAuth)
-      // Message générique pour ne pas révéler que le compte existe
+      // Verify if the user has a password (OAuth case)
+      // Generic message to avoid revealing that the account exists
       if (!user.password) {
         return { success: false, error: "Email or password incorrect" };
       }
 
-      // Vérifier le mot de passe
+      // Verify the password
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
         return { success: false, error: "Email or password incorrect" };
       }
 
-      // Générer les tokens
+      // Generate tokens
       const token = this.generateToken(user);
       const refreshToken = this.generateRefreshToken(user);
 
@@ -173,7 +172,6 @@ class AuthService {
 
       return { success: true, user: userData, token, refreshToken };
     } catch (error) {
-      console.error("Authentication error:", error);
       return { success: false, error: "Authentication error" };
     }
   }
@@ -223,17 +221,12 @@ class AuthService {
    *  - error {string} Error message (if invalid/expired)
    */
   verifyToken(token) {
-    console.log("Secret used for sign:", this.jwtSecret);
-    console.log("Secret used for verify:", process.env.JWT_SECRET);
-    console.log("Equal?", this.jwtSecret === process.env.JWT_SECRET);
-
     try {
+      // Clean the token from any surrounding quotes and spaces
       const cleanToken = token.replace(/^"|"$/g, "").trim();
       const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
-      console.log("Decoded token:", decoded);
       return { success: true, user: decoded };
     } catch (error) {
-      console.error("JWT verification error:", error.message);
       return { success: false, error: "Invalid or expired token" };
     }
   }
@@ -244,7 +237,6 @@ class AuthService {
    * @returns {Promise<Object>} Result containing:
    *  - success {boolean}
    *  - user {Object} Created/updated user data (without password)
-   *  - token {string} JWT token for the new user
    *  - error {string} Error message (if failure)
    */
   async createUser(userData) {
@@ -256,7 +248,7 @@ class AuthService {
       try {
         await sendWelcomeEmail(result.user.email, result.user.firstname);
       } catch (error) {
-        console.error("Error sending welcome email:", error);
+        return { success: false, error: "Error sending welcome email" };
       }
 
       const userResponse = {

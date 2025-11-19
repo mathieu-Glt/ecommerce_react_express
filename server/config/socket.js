@@ -13,11 +13,8 @@ let ioInstance;
  * - https://socket.io/docs/v4/server-initialization/
  */
 function initSocket(httpServer, sessionMiddleware) {
-  console.log("🚀 Initializing Socket.IO...");
-
   // Return existing instance if already initialized
   if (ioInstance) return ioInstance;
-  console.log("♻️ Socket.IO already initialized, returning existing instance");
 
   // Create new Socket.IO server
   // https://socket.io/docs/v4/server-options/#cors
@@ -33,8 +30,6 @@ function initSocket(httpServer, sessionMiddleware) {
     transports: ["websocket", "polling"], // Transport methods
   });
 
-  console.log("⚙️ Socket.IO configuration complete");
-  console.log("🔗 Applying session middleware...");
   // Integrate session middleware with Socket.IO
   // https://socket.io/docs/v4/middlewares/#compatibility-with-express-middleware
   ioInstance.engine.use(sessionMiddleware);
@@ -44,37 +39,16 @@ function initSocket(httpServer, sessionMiddleware) {
     const session = socket.request.session;
     const sessionId = session?.id;
 
-    console.log("🔌 NEW SOCKET CONNECTION:");
-    console.log(`   → Socket ID: ${socket.id}`);
-    console.log(`   → Session ID: ${sessionId}`);
-    console.log(`   → IP: ${socket.request.connection.remoteAddress}`);
-
     if (!session) {
-      console.error("❌ No session found in socket request");
       socket.emit("auth:required", { reason: "no_session" });
       return socket.disconnect(true);
     }
 
-    // Log session details for debugging
-    console.log("🔍 SESSION INSPECTION:");
-    console.log(`   → Session ID: ${session.id}`);
-    console.log(`   → Keys: [${Object.keys(session).join(", ")}]`);
-    console.log(`   → Has user: ${!!session.user}`);
-    console.log(`   → Has token: ${!!session.token}`);
-    console.log(
-      `   → Has pending notification: ${!!session.pendingSocketNotification}`
-    );
-
     // Handle pending notifications (if any)
     if (!session.user && session.pendingSocketNotification) {
-      console.log("📋 PROCESSING PENDING NOTIFICATION:");
-
       const notification = session.pendingSocketNotification;
-      console.log(`   → Type: ${notification.type}`);
-      console.log(`   → Has user data: ${!!notification.data?.user}`);
 
       if (notification.data && notification.data.user) {
-        console.log("✅ RESTORING USER DATA");
         session.user = notification.data.user;
         session.token = notification.data.token;
         session.refreshToken = notification.data.refreshToken;
@@ -85,9 +59,7 @@ function initSocket(httpServer, sessionMiddleware) {
         // Save session
         session.save((err) => {
           if (err) {
-            console.error("❌ Error saving restored session:", err);
           } else {
-            console.log("✅ Session restored and saved");
           }
         });
       }
@@ -95,9 +67,6 @@ function initSocket(httpServer, sessionMiddleware) {
 
     // Final validation: ensure session has a user
     if (!session.user) {
-      console.warn("❌ CONNECTION REFUSED - No user in session");
-      console.warn("🔍 Full session:", JSON.stringify(session, null, 2));
-
       socket.emit("auth:required", {
         reason: "no_user_in_session",
         debug: {
@@ -107,12 +76,6 @@ function initSocket(httpServer, sessionMiddleware) {
       });
       return socket.disconnect(true);
     }
-
-    // Authorized connection
-    console.log("✅ SOCKET CONNECTION AUTHORIZED:");
-    console.log(`   → User ID: ${session.user}`);
-    console.log(`   → User ID: ${session.user.id}`);
-    console.log(`   → User email: ${session.user.email}`);
 
     // Join rooms for the session and user
     socket.join(sessionId);
@@ -127,13 +90,10 @@ function initSocket(httpServer, sessionMiddleware) {
       timestamp: Date.now(),
     };
 
-    console.log("📡 EMITTING user:connected");
     socket.emit("user:connected", connectionData);
 
     // Disconnect listener
-    socket.on("disconnect", (reason) => {
-      console.log(`🔌 SOCKET DISCONNECTED: ${socket.id} - Reason: ${reason}`);
-    });
+    socket.on("disconnect", (reason) => {});
   });
 
   return ioInstance;

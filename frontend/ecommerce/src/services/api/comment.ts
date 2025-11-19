@@ -21,19 +21,11 @@ export const fetchAllComments = async (): Promise<Comment[]> => {
     if (response.data.success) {
       return response.data.results.comments;
     } else {
-      console.error(
-        "Erreur lors de la récupération des commentaires :",
-        response.data.message
-      );
-      return [];
+      throw new Error(response.data.message);
     }
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(
-      "Erreur lors de la récupération des commentaires :",
-      axiosError.message
-    );
-    return [];
+    throw new Error("Error while fetching comments: " + axiosError.message);
   }
 };
 
@@ -47,19 +39,11 @@ export const fetchCommentsByProduct = async (
     if (response.data.success) {
       return response.data.results.comments;
     } else {
-      console.error(
-        "Erreur lors de la récupération des commentaires :",
-        response.data.message
-      );
-      return [];
+      throw new Error(response.data.message);
     }
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(
-      "Erreur lors de la récupération des commentaires :",
-      axiosError.message
-    );
-    return [];
+    throw new Error("Error while fetching comments: " + axiosError.message);
   }
 };
 
@@ -73,19 +57,11 @@ export const fetchCommentsByUser = async (
     if (response.data.success) {
       return response.data.results.comments;
     } else {
-      console.error(
-        "Erreur lors de la récupération des commentaires :",
-        response.data.message
-      );
-      return [];
+      throw new Error(response.data.message);
     }
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(
-      "Erreur lors de la récupération des commentaires :",
-      axiosError.message
-    );
-    return [];
+    throw new Error(axiosError.message);
   }
 };
 
@@ -102,19 +78,11 @@ export const postComment = async (
     if (response.data.success) {
       return response.data.results.comments[0];
     } else {
-      console.error(
-        "Erreur lors de la création du commentaire :",
-        response.data.message
-      );
       return null;
     }
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(
-      "Erreur lors de la création du commentaire :",
-      axiosError.message
-    );
-    return null;
+    throw new Error(axiosError.message);
   }
 };
 
@@ -122,29 +90,18 @@ export const updateComment = async (
   commentId: string,
   updatedData: Partial<Comment>
 ): Promise<Comment | null> => {
-  console.log("updateComment - commentId :", commentId);
-  console.log("updateComment - updatedData :", updatedData);
   try {
     const response: AxiosResponse<any> = await api.put(
       API_ROUTES.COMMENTS.UPDATE(commentId),
       updatedData
     );
-    console.log("Response from updateComment :", response.data);
     if (response.data.success) {
       return response.data;
     } else {
-      console.error(
-        "Erreur lors de la mise à jour du commentaire :",
-        response.data.message
-      );
       return null;
     }
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(
-      "Erreur lors de la mise à jour du commentaire :",
-      axiosError.message
-    );
     return null;
   }
 };
@@ -157,10 +114,6 @@ export const deleteComment = async (commentId: string): Promise<boolean> => {
     return response.data.success;
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(
-      "Erreur lors de la suppression du commentaire :",
-      axiosError.message
-    );
     return false;
   }
 };

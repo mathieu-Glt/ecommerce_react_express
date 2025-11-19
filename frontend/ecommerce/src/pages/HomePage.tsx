@@ -7,10 +7,6 @@ import BannerListAcessoriesProduct from "../components/BannerListProductsAccesso
 export const HomePage = () => {
   // Use context for take user, token and refreshToken
   const { user, token, isAuthenticated, refreshToken } = useUserContext();
-  console.log("👤 User:", user);
-  console.log("🔑 Token:", token);
-  console.log("♻️ Refresh Token:", refreshToken);
-  console.log("✅ Authenticated:", isAuthenticated);
 
   return (
     <div className="container-banner">

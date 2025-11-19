@@ -79,18 +79,14 @@ export const registerUser = createAsyncThunk<
 // ==============================
 // 🚪 LOGOUT
 // ==============================
-export const logoutUser = createAsyncThunk<
+export const logoutThunk = createAsyncThunk<
   LogoutSuccessResponse,
   void,
   { rejectValue: ResponseErrorInterface }
 >("auth/logoutUser", async (_, thunkAPI) => {
   try {
     const response = await signOut(); // Appel à l'API pour la déconnexion
-    console.log(
-      "🚪authThunk- logoutUser [logoutUser] Logout response:",
-      response
-    );
-    // Nettoyage du localStorage sera géré dans le reducer
+    // Cleanup of localStorage will be handled in the reducer
     // Provide a value cast to any to satisfy the action's required-argument type
     if (response.success) {
       // Cleanup will be handled in the reducer
@@ -115,8 +111,6 @@ export const fetchCurrentUser = createAsyncThunk<
   { rejectValue: string }
 >("auth/fetchCurrentUser", async (_, { rejectWithValue }) => {
   try {
-    console.log("🔍 [fetchCurrentUser] Récupération de l'utilisateur...");
-
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
 
@@ -125,7 +119,6 @@ export const fetchCurrentUser = createAsyncThunk<
         const user = JSON.parse(storedUser) as User;
         return { success: true, user, token: storedToken };
       } catch (parseError) {
-        console.error("❌ [fetchCurrentUser] Erreur parsing user:", parseError);
         localStorage.removeItem("user");
         localStorage.removeItem("token");
       }
@@ -141,7 +134,6 @@ export const fetchCurrentUser = createAsyncThunk<
 
     return rejectWithValue("Invalid user data received from server");
   } catch (error: any) {
-    console.error("❌ [fetchCurrentUser] Erreur:", error);
     return rejectWithValue(error.message || "Failed to fetch current user");
   }
 });

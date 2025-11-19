@@ -21,13 +21,7 @@ function ResetPasswordPage() {
       token: params?.token ?? "",
     };
 
-    console.log("ResetPasswordPage datas:", datas);
-
-    try {
-      await resetPasswordAuth(datas);
-    } catch (error) {
-      console.error("Forgot password failed:", error);
-    }
+    await resetPasswordAuth(datas);
   };
 
   return (
@@ -38,7 +32,7 @@ function ResetPasswordPage() {
         <div className="shape shape-3"></div>
       </div>
       <ResetPasswordForm
-        handleResetPassword={handleResetPassword} //Formik enverra les valeurs ici
+        handleResetPassword={handleResetPassword} //Formik will send values here
         loading={loading}
         error={error}
         success={success}
@@ -47,4 +41,4 @@ function ResetPasswordPage() {
   );
 }
 
-export default ResetPasswordPage; // sera default: m.default dans fichier routes/index.ts
+export default ResetPasswordPage; // will be default: m.default in routes/index.ts file

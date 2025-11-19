@@ -29,7 +29,6 @@ class AuthServiceFactory {
       // ou si on souhaite utiliser MySQL, on utilisera MySQLUserRepository et on ajoutera cette clase à AuthService pour MySQL
       return new AuthService(userRepository);
     } catch (error) {
-      console.error("Error creating Mongoose user service:", error);
       throw new Error("Failed to create Mongoose user service");
     }
   }
@@ -57,7 +56,6 @@ class AuthServiceFactory {
       const userRepository = new MySQLUserRepository(connection);
       return new UserService(userRepository);
     } catch (error) {
-      console.error("Error creating MySQL user service:", error);
       throw new Error("Failed to create MySQL user service");
     }
   }
@@ -71,17 +69,12 @@ class AuthServiceFactory {
    */
 
   static createAuthService(databaseType = "mongoose") {
-    console.log(`Creating auth service with database type: ${databaseType}`);
-
     switch (databaseType.toLowerCase()) {
       case "mongoose":
         return this.createMongooseAuthService();
       case "mysql":
         return this.createMySQLAuthService();
       default:
-        console.warn(
-          `Unsupported database type: ${databaseType}, falling back to mongoose`
-        );
         return this.createMongooseAuthService();
     }
   }

@@ -40,13 +40,11 @@ const api: AxiosInstance = useApi();
 export async function signUp(
   body: RegisterFormData | FormData
 ): Promise<ApiResponse> {
-  console.log("🚀 ~ file: auth.ts:47 ~ signUp ~ body:", body);
   try {
     const register: AxiosResponse<ApiResponse> = await api.post(
       API_ROUTES.AUTH.REGISTER,
       body
     );
-    console.log("🚀 ~ file: auth.ts:53 ~ signUp ~ register:", register);
     return register.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -80,10 +78,9 @@ export async function signIn(body: LoginCredentials): Promise<LoginResponse> {
       API_ROUTES.AUTH.LOGIN,
       body
     );
-    console.log("🚀 ~ file: auth.ts:100 ~ signIn ~ login:", login);
     return login.data;
   } catch (error: any) {
-    // Vérifie la structure plutôt que l'instance
+    // Check the structure rather than the instance
     const errorMessage =
       error?.response?.data?.message ||
       error?.response?.data?.error ||
@@ -112,7 +109,7 @@ export async function resetPassword(body: {}): Promise<any> {
     const reset = await api.post(API_ROUTES.AUTH.RESET_PASSWORD, body);
     return reset.data;
   } catch (error) {
-    console.log("error auth" + error);
+    throw new Error("Failed during resetPassword");
   }
 }
 
@@ -126,9 +123,7 @@ export async function resetPassword(body: {}): Promise<any> {
  * @example
  * try {
  *   const profile = await getUserProfile();
- *   console.log("User:", profile.user);
  * } catch (error) {
- *   console.error("Failed to load profile:", error.message);
  * }
  *
  * @example
@@ -181,7 +176,6 @@ export async function getUserProfile(): Promise<ApiResponse | undefined> {
  *   // Redirect to login
  *   navigate("/login");
  * } catch (error) {
- *   console.error("Logout failed:", error.message);
  * }
  *
  * @example
@@ -199,7 +193,6 @@ export async function getUserProfile(): Promise<ApiResponse | undefined> {
 export async function signOut(): Promise<ApiResponse> {
   try {
     const logout = await api.post(API_ROUTES.AUTH.LOGOUT);
-    console.log("🚪 ~ file: auth.tsx:151 ~ signOut ~ logout:", logout);
     return logout.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -223,10 +216,6 @@ export async function refreshTokens() {
       BASE_URL + API_ROUTES.AUTH.REFRESH_TOKEN,
       { headers }
     );
-    console.log(
-      ":rocket: ~ file: auth.tsx:55 ~ refreshToken ~ refreshToken:",
-      refreshResponse
-    );
     return refreshResponse;
   } catch (error) {
     throw new Error(" Failed to refresh token");
@@ -241,18 +230,17 @@ export async function destroyTokenUser() {
 }
 
 /**
- * Récupère l'utilisateur actuellement connecté
+ * Retrieves the currently authenticated user
  *
- * @param token - JWT token pour l'authentification
- * @returns Données utilisateur si authentifié
+ * @param token - JWT token for authentication
+ * @returns User data if authenticated
  *
- * @throws Error si token invalide (401) ou utilisateur introuvable (404)
+ * @throws Error if token is invalid (401) or user not found (404)
  *
  * @example
  * ```typescript
  * const response = await authService.getCurrentUser(token);
  * if (response.success) {
- *   console.log("User:", response.user);
  * }
  * ```
  */
@@ -279,7 +267,7 @@ export async function getCurrentUser(
   }
 }
 
-/// reflexion a la creation d'une classe service
+/// reflection on creating a service class
 // class AuthService {
 //   private api: AxiosInstance;
 //

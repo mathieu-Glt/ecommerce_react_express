@@ -24,20 +24,19 @@ export const useSubCategory = () => {
   );
 
   // ============================================
-  // 🔹 FETCH ALL SUB-CATEGORIES
+  // FETCH ALL SUB-CATEGORIES
   // ============================================
   const getAllSubCategories = useCallback(async (): Promise<void> => {
     try {
       await dispatch(fetchSubCategories()).unwrap();
       toast.showSuccess("Sub-categories loaded successfully");
     } catch (err: any) {
-      console.error("❌ Failed to fetch sub-categories:", err);
       toast.showError(err?.message || "Failed to fetch sub-categories");
     }
   }, [dispatch, toast]);
 
   // ============================================
-  // 🔹 FETCH SUB-CATEGORY BY SLUG
+  // FETCH SUB-CATEGORY BY SLUG
   // ============================================
   const getSubCategoryBySlug = useCallback(
     async (slug: string): Promise<SubCategory | null> => {
@@ -53,7 +52,7 @@ export const useSubCategory = () => {
   );
 
   // ============================================
-  // 🔹 CREATE SUB-CATEGORY
+  // CREATE SUB-CATEGORY
   // ============================================
   const createSubCategory = useCallback(
     async (
@@ -72,7 +71,7 @@ export const useSubCategory = () => {
   );
 
   // ============================================
-  // 🔹 UPDATE SUB-CATEGORY
+  // UPDATE SUB-CATEGORY
   // ============================================
   const updateSubCategory = useCallback(
     async (
@@ -92,7 +91,7 @@ export const useSubCategory = () => {
   );
 
   // ============================================
-  // 🔹 DELETE SUB-CATEGORY
+  // DELETE SUB-CATEGORY
   // ============================================
   const deleteSubCategory = useCallback(
     async (slug: string): Promise<boolean> => {
@@ -109,7 +108,7 @@ export const useSubCategory = () => {
   );
 
   // ============================================
-  // 🔹 MEMOIZED RETURN VALUE
+  // MEMOIZED RETURN VALUE
   // ============================================
   const subCategoryContextValue = useMemo(
     () => ({

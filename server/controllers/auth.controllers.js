@@ -38,17 +38,17 @@ const authService = AuthServiceFactory.createAuthService(
  */
 exports.getCurrentUser = (req, res) => {
   try {
-    // Récupérer l'utilisateur depuis Passport ou la session
+    // Retrieve the user from Passport or the session
     const user = req.user || req.session?.user;
 
     if (!user) {
       return res.status(401).json({
         status: "error",
-        message: "Utilisateur non trouvé",
+        message: "User not found",
       });
     }
 
-    // Ne renvoyer que les champs nécessaires côté frontend
+    // Only return necessary fields to the frontend
     const safeUser = {
       _id: user._id,
       googleId: user.googleId,
@@ -62,7 +62,7 @@ exports.getCurrentUser = (req, res) => {
       isActive: user.isActive,
     };
 
-    // Injecte dans la session pour Socket.IO
+    // Inject into the session for Socket.IO
     req.session.user = user;
     req.session.token = req.token;
     req.session.refreshToken = req.refreshToken;
@@ -73,10 +73,9 @@ exports.getCurrentUser = (req, res) => {
       user: safeUser,
     });
   } catch (err) {
-    console.error("Erreur getCurrentUser :", err);
     return res.status(500).json({
       status: "error",
-      message: "Une erreur est survenue",
+      message: "An error occurred while retrieving user information",
     });
   }
 };
@@ -142,7 +141,6 @@ exports.handleOAuthCallback = async (req, res) => {
 
     res.redirect(redirectUrl.toString());
   } catch (error) {
-    console.error("Erreur handleOAuthCallback :", error);
     res.redirect(`${FRONTEND_URL}/login?error=callback_error`);
   }
 };
@@ -178,7 +176,7 @@ exports.getUserProfile = asyncHandler(async (req, res) => {
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  // Validation des champs requis
+  // Validation of required fields
   if (!email) {
     return res.status(400).json({
       success: false,
@@ -193,7 +191,7 @@ exports.login = asyncHandler(async (req, res) => {
     });
   }
 
-  // Authentification
+  // Authentication
   const result = await authService.authenticateUser(email, password);
 
   if (!result.success) {
@@ -228,21 +226,11 @@ exports.login = asyncHandler(async (req, res) => {
 exports.register = asyncHandler(async (req, res) => {
   const { email, password, firstname, lastname, address } = req.body;
 
-  console.log("📝 Données reçues pour l'inscription:", {
-    email,
-    firstname,
-    lastname,
-    hasPassword: !!password,
-    hasPicture: !!req.file,
-    file: req.file,
-    address: address || "Non communiqué",
-  });
-
-  // Validation des champs REQUIS (picture est optionnel)
+  // Validation of required fields (picture is optional)
   if (!email || !password || !firstname || !lastname) {
-    // Supprimer le fichier uploadé si validation échoue
+    // Delete uploaded file if validation fails
     if (req.file) {
-      fs.unlinkSync(req.file.path); // Version synchrone plus simple
+      fs.unlinkSync(req.file.path);
     }
 
     return res.status(400).json({
@@ -250,7 +238,7 @@ exports.register = asyncHandler(async (req, res) => {
       error: "Email, password, firstname et lastname are required",
     });
   }
-  // Vérifier si l'utilisateur n'existe pas déja
+  // Verify if the user already exists
   const existingUser = await authService.userExists(email);
   if (existingUser.success && existingUser.user) {
     return res.status(400).json({
@@ -259,7 +247,7 @@ exports.register = asyncHandler(async (req, res) => {
     });
   }
 
-  // Validation de la longueur du mot de passe
+  // Validation of password length
   if (password.length < 8) {
     if (req.file) {
       fs.unlinkSync(req.file.path);
@@ -271,18 +259,20 @@ exports.register = asyncHandler(async (req, res) => {
     });
   }
 
-  // Construire le chemin de l'image pour la BDD
+  // Construct the image path for the database
   let picturePath = null;
   if (req.file) {
-    // Chemin relatif pour stockage en BDD
+    // Relative path for storage in the database
     picturePath = `/uploads/avatars/${req.file.filename}`;
-    console.log("✅ Image enregistrée:", picturePath);
   } else {
-    console.log("ℹ️ Aucune image uploadée (optionnel)");
+    return res.status(400).json({
+      success: false,
+      error: "Profile picture is required",
+    });
   }
 
   try {
-    // Créer l'utilisateur dans la base de données
+    // Create the user in the database
     const result = await authService.createUser({
       email,
       password,
@@ -290,11 +280,11 @@ exports.register = asyncHandler(async (req, res) => {
       lastname,
       address: address || "",
       role: "user",
-      picture: picturePath, // null si pas d'image
+      picture: picturePath, // null if no image
     });
 
     if (!result.success) {
-      // Supprimer le fichier si la création échoue
+      // Delete file if creation fails
       if (req.file) {
         fs.unlinkSync(req.file.path);
       }
@@ -307,24 +297,26 @@ exports.register = asyncHandler(async (req, res) => {
 
     try {
       await sendWelcomeEmail(email, firstname || lastname || "User");
-      console.log("✅ Welcome email sent successfully");
     } catch (emailErr) {
-      console.error("⚠️ Welcome email failed:", emailErr);
-      // on ne bloque pas l’inscription si le mail échoue
+      return res.status(201).json({
+        success: true,
+        message: "User created successfully, but failed to send welcome email",
+        user: result.user,
+      });
     }
 
-    // Succès - Retourner les données utilisateur
+    // Success - Return user data
     res.status(201).json({
       success: true,
-      message: "Utilisateur créé avec succès",
+      message: "User created successfully",
       user: result.user,
     });
   } catch (error) {
-    // Supprimer le fichier en cas d'erreur
+    // Delete the file in case of an error
     if (req.file) {
       fs.unlinkSync(req.file.path);
     }
-    throw error; // Laisse asyncHandler gérer l'erreur
+    throw error; // Let asyncHandler handle the error
   }
 });
 /**
@@ -382,22 +374,23 @@ exports.verifyToken = asyncHandler(async (req, res) => {
  * @returns {Object} 500 - Error destroying session
  */
 exports.logout = asyncHandler(async (req, res) => {
-  const sessionId = req.session?.id;
+  // const sessionId = req.session?.id;
 
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Erreur lors de la destruction de session :", err);
-      return res
-        .status(500)
-        .json({ success: false, message: "Erreur de logout" });
-    }
+  // req.session.destroy((err) => {
+  //   if (err) {
+  //     return res
+  //       .status(500)
+  //       .json({ success: false, message: "Erreur de logout" });
+  //   }
 
-    res.clearCookie("connect.sid"); // Clear session cookie
+  //   res.clearCookie("connect.sid"); // Clear session cookie
 
-    // Émet l'événement Socket.IO
-    // const io = getIO();
-    // io.to(sessionId).emit("user:logout");
+  //   res.json({ success: true, message: "Logout successful" });
+  // });
 
-    res.json({ success: true, message: "Logout successful" });
+  // Token deletion client-side only
+  res.json({
+    success: true,
+    message: "Logout successful. Please remove tokens from client.",
   });
 });

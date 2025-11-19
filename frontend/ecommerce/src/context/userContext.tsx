@@ -28,7 +28,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   const authValue = useAuth();
 
-  // ✅ Utiliser useRef pour éviter d'appeler fetchCurrentUser plusieurs fois
+  // Use useRef to avoid calling fetchCurrentUser multiple times
   const hasInitialized = useRef(false);
 
   // ============================================
@@ -36,44 +36,36 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   // ============================================
 
   useEffect(() => {
-    // ✅ N'exécuter qu'une seule fois
+    // Execute only once
     if (hasInitialized.current) {
       return;
     }
 
     hasInitialized.current = true;
-    console.log("🚀 UserProvider mounted - checking authentication...");
 
     // Récupérer/vérifier l'utilisateur actuel
-    dispatch(fetchCurrentUser())
-      .unwrap()
-      .then(() => {
-        console.log("✅ User authentication verified");
-      })
-      .catch((error) => {
-        console.log("⚠️ No active session:", error);
-      });
-  }, []); // ✅ Tableau vide - n'exécuter qu'une fois
+    dispatch(fetchCurrentUser()).unwrap();
+  }, []); // No dependencies - runs only once on mount
 
   // ============================================
   // DEBUG LOGS (Development only)
   // ============================================
-
-  useEffect(() => {
-    if (DEBUG_AUTH) {
-      console.group("🔐 UserContext Auth State");
-      console.log("👤 User:", authValue.user);
-      console.log("🔑 Token:", authValue.token ? "présent" : "absent");
-      console.log(
-        "♻️ Refresh Token:",
-        authValue.refreshToken ? "présent" : "absent"
-      );
-      console.log("✅ Authenticated:", authValue.isAuthenticated);
-      console.log("⏳ Loading:", authValue.loading);
-      console.log("❌ Error:", authValue.error);
-      console.groupEnd();
-    }
-  }); // ✅ Pas de dépendances - s'exécute à chaque render mais sans causer de boucle
+  // No dependencies - runs on every render but does not cause a loop
+  // useEffect(() => {
+  //   if (DEBUG_AUTH) {
+  //     console.group("🔐 UserContext Auth State");
+  //     console.log("👤 User:", authValue.user);
+  //     console.log("🔑 Token:", authValue.token ? "présent" : "absent");
+  //     console.log(
+  //       "♻️ Refresh Token:",
+  //       authValue.refreshToken ? "présent" : "absent"
+  //     );
+  //     console.log("✅ Authenticated:", authValue.isAuthenticated);
+  //     console.log("⏳ Loading:", authValue.loading);
+  //     console.log("❌ Error:", authValue.error);
+  //     console.groupEnd();
+  //   }
+  //   });
 
   // ============================================
   // MEMOIZED CONTEXT VALUE

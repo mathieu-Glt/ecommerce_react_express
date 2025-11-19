@@ -34,7 +34,7 @@ export const ProductDetail = ({
   const [open, setOpen] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  // Callback appelé quand l'utilisateur clique sur ajouter au panier
+  // Callback called when the user clicks on add to cart
   const onAddToCart = useCallback(async () => {
     const datasCart = {
       product: selectedProduct,
@@ -43,20 +43,15 @@ export const ProductDetail = ({
     };
     try {
       await addToCart(datasCart);
-      console.log("✅ Produit ajouté au panier !");
     } catch (error) {
-      console.error("❌ Erreur lors de l'ajout au panier :", error);
+      console.warn("❌ Error while adding to cart:", error);
     }
   }, [selectedProduct, addToCart]);
   // Callback appelé quand l'utilisateur clique sur une étoile
   const onRateChange = useCallback(
     async (newRating: number) => {
       try {
-        console.log(
-          `⭐ Nouvelle note pour le produit ${selectedProduct._id}: ${newRating}`
-        );
         const hasRated = await checkRateProductByUser(product._id);
-        console.log("Has user rated this product before?", hasRated);
         const isUpdate = hasRated ? true : false;
 
         // Appelle la fonction du hook
@@ -65,14 +60,8 @@ export const ProductDetail = ({
           newRating,
           isUpdate
         );
-
-        if (success) {
-          console.log("✅ Note enregistrée avec succès !");
-        } else {
-          console.error("❌ Échec de la mise à jour de la note.");
-        }
       } catch (error) {
-        console.error("Erreur lors de la notation :", error);
+        console.warn("❌ Error while rating the product:", error);
       }
     },
     [selectedProduct, rateProduct]
@@ -99,14 +88,14 @@ export const ProductDetail = ({
             className="logo-avis-verified"
             onClick={() => setOpen(true)}
           />
-          Voir les avis
+          View reviews
         </Button>
         <RateComponent
           rate={Number(selectedProduct.averageRating) || 1}
           editable={true}
           starColor="#FFD700"
           emptyStarColor="#DDDDDD"
-          onRateChange={onRateChange} // ✅ On passe le handler ici
+          onRateChange={onRateChange} // ✅ Passing the handler here
         />
         <h1 className="product-detail-title">{selectedProduct.title}</h1>
         <p className="product-detail-description">
@@ -127,7 +116,7 @@ export const ProductDetail = ({
           onClick={() => setOpenCreate(true)}
           className="view-comments-button"
         >
-          Ajoute un commentaire
+          Add a comment
         </Button>
       </div>
       <CommentsModal

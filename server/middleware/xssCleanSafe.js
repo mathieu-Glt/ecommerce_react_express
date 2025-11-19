@@ -1,7 +1,13 @@
+/**
+ * Middleware to clean user inputs to prevent XSS attacks,
+ * using the xss library.
+ * Cleans req.body and req.params (except parameters named 'id').
+ * Does not touch req.query to avoid issues with read-only parameters.
+ */
 const xss = require("xss");
 
 function xssSanitizeMiddleware(req, res, next) {
-  // Nettoyage du body
+  // Clean body
   if (req.body) {
     for (const key in req.body) {
       if (typeof req.body[key] === "string") {
@@ -10,16 +16,16 @@ function xssSanitizeMiddleware(req, res, next) {
     }
   }
 
-  // Nettoyage des params de route
+  // Clean route params
   if (req.params) {
     for (const key in req.params) {
-      // Ne pas nettoyer les paramètres nommés 'id'
+      // Do not clean parameters named 'id'
       if (key !== "id" && typeof req.params[key] === "string") {
         req.params[key] = xss(req.params[key]);
       }
     }
   }
-  // NE PAS toucher à req.query
+  // DO NOT touch req.query
   next();
 }
 

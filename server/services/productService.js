@@ -19,6 +19,7 @@
  *
  * This service follows the Dependency Inversion Principle (SOLID),
  * ensuring it does not depend on low-level implementation details.
+ * 
  */
 
 /**
@@ -48,7 +49,6 @@ class ProductService {
    * @returns {Promise<Object|null>} Product object or null if not found.
    */
   async getProductBySlug(slug) {
-    console.log("Service - getProductBySlug called with slug:", slug);
     return await this.productRepository.getProductBySlug(slug);
   }
 
@@ -58,7 +58,6 @@ class ProductService {
    * @returns {Promise<Object|null>} Product object or null if not found.
    */
   async getProductByTitle(title) {
-    console.log("Service - getProductByTitle called with title:", title);
     return await this.productRepository.getProductByTitle(title);
   }
 
@@ -198,7 +197,6 @@ class ProductService {
       productId,
       userId
     );
-    console.log("Service result for takeRatingFromProduct:", result);
     return result;
   }
 
@@ -265,10 +263,6 @@ class ProductService {
     const results = await this.productRepository.findProductsByPriceRangeRepo(
       minPrice,
       maxPrice
-    );
-    console.log(
-      "Service - findProductsByPriceRangeService results Service:",
-      results
     );
     return results;
   }

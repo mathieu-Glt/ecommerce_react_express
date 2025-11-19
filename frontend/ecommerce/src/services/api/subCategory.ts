@@ -20,19 +20,12 @@ const api: AxiosInstance = useApi();
  */
 export async function getSubs(): Promise<SubCategoryResponse> {
   try {
-    console.log(
-      "🔧 [getSubs] Fetching subs from:",
-      API_ROUTES.SUB_CATEGORIES.LIST
-    );
-
     const response: AxiosResponse<SubCategoryResponse> = await api.get(
       API_ROUTES.SUB_CATEGORIES.LIST
     );
 
-    console.log("✅ [getSubs] Response data:", response.data);
     return response.data;
   } catch (error) {
-    console.error("❌ [getSubs] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data?.error || "Failed to fetch subs");
     }
@@ -53,7 +46,6 @@ export async function getSubBySlug(slug: string): Promise<SubCategoryResponse> {
     );
     return response.data;
   } catch (error) {
-    console.error("❌ [getSubBySlug] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data?.error || "Failed to fetch sub");
     }
@@ -77,7 +69,6 @@ export async function createSub(
     );
     return response.data;
   } catch (error) {
-    console.error("❌ [createSub] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data?.error || "Failed to create sub");
     }
@@ -103,7 +94,6 @@ export async function updateSub(
     );
     return response.data;
   } catch (error) {
-    console.error("❌ [updateSub] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data?.error || "Failed to update sub");
     }
@@ -124,7 +114,6 @@ export async function deleteSub(slug: string): Promise<SubCategoryResponse> {
     );
     return response.data;
   } catch (error) {
-    console.error("❌ [deleteSub] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data?.error || "Failed to delete sub");
     }

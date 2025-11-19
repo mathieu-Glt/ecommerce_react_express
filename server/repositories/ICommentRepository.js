@@ -1,6 +1,9 @@
 /**
- * Interface/Abstraction pour le repository comment
- * Définit les méthodes que toutes les implémentations doivent avoir
+ * Interface/Abstraction for the comment repository
+ * Set the methods that all implementations must have
+ * (e.g., Mongoose, MySQL) to manage comments.
+ *
+ * @interface ICommentRepository
  */
 class ICommentRepository {
   async addComment(commentData) {

@@ -4,7 +4,7 @@ import type { RootState } from "../store"; // adapte le chemin selon ton store
 import type { Product } from "../../interfaces/product.interface";
 import type { CartItem } from "../slices/cartSlice";
 
-// On importe les actions synchrones du slice (elles gèrent le localStorage)
+// We import the synchronous actions from the slice (they handle localStorage)
 import {
   addToCart as addToCartAction,
   updateToCart as updateToCartAction, // corrected: 'update' instead of 'upodate'
@@ -16,9 +16,9 @@ import {
 
 /**
  * NOTE:
- * Ces thunks NE DOIVENT PAS toucher au localStorage.
- * Ils se contentent de dispatcher les reducers synchrones (qui eux font la persistance).
- * Ensuite, ils retournent l'état à jour (items) via thunkAPI.getState().
+ * These thunks MUST NOT touch localStorage.
+ * They only dispatch the synchronous reducers (which handle persistence).
+ * Then, they return the updated state (items) via thunkAPI.getState().
  */
 
 // ===== Fetch cart (simply returns current items from state) =====
@@ -29,7 +29,6 @@ export const fetchUserCartThunk = createAsyncThunk<CartItem[]>(
       const state = getState() as RootState;
       return state.cart.items;
     } catch (err: any) {
-      console.error("❌ fetchUserCartThunk error:", err);
       return rejectWithValue("Failed to get cart from state");
     }
   }
@@ -42,26 +41,15 @@ export const addItemToCartThunk = createAsyncThunk<
 >(
   "cart/addItemToCart",
   async (datasCart, { dispatch, getState, rejectWithValue }) => {
-    console.log("datasCart in thunk:", datasCart);
     const { product, quantity = 1, orderBy } = datasCart;
-    console.log(
-      "Adding to cart - product:",
-      product,
-      "quantity:",
-      quantity,
-      "orderBy:",
-      orderBy
-    );
     try {
       // Dispatch the synchronous addToCart reducer with the product payload.
-      // Ici on envoie les valeurs déjà destructurées (quantity a une valeur par défaut ici).
+      // Here we send the already destructured values (quantity has a default value here).
       dispatch(addToCart({ product, quantity, orderBy }));
 
       const state = getState() as RootState;
-      console.log("Updated cart items after add:", state.cart.items);
       return state.cart.items;
     } catch (err: any) {
-      console.error("❌ addItemToCartThunk error:", err);
       return rejectWithValue("Failed to add item to cart");
     }
   }
@@ -74,19 +62,12 @@ export const updateCartItemThunk = createAsyncThunk<
 >(
   "cart/updateCartItem",
   async ({ productId, quantity }, { dispatch, getState, rejectWithValue }) => {
-    console.log(
-      "Updating cart item - productId:",
-      productId,
-      "to quantity:",
-      quantity
-    );
     try {
-      // On dispatch l'action syncro du slice qui met à jour la quantité et écrit le localStorage
+      // We dispatch the slice's synchronous action that updates the quantity and writes to localStorage
       dispatch(updateToCart({ productId, quantity }));
       const state = getState() as RootState;
       return state.cart.items;
     } catch (err: any) {
-      console.error("❌ updateCartItemThunk error:", err);
       return rejectWithValue("Failed to update cart item");
     }
   }
@@ -101,7 +82,6 @@ export const removeItemFromCartThunk = createAsyncThunk<CartItem[], string>(
       const state = getState() as RootState;
       return state.cart.items;
     } catch (err: any) {
-      console.error("❌ removeItemFromCartThunk error:", err);
       return rejectWithValue("Failed to remove item from cart");
     }
   }
@@ -116,7 +96,6 @@ export const clearCartThunk = createAsyncThunk<CartItem[]>(
       const state = getState() as RootState;
       return state.cart.items; // devrait être []
     } catch (err: any) {
-      console.error("❌ clearCartThunk error:", err);
       return rejectWithValue("Failed to clear cart");
     }
   }

@@ -5,7 +5,6 @@ import { useComment } from "../../hooks/useComment";
 import EditCommentModal from "../EditCommentModal/EditCommentModal";
 import type { User } from "../../interfaces/user.interface";
 import "./commentsModal.css";
-import { deleteExistingComment } from "../../redux/thunks/commentThunk";
 import { useConfirmModal } from "../../hooks/useConfirmModal";
 
 export default function CommentsModal({
@@ -28,7 +27,6 @@ export default function CommentsModal({
   useEffect(() => {
     if (open && productId) {
       fetchCommentsByProductId(productId).catch((err) =>
-        console.error("Erreur chargement commentaires :", err)
       );
     }
   }, [open, productId, fetchCommentsByProductId]);
@@ -40,10 +38,9 @@ export default function CommentsModal({
 
   const handleDeleteClick = useCallback(
     (commentId: string) => {
-      console.log("🧨 handleDeleteClick déclenché pour :", commentId);
       confirm(
-        "Supprimer le commentaire ?",
-        "Cette action est irréversible.",
+        "Delete the comment ?",
+        "This action is irreversible.",
         async () => {
           await deleteComment(commentId);
           await fetchCommentsByProductId(productId);
@@ -57,7 +54,7 @@ export default function CommentsModal({
     <>
       <Modal
         open={open}
-        title="Avis des utilisateurs"
+        title="User Reviews"
         onCancel={onClose}
         footer={null}
         centered
@@ -70,7 +67,7 @@ export default function CommentsModal({
             <Spin size="large" />
           </div>
         ) : comments.length === 0 ? (
-          <Empty description="Aucun commentaire pour ce produit" />
+          <Empty description="No comments for this product" />
         ) : (
           <div className="modal-comments-wrapper">
             {comments.map((comment) => (
@@ -94,7 +91,7 @@ export default function CommentsModal({
                       <div className="author">
                         {comment.user
                           ? `${comment.user.firstname} ${comment.user.lastname}`
-                          : "Utilisateur anonyme"}
+                          : "Anonymous User"}
                       </div>
                       <Rate disabled defaultValue={comment.rating} />
                     </div>
@@ -117,14 +114,14 @@ export default function CommentsModal({
                       onClick={() => handleEditClick(comment)}
                       className="edit-comments-button"
                     >
-                      Modifier votre commentaire
+                      Edit your comment
                     </Button>
                     <Button
                       danger
                       onClick={() => handleDeleteClick(comment._id)}
                       className="delete-comments-button"
                     >
-                      Supprimer ce commentaire
+                      Delete this comment
                     </Button>
                   </>
                 )}

@@ -13,9 +13,6 @@ const {
   searchProducts,
   rateProduct,
   updateProductRating,
-  commentProduct,
-  updateCommentProduct,
-  deleteCommentProduct,
   takeProductRating,
   findProductsByCategoryId,
   findProductsByAverageRateRange,
@@ -56,7 +53,7 @@ router.get("/", getProducts);
  * @desc Get product details by slug
  * @access Public
  */
-router.get("/products/slug/:slug", getProductBySlug);
+router.get("/:slug", getProductBySlug);
 
 /**
  * @route GET /product/search
@@ -77,7 +74,7 @@ router.get("/products/search/price", searchProductByPriceRange);
  * @desc Get product details by ID
  * @access Public
  */
-router.get("/id/:id", getProductById);
+router.get("/:id", getProductById);
 
 /**
  * @route GET /product/lastest

@@ -7,9 +7,9 @@ export default function LogoutButton() {
   const { setToken, setRefreshToken, clearTokens } = useLocalStorage();
   // Initialize hooks for each localStorage key
   const handleLogout = async () => {
-    // Supprime les clés du localStorage
+    // Delete the keys from localStorage
     clearTokens();
-    // Déconnecte Redux / middleware
+    // Logout from Redux / middleware
     await logout();
   };
 

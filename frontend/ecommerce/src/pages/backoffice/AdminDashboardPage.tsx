@@ -6,7 +6,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import "../styles/admin-dashboard.css";
 
 const AdminDashboardPage = () => {
-  // Données pour le graphique des produits les plus vendus
+  // Data for the top-selling products chart
   const [topProductsData, setTopProductsData] = useState({
     products: [
       "iPhone 15 Pro Max",
@@ -19,14 +19,14 @@ const AdminDashboardPage = () => {
     revenue: [184258, 117620, 78213, 38336, 31148],
   });
 
-  // Données pour la répartition par catégorie
+  // Data for category distribution
   const [categoryData, setCategoryData] = useState([
     { id: 0, value: 78500, label: "Téléphones" },
     { id: 1, value: 32100, label: "Outillage" },
     { id: 2, value: 16850, label: "Maintenance" },
   ]);
 
-  // Données pour l'évolution mensuelle
+  // Data for monthly trends
   const [monthlyData, setMonthlyData] = useState({
     months: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"],
     phones: [45000, 52000, 48000, 61000, 70000, 78500],
@@ -34,7 +34,7 @@ const AdminDashboardPage = () => {
     maintenance: [8000, 10000, 12000, 14000, 15000, 16850],
   });
 
-  // Données par marque de téléphones
+  // Data by phone brand
   const [phoneBrandsData, setPhoneBrandsData] = useState([
     { id: 0, value: 42, label: "Apple" },
     { id: 1, value: 28, label: "Samsung" },
@@ -46,21 +46,21 @@ const AdminDashboardPage = () => {
     <div className="admin-dashboard">
       <div className="dashboard-header">
         <div>
-          <h1>📊 Dashboard Admin</h1>
-          <p>Analytics et statistiques de vente</p>
+          <h1>📊 Admin Dashboard</h1>
+          <p>Sales analytics and statistics</p>
         </div>
       </div>
 
-      {/* Section graphiques principaux */}
+      {/* Main charts section */}
       <div className="charts-grid">
-        {/* Graphique en barres - Top produits par ventes */}
+        {/* Bar chart - Top products by sales */}
         <div className="chart-card">
           <div className="chart-header">
-            <h2>🏆 Top 5 Produits - Nombre de ventes</h2>
+            <h2>🏆 Top 5 Products - Number of Sales</h2>
             <select className="chart-filter">
-              <option>Cette semaine</option>
-              <option>Ce mois</option>
-              <option>Cette année</option>
+              <option>This week</option>
+              <option>This month</option>
+              <option>This year</option>
             </select>
           </div>
           <div className="chart-container">
@@ -89,11 +89,11 @@ const AdminDashboardPage = () => {
           </div>
         </div>
 
-        {/* Graphique en barres - Top produits par revenus */}
+        {/* Bar chart - Top products by revenue */}
         <div className="chart-card">
           <div className="chart-header">
-            <h2>💰 Top 5 Produits - Revenus générés</h2>
-            <span className="chart-subtitle">En euros (€)</span>
+            <h2>💰 Top 5 Products - Revenue Generated</h2>
+            <span className="chart-subtitle">In euros (€)</span>
           </div>
           <div className="chart-container">
             <BarChart
@@ -122,10 +122,10 @@ const AdminDashboardPage = () => {
           </div>
         </div>
 
-        {/* Graphique circulaire - Répartition CA par catégorie */}
+        {/* Pie chart - Revenue distribution by category   */}
         <div className="chart-card">
           <div className="chart-header">
-            <h2>📊 Répartition du CA par catégorie</h2>
+            <h2>Revenue distribution by category</h2>
             <span className="chart-total">
               Total:{" "}
               {categoryData.reduce((a, b) => a + b.value, 0).toLocaleString()}€
@@ -157,11 +157,11 @@ const AdminDashboardPage = () => {
           </div>
         </div>
 
-        {/* Graphique circulaire - Répartition par marque */}
+        {/* Pie chart - Distribution by phone brand */}
         <div className="chart-card">
           <div className="chart-header">
-            <h2>📱 Répartition par marque de téléphones</h2>
-            <span className="chart-subtitle">Nombre de produits en stock</span>
+            <h2>📱 Distribution by phone brand</h2>
+            <span className="chart-subtitle">Number of products in stock</span>
           </div>
           <div className="chart-container">
             <PieChart
@@ -193,24 +193,24 @@ const AdminDashboardPage = () => {
           </div>
         </div>
 
-        {/* Graphique en lignes - Évolution mensuelle du CA par catégorie */}
+        {/* Line chart - Monthly revenue evolution by category */}
         <div className="chart-card full-width">
           <div className="chart-header">
-            <h2>📈 Évolution mensuelle du CA par catégorie</h2>
+            <h2>📈 Monthly revenue evolution by category</h2>
             <div className="chart-legend-custom">
               <span className="legend-item">
                 <span
                   className="legend-color"
                   style={{ background: "#3b82f6" }}
                 ></span>
-                Téléphones
+                Phones
               </span>
               <span className="legend-item">
                 <span
                   className="legend-color"
                   style={{ background: "#10b981" }}
                 ></span>
-                Outillage
+                Tools
               </span>
               <span className="legend-item">
                 <span
@@ -257,10 +257,10 @@ const AdminDashboardPage = () => {
           </div>
         </div>
 
-        {/* Comparaison Ventes vs Revenus */}
+        {/* Comparison Sales vs Revenue */}
         <div className="chart-card full-width">
           <div className="chart-header">
-            <h2>📊 Comparaison: Ventes vs Revenus (Top 5)</h2>
+            <h2>📊 Comparison: Sales vs Revenue (Top 5)</h2>
           </div>
           <div className="chart-container">
             <BarChart
@@ -295,41 +295,41 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      {/* Stats complémentaires */}
+      {/* Additional stats */}
       <div className="stats-summary">
         <div className="stat-item">
           <span className="stat-icon">🎯</span>
           <div className="stat-content">
-            <strong>Taux de conversion</strong>
+            <strong>Conversion rate</strong>
             <p className="stat-value">3.2%</p>
-            <span className="stat-change positive">+0.5% vs mois dernier</span>
+            <span className="stat-change positive">+0.5% vs last month</span>
           </div>
         </div>
 
         <div className="stat-item">
           <span className="stat-icon">🛒</span>
           <div className="stat-content">
-            <strong>Panier moyen</strong>
+            <strong>Average cart</strong>
             <p className="stat-value">372€</p>
-            <span className="stat-change positive">+12% vs mois dernier</span>
+            <span className="stat-change positive">+12% vs last month</span>
           </div>
         </div>
 
         <div className="stat-item">
           <span className="stat-icon">⭐</span>
           <div className="stat-content">
-            <strong>Satisfaction client</strong>
+            <strong>Customer satisfaction</strong>
             <p className="stat-value">4.7/5</p>
-            <span className="stat-change">245 avis ce mois</span>
+            <span className="stat-change">245 reviews this month</span>
           </div>
         </div>
 
         <div className="stat-item">
           <span className="stat-icon">📦</span>
           <div className="stat-content">
-            <strong>Taux de livraison</strong>
+            <strong>Delivery rate</strong>
             <p className="stat-value">98.5%</p>
-            <span className="stat-change positive">+1.2% vs mois dernier</span>
+            <span className="stat-change positive">+1.2% vs last month</span>
           </div>
         </div>
       </div>

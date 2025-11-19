@@ -35,7 +35,7 @@ export function useConfirmModal() {
               onConfirm();
             }}
           >
-            Confirmer
+            Confirm
           </Button>
         </Modal.Footer>
       </Modal>

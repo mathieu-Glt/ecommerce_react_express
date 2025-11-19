@@ -1,9 +1,16 @@
+/**
+ * Module for generating PDF invoices for orders.
+ * Uses the PDFKit library to create PDF documents.
+ *
+ * @module utils/invoice
+ * docutile : génération de factures PDF - https://www.npmjs.com/package/pdfkit?activeTab=readme
+ */
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
-// Stripe facture generation
+// Stripe invoice generation
 function generateInvoice(order, filePath) {
-  // Assure que le dossier "invoices" existe
+  // Ensure the "invoices" folder exists
   const invoicesDir = path.dirname(filePath);
   if (!fs.existsSync(invoicesDir)) {
     fs.mkdirSync(invoicesDir, { recursive: true });
@@ -14,7 +21,7 @@ function generateInvoice(order, filePath) {
   doc.pipe(stream);
 
   // ------------------------------
-  // Logo en haut
+  // Logo at the top
   // ------------------------------
   const logoPath = path.join(__dirname, "..", "assets", "logo.png");
   if (fs.existsSync(logoPath)) {
@@ -24,7 +31,7 @@ function generateInvoice(order, filePath) {
   doc.moveDown(4);
 
   // ------------------------------
-  // Titre facture
+  // Invoice Title
   // ------------------------------
   doc
     .fontSize(20)
@@ -35,7 +42,7 @@ function generateInvoice(order, filePath) {
   doc.moveDown(1);
 
   // ------------------------------
-  // Informations client
+  // Customer Information
   // ------------------------------
   doc
     .fontSize(12)
@@ -50,7 +57,7 @@ function generateInvoice(order, filePath) {
   doc.moveDown(1);
 
   // ------------------------------
-  // Tableau des articles
+  // Purchased Items Table
   // ------------------------------
   doc
     .fontSize(12)
@@ -58,17 +65,17 @@ function generateInvoice(order, filePath) {
     .text("Articles achetés :", { underline: true });
   doc.moveDown(0.5);
 
-  // En-tête du tableau
+  // Table Header
   doc.font("Helvetica-Bold");
-  doc.text("Produit", 50, doc.y, { width: 220 });
-  doc.text("Quantité", 270, doc.y, { width: 80, align: "right" });
-  doc.text("Prix Unitaire", 350, doc.y, { width: 100, align: "right" });
+  doc.text("Product", 50, doc.y, { width: 220 });
+  doc.text("Quantity", 270, doc.y, { width: 80, align: "right" });
+  doc.text("Unit Price", 350, doc.y, { width: 100, align: "right" });
   doc.text("Total", 450, doc.y, { width: 100, align: "right" });
   doc.moveDown(0.5);
   doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
   doc.moveDown(0.2);
 
-  // Articles
+  // Items
   doc.font("Helvetica");
   order.items.forEach((item) => {
     const totalItem = item.product.price * item.quantity;
@@ -95,7 +102,6 @@ function generateInvoice(order, filePath) {
     .text(`TOTAL : ${order.total.toFixed(2)} €`, { align: "right" });
 
   doc.end();
-  console.log(`✅ Facture générée : ${path.basename(filePath)}`);
 }
 
 // Nouvelle version améliorée de la fonction de génération de facture

@@ -42,7 +42,7 @@ const ResetPasswordForm: React.FC<ResetPasswordProps> = ({
         <div className="shape shape-3"></div>
       </div> */}
 
-      {/* Card du formulaire */}
+      {/* Form card */}
       <div className="login-card-wrapper">
         <div className="login-card">
           {/* Header */}
@@ -56,18 +56,18 @@ const ResetPasswordForm: React.FC<ResetPasswordProps> = ({
             </p>
           </div>
 
-          {/* Formulaire */}
+          {/* Form */}
           <div className="login-form-wrapper">
             {error && (
               <Alert variant="danger" dismissible className="mb-3">
-                <Alert.Heading>Erreur</Alert.Heading>
+                <Alert.Heading>Error</Alert.Heading>
                 <p>{error}</p>
               </Alert>
             )}
 
             {success && (
               <Alert variant="success" className="mb-3">
-                <Alert.Heading>Succès</Alert.Heading>
+                <Alert.Heading>Success</Alert.Heading>
                 <p>{success}</p>
               </Alert>
             )}
@@ -75,7 +75,7 @@ const ResetPasswordForm: React.FC<ResetPasswordProps> = ({
             <Form noValidate onSubmit={formik.handleSubmit}>
               {/* Password Field */}
               <Form.Group className="mb-3" controlId="formPassword">
-                <Form.Label>Password *</Form.Label>
+                <Form.Label>Password </Form.Label>
                 <Form.Control
                   type="password"
                   name="password"
@@ -98,7 +98,7 @@ const ResetPasswordForm: React.FC<ResetPasswordProps> = ({
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formConfirmPassword">
-                <Form.Label>Confirm Password *</Form.Label>
+                <Form.Label>Confirm Password </Form.Label>
                 <Form.Control
                   type="password"
                   name="confirmPassword"
@@ -142,10 +142,10 @@ const ResetPasswordForm: React.FC<ResetPasswordProps> = ({
                       aria-hidden="true"
                       className="me-2"
                     />
-                    Envoi...
+                    Sending...
                   </>
                 ) : (
-                  "Réinitialiser le mot de passe"
+                  "Reset Password"
                 )}
               </Button>
             </Form>

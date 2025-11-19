@@ -1,6 +1,5 @@
 // Middleware for centralized error handling
 const errorHandler = (err, req, res, next) => {
-  console.error("Error:", err);
 
   // Mongoose validation errors
   if (err.name === "ValidationError") {

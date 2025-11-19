@@ -12,27 +12,20 @@ export default function ProductCard({ product }: ProductProps) {
   const { user } = useLocalStorage();
   const { addToCart } = useCart();
 
-  // Fonction appelée quand l'utilisateur change la notes
+  // Function called when the user changes the rating
   const onRateChange = async (newRating: number) => {
     try {
-      console.log(
-        `⭐ Nouvelle note pour le produit ${product._id}: ${newRating}`
-      );
       const hasRated = await checkRateProductByUser(product._id);
-      console.log("Has user rated this product before?", hasRated);
       const isUpdate = hasRated ? true : false;
       const success = await rateProduct(product._id, newRating, product.rating);
-      console.log("success : ", success);
-      console.log(`Rating ${isUpdate ? "updated" : "added"}:`, success);
     } catch (error) {
-      console.error("Erreur lors de la notation du produit :", error);
+      console.warn("Error while rating the product:", error);
     }
   };
 
-  // Callback appelé quand l'utilisateur clique sur ajouter au panier
+  // Callback called when the user clicks on add to cart
   const onAddToCart = useCallback(async () => {
     if (!user?._id) {
-      console.warn("❌ Aucun utilisateur connecté !");
       return;
     }
 
@@ -41,26 +34,25 @@ export default function ProductCard({ product }: ProductProps) {
       quantity: 1,
       orderBy: user._id,
     };
-    console.log("🛒 addToCart datas:", datasCart);
     try {
       await addToCart(datasCart);
-      console.log("✅ Produit ajouté au panier !");
     } catch (error) {
-      console.error("❌ Erreur lors de l'ajout au panier :", error);
+      console.warn("❌ Error while adding to cart:", error);
+      return;
     }
   }, [product, user]);
   return (
     <div key={String(product._id)} className="product-card">
-      {/* ⭐ Composant de notation */}
+      {/* Rating component */}
       <RateComponent
         rate={Number(product.averageRating) || 1}
         editable={true}
         starColor="#FFD700"
         emptyStarColor="#DDDDDD"
-        onRateChange={onRateChange} // ✅ on passe notre handler
+        onRateChange={onRateChange} // passing our handler
       />
 
-      {/* 🖼️ Image du produit */}
+      {/* 🖼️ Product image */}
       {product.images?.[0] && (
         <img
           src={product.images[0]}
@@ -70,7 +62,7 @@ export default function ProductCard({ product }: ProductProps) {
         />
       )}
 
-      {/* 📦 Infos produit */}
+      {/* Product info */}
       <div className="product-info">
         <h2 className="product-title">{product.title}</h2>
         <p className="product-description">
@@ -78,7 +70,7 @@ export default function ProductCard({ product }: ProductProps) {
         </p>
         <p className="product-price">{product.price} €</p>
 
-        {/* ⚙️ Actions */}
+        {/* Actions */}
         <div
           className="product-action"
           style={{
@@ -90,14 +82,14 @@ export default function ProductCard({ product }: ProductProps) {
             marginTop: "10px",
           }}
         >
-          {/* 🛒 Ajouter au panier */}
+          {/* Add to cart */}
           <button className="add-to-cart-button" onClick={onAddToCart}>
-            Ajouter au panier
+            Add to cart
             <ShoppingCartOutlined
               style={{ fontSize: "26px", color: "#f32400ff" }}
             />
           </button>
-          {/* 👁️ Voir les détails */}
+          {/* View details */}
           <Link
             to={`/products/${product._id}`}
             className="product-details-button"

@@ -16,7 +16,7 @@ const router = express.Router();
  * @access Public
  */
 router.post("/generate", (req, res) => {
-  const { order } = req.body; // récupérer les infos du paiement
+  const { order } = req.body; // retrieve the payment information
   if (!order) return res.status(400).json({ error: "Order data required" });
 
   const fileName = `invoice-${Date.now()}.pdf`;

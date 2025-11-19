@@ -48,15 +48,13 @@ export const getCommentsByProduct = createAsyncThunk<
     const comments = await fetchCommentsByProduct(productId);
 
     if (!comments) {
-      return thunkAPI.rejectWithValue(
-        "Aucun commentaire trouvé pour ce produit"
-      );
+      return thunkAPI.rejectWithValue("No comments found for this product");
     }
 
     return comments;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
-      error.message || "Erreur lors du chargement des commentaires du produit"
+      error.message || "Error loading comments for the product"
     );
   }
 });
@@ -75,15 +73,13 @@ export const getCommentsByUser = createAsyncThunk<
     const comments = await fetchCommentsByUser(userId);
 
     if (!comments) {
-      return thunkAPI.rejectWithValue(
-        "Aucun commentaire trouvé pour cet utilisateur"
-      );
+      return thunkAPI.rejectWithValue("No comments found for this user");
     }
 
     return comments;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
-      error.message || "Erreur lors du chargement des commentaires utilisateur"
+      error.message || "Error loading comments for the user"
     );
   }
 });
@@ -102,14 +98,12 @@ export const createNewComment = createAsyncThunk<
     const newComment = await postComment(productId, text, rating);
 
     if (!newComment) {
-      return thunkAPI.rejectWithValue("Échec de la création du commentaire");
+      return thunkAPI.rejectWithValue("Failed to create comment");
     }
 
     return newComment;
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      error.message || "Erreur lors de la création du commentaire"
-    );
+    return thunkAPI.rejectWithValue(error.message || "Error creating comment");
   }
 });
 
@@ -123,25 +117,19 @@ export const updateExistingComment = createAsyncThunk<
   { commentId: string; text?: string; rating?: number },
   { rejectValue: string }
 >("comments/update", async ({ commentId, text, rating }, thunkAPI) => {
-  console.log("commentId dans thunk :", commentId);
-  console.log("text dans thunk :", text);
-  console.log("rating dans thunk :", rating);
   const commentData = { text, rating };
   try {
     // Here you would call an API to update the comment
     const result = await updateComment(commentId, commentData);
-    console.log("result dans thunk :", result);
     if (!result) {
-      return thunkAPI.rejectWithValue("Échec de la mise à jour du commentaire");
+      return thunkAPI.rejectWithValue("Failed to update comment");
     }
 
     return result;
 
     // For demonstration, we'll just return a mock updated comment
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      error.message || "Erreur lors de la mise à jour du commentaire"
-    );
+    return thunkAPI.rejectWithValue(error.message || "Error updating comment");
   }
 });
 
@@ -159,13 +147,11 @@ export const deleteExistingComment = createAsyncThunk<
     const success = await deleteComment(commentId);
 
     if (!success) {
-      return thunkAPI.rejectWithValue("Échec de la suppression du commentaire");
+      return thunkAPI.rejectWithValue("Failed to delete comment");
     }
 
     return commentId;
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(
-      error.message || "Erreur lors de la suppression du commentaire"
-    );
+    return thunkAPI.rejectWithValue(error.message || "Error deleting comment");
   }
 });

@@ -147,7 +147,6 @@ function useToast(): UseToastReturn {
    */
   const showSuccess = useCallback(
     (message: ToastContent, config: ToastConfig = {}): Id => {
-      console.log("✅ Success toast:", message);
       return toast.success(message, { ...defaultConfig, ...config });
     },
     [defaultConfig]
@@ -162,7 +161,6 @@ function useToast(): UseToastReturn {
    */
   const showError = useCallback(
     (message: ToastContent, config: ToastConfig = {}): Id => {
-      console.error("❌ Error toast:", message);
       return toast.error(message, { ...defaultConfig, ...config });
     },
     [defaultConfig]
@@ -177,7 +175,6 @@ function useToast(): UseToastReturn {
    */
   const showWarning = useCallback(
     (message: ToastContent, config: ToastConfig = {}): Id => {
-      console.warn("⚠️ Warning toast:", message);
       return toast.warning(message, { ...defaultConfig, ...config });
     },
     [defaultConfig]
@@ -192,7 +189,6 @@ function useToast(): UseToastReturn {
    */
   const showInfo = useCallback(
     (message: ToastContent, config: ToastConfig = {}): Id => {
-      console.log("ℹ️ Info toast:", message);
       return toast.info(message, { ...defaultConfig, ...config });
     },
     [defaultConfig]
@@ -207,7 +203,6 @@ function useToast(): UseToastReturn {
    */
   const showLoading = useCallback(
     (message: ToastContent = "Loading...", config: ToastConfig = {}): Id => {
-      console.log("🔄 Loading toast:", message);
       return toast.loading(message, {
         ...defaultConfig,
         autoClose: false,
@@ -225,7 +220,6 @@ function useToast(): UseToastReturn {
    */
   const updateToSuccess = useCallback(
     (toastId: Id, message: ToastContent = "Success!"): void => {
-      console.log("✅ Toast updated to success:", message);
       toast.update(toastId, {
         render: message,
         type: "success",
@@ -244,7 +238,6 @@ function useToast(): UseToastReturn {
    */
   const updateToError = useCallback(
     (toastId: Id, message: ToastContent = "Error!"): void => {
-      console.error("❌ Toast updated to error:", message);
       toast.update(toastId, {
         render: message,
         type: "error",

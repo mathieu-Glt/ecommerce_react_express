@@ -6,6 +6,9 @@ const IUserRepository = require("./IUserRepository");
  * This class handles all user-related database operations using
  * a Mongoose model. It extends the IUserRepository abstraction
  * to ensure the service layer does not depend on the database implementation.
+ * @extends {IUserRepository}
+ * @module repositories/MongooseUserRepository
+ *
  */
 class MongooseUserRepository extends IUserRepository {
   /**
@@ -41,18 +44,9 @@ class MongooseUserRepository extends IUserRepository {
    */
   async findOrCreateUser(userData) {
     try {
+      // Destructure user data
       const { firstname, lastname, email, picture, password, role, address } =
         userData;
-
-      console.log("Repository - Received user data:", {
-        email,
-        firstname,
-        lastname,
-        hasPassword: !!password,
-        hasPicture: !!picture,
-        address: address || "Not provided",
-        role,
-      });
 
       // Check if user exists
       let user = await this.User.findOne({ email });
@@ -82,15 +76,8 @@ class MongooseUserRepository extends IUserRepository {
         await user.save(); // triggers pre("save") middleware
       }
 
-      console.log(" Repository - User saved successfully:", {
-        _id: user._id,
-        email: user.email,
-        address: user.address || "Undefined",
-      });
-
       return { success: true, user };
     } catch (error) {
-      console.error("MongooseUserRepository.findOrCreateUser error:", error);
       return { success: false, error: error.message };
     }
   }
@@ -104,11 +91,10 @@ class MongooseUserRepository extends IUserRepository {
   async updateUser(email, updateData) {
     try {
       const user = await this.User.findOneAndUpdate({ email }, updateData, {
-        new: true,
+        new: true, // return the updated document
       });
       return { success: true, user };
     } catch (error) {
-      console.error("MongooseUserRepository.updateUser error:", error);
       return { success: false, error: error.message };
     }
   }
@@ -121,22 +107,17 @@ class MongooseUserRepository extends IUserRepository {
    */
   async updateUserById(userId, updateData) {
     try {
-      console.log(" Repository: Updating user with ID:", userId);
-      console.log(" Repository: Update data:", updateData);
-
       const user = await this.User.findByIdAndUpdate(userId, updateData, {
-        new: true,
-        runValidators: true,
+        new: true, // Return the updated document
+        runValidators: true, // Ensure validation rules are applied
       });
 
       if (!user) {
         return { success: false, error: "User not found" };
       }
 
-      console.log(" Repository: User updated successfully:", user);
       return { success: true, user };
     } catch (error) {
-      console.error("MongooseUserRepository.updateUserById error:", error);
       return { success: false, error: error.message };
     }
   }
@@ -151,7 +132,6 @@ class MongooseUserRepository extends IUserRepository {
       const user = await this.User.findOne({ email });
       return { success: true, user };
     } catch (error) {
-      console.error("MongooseUserRepository.getUserByEmail error:", error);
       return { success: false, error: error.message };
     }
   }
@@ -166,7 +146,6 @@ class MongooseUserRepository extends IUserRepository {
       const user = await this.User.findById(id);
       return { success: true, user };
     } catch (error) {
-      console.error("MongooseUserRepository.findUserById error:", error);
       return { success: false, error: error.message };
     }
   }
@@ -181,7 +160,6 @@ class MongooseUserRepository extends IUserRepository {
       const result = await this.User.findOneAndDelete({ email });
       return { success: true, deleted: !!result };
     } catch (error) {
-      console.error("MongooseUserRepository.deleteUser error:", error);
       return { success: false, error: error.message };
     }
   }
@@ -206,7 +184,6 @@ class MongooseUserRepository extends IUserRepository {
 
       return { success: true, user };
     } catch (error) {
-      console.error("MongooseUserRepository.updateUserPassword error:", error);
       return { success: false, error: error.message };
     }
   }

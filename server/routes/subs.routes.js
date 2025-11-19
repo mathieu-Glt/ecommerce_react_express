@@ -11,7 +11,7 @@ const {
 } = require("../controllers/sub.controllers");
 
 // Middlewares
-const { requireRole } = require("../middleware/auth");
+const { requireRole, authenticateToken } = require("../middleware/auth");
 
 /**
  * Sub Routes
@@ -44,7 +44,7 @@ router.get("/:slug", getSubBySlug);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.post("/subs", requireRole(["admin"]), createSub);
+router.post("/subs", authenticateToken, requireRole(["admin"]), createSub);
 
 /**
  * @route PUT /sub/:slug
@@ -52,7 +52,7 @@ router.post("/subs", requireRole(["admin"]), createSub);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.put("/subs/:slug", requireRole(["admin"]), updateSub);
+router.put("/subs/:slug", authenticateToken, requireRole(["admin"]), updateSub);
 
 /**
  * @route DELETE /sub/:slug
@@ -60,6 +60,11 @@ router.put("/subs/:slug", requireRole(["admin"]), updateSub);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.delete("/subs/:slug", requireRole(["admin"]), deleteSub);
+router.delete(
+  "/subs/:slug",
+  authenticateToken,
+  requireRole(["admin"]),
+  deleteSub
+);
 
 module.exports = router;

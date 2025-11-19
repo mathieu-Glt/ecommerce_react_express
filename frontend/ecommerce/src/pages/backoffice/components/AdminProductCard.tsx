@@ -9,7 +9,7 @@ export default function AdminProductCard({ product, onDelete }: ProductProps) {
 
   return (
     <div key={String(product._id)} className="product-card">
-      {/* 🖼️ Image du produit */}
+      {/* Product image */}
       {product.images?.[0] && (
         <img
           src={product.images[0]}
@@ -19,7 +19,7 @@ export default function AdminProductCard({ product, onDelete }: ProductProps) {
         />
       )}
 
-      {/* 📦 Infos produit */}
+      {/* Product info */}
       <div className="product-info">
         <h2 className="product-title">{product.title}</h2>
         <p className="product-description">
@@ -27,7 +27,7 @@ export default function AdminProductCard({ product, onDelete }: ProductProps) {
         </p>
         <p className="product-price">{product.price} €</p>
 
-        {/* ⚙️ Actions */}
+        {/* Actions */}
         <div
           className="product-action"
           style={{
@@ -40,7 +40,7 @@ export default function AdminProductCard({ product, onDelete }: ProductProps) {
           }}
         ></div>
         <div className="product-admin-container">
-          {/* 📦 Link Edition du produit */}
+          {/* Link Edit Product */}
           <div className="product-edit-info">
             {/* <button className="product-edit-button">Edit Product</button> */}
             <Link

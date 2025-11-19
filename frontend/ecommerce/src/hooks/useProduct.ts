@@ -48,7 +48,6 @@ export const useProduct = () => {
       await dispatch(fetchProducts()).unwrap();
       toast.showSuccess("Products loaded successfully");
     } catch (err: any) {
-      console.error("❌ Failed to fetch products:", err);
       toast.showError(err?.message || "Failed to fetch products");
     }
   }, [dispatch, toast]);
@@ -63,7 +62,6 @@ export const useProduct = () => {
         await dispatch(fetchLatestProducts(limit)).unwrap();
         toast.showSuccess("Latest products loaded successfully");
       } catch (err: any) {
-        console.error("❌ Failed to fetch latest products:", err);
         toast.showError(err?.message || "Failed to fetch latest products");
       }
     },
@@ -75,10 +73,8 @@ export const useProduct = () => {
   // ============================================
   const getProductById = useCallback(
     async (id: string): Promise<Product | null> => {
-      console.log("Getting product by ID:", id);
       try {
         const result = await dispatch(fetchProductById(id)).unwrap();
-        console.log("Fetched product:", result);
         return result;
       } catch (err: any) {
         toast.showError(err?.message || "Failed to fetch product");
@@ -109,7 +105,6 @@ export const useProduct = () => {
   // ============================================
   const createProduct = useCallback(
     async (data: Record<string, any> | FormData): Promise<Product | null> => {
-      console.log("Creating product with data:", data);
       try {
         const result = await dispatch(createNewProduct(data)).unwrap();
         toast.showSuccess("Product created successfully");
@@ -187,10 +182,6 @@ export const useProduct = () => {
     async (productId: string): Promise<{} | null> => {
       try {
         const checkRateProductByUser = await hasUserRatedProduct(productId);
-        console.log(
-          `Check if user has rated product ${productId}:`,
-          checkRateProductByUser
-        );
         return checkRateProductByUser;
       } catch (err: any) {
         toast.showError(err?.message || "Failed to check product rating");
@@ -207,7 +198,6 @@ export const useProduct = () => {
     async (params: { title?: string; slug?: string }): Promise<Product[]> => {
       try {
         const results = await dispatch(searchProducts(params)).unwrap();
-        console.log("✅ Search products results:", results);
         if (results.length === 0) {
           toast.showInfo("No matching products found");
         } else {
@@ -215,7 +205,6 @@ export const useProduct = () => {
         }
         return results;
       } catch (err: any) {
-        console.error("❌ Failed to search products:", err);
         toast.showError(err?.message || "Failed to search products");
         return [];
       }
@@ -231,7 +220,6 @@ export const useProduct = () => {
         const results = await dispatch(
           fetchProductsByCategoryId(categoryId)
         ).unwrap();
-        console.log("✅ Search products by category ID results:", results);
         if (results.length === 0) {
           toast.showInfo("No matching products found for this category");
         } else {
@@ -239,7 +227,6 @@ export const useProduct = () => {
         }
         return results;
       } catch (err: any) {
-        console.error("❌ Failed to search products by category ID:", err);
         toast.showError(
           err?.message || "Failed to search products by category ID"
         );
@@ -257,7 +244,6 @@ export const useProduct = () => {
         const results = await dispatch(
           fetchProductsBySubsCategoryId(subsCategoryId)
         ).unwrap();
-        console.log("✅ Search products by sub-category ID results:", results);
         if (results.length === 0) {
           toast.showInfo("No matching products found for this sub-category");
         } else {
@@ -267,7 +253,6 @@ export const useProduct = () => {
         }
         return results;
       } catch (err: any) {
-        console.error("❌ Failed to search products by sub-category ID:", err);
         toast.showError(
           err?.message || "Failed to search products by sub-category ID"
         );
@@ -282,20 +267,10 @@ export const useProduct = () => {
   // ============================================
   const searchProductsByAverageRateHook = useCallback(
     async (minRate: number, maxRate: number): Promise<Product[]> => {
-      console.log(
-        " useProdcut - Searching products by average rate with minRate:",
-        minRate,
-        "and maxRate:",
-        maxRate
-      );
       try {
         const results = await dispatch(
           fetchProductsByAverageRate({ minRate, maxRate })
         ).unwrap();
-        console.log(
-          "✅ Search products by average rate results useProduct:",
-          results
-        );
         if (results.length === 0) {
           toast.showInfo("No matching products found for this average rate");
         } else {
@@ -305,7 +280,6 @@ export const useProduct = () => {
         }
         return results;
       } catch (err: any) {
-        console.error("❌ Failed to search products by average rate:", err);
         toast.showError(
           err?.message || "Failed to search products by average rate"
         );
@@ -319,20 +293,11 @@ export const useProduct = () => {
   // ============================================
   const searchProductsByPriceRangeHook = useCallback(
     async (minPrice: number, maxPrice: number): Promise<Product[]> => {
-      console.log(
-        "useProduct - Searching products by price range with minPrice:",
-        minPrice,
-        "and maxPrice:",
-        maxPrice
-      );
       try {
         const results = await dispatch(
           fetchProductsByPriceRangeThunk({ minPrice, maxPrice })
         ).unwrap();
-        console.log(
-          "✅ Search products by price range results useProduct:",
-          results
-        );
+
         if (results.length === 0) {
           toast.showInfo("No matching products found for this price range");
         } else {
@@ -340,7 +305,6 @@ export const useProduct = () => {
         }
         return results;
       } catch (err: any) {
-        console.error("❌ Failed to search products by price range:", err);
         toast.showError(
           err?.message || "Failed to search products by price range"
         );
@@ -358,11 +322,9 @@ export const useProduct = () => {
   > => {
     try {
       const results = await dispatch(fetchProductsTopRated()).unwrap();
-      console.log("✅ Top rated products results useProduct:", results);
       toast.showSuccess("Top rated products loaded successfully");
       return results;
     } catch (err: any) {
-      console.error("❌ Failed to get top rated products:", err);
       toast.showError(err?.message || "Failed to get top rated products");
       return [];
     }
@@ -378,11 +340,9 @@ export const useProduct = () => {
       const results = await dispatch(
         fetchProductsByCategoryAcesories()
       ).unwrap();
-      console.log("✅ Acesories products results useProduct:", results);
       toast.showSuccess("Acesories products loaded successfully");
       return results;
     } catch (err: any) {
-      console.error("❌ Failed to get acesories products:", err);
       toast.showError(err?.message || "Failed to get acesories products");
       return [];
     }
@@ -398,11 +358,9 @@ export const useProduct = () => {
       const results = await dispatch(
         fetchProductsByCategoryOutillage()
       ).unwrap();
-      console.log("✅ Outillage products results useProduct:", results);
       toast.showSuccess("Outillage products loaded successfully");
       return results;
     } catch (err: any) {
-      console.error("❌ Failed to get outillage products:", err);
       toast.showError(err?.message || "Failed to get outillage products");
       return [];
     }

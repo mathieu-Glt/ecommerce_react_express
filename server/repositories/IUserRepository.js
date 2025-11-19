@@ -1,7 +1,7 @@
 /**
  * Interface/Abstraction for User Repository
  *
- * Defines the methods that all user repository implementations
+ * Set the methods that all user repository implementations
  * (e.g., Mongoose, MySQL) must implement. Each method is expected
  * to perform a specific CRUD operation on user data.
  *

@@ -38,21 +38,9 @@ function useSessionManager(): SessionManagerReturn {
       ? now - parseInt(lastActivity)
       : 0;
 
-    console.log("useSessionManager - checkSessionStatus:");
-    console.log("  sessionUser:", sessionUser ? "Présent" : "Absent");
-    console.log("  sessionToken:", sessionToken ? "Présent" : "Absent");
-    console.log("  lastActivity:", lastActivity);
-    console.log("  timeSinceLastActivity:", timeSinceLastActivity, "ms");
-    console.log("  sessionTimeout:", sessionTimeout, "ms");
-    console.log("  user:", user ? "Présent" : "Absent");
-    console.log("  token:", token ? "Présent" : "Absent");
-
     // Ne pas afficher la popup si l'utilisateur vient de se connecter
     // Si pas de session mais qu'on a un user/token, synchroniser automatiquement
     if ((!sessionUser || !sessionToken) && (user || token)) {
-      console.log(
-        "useSessionManager - Session manquante, synchronisation automatique"
-      );
       // Synchroniser automatiquement au lieu d'afficher la popup
       sessionStorage.setItem("user", JSON.stringify(user));
       sessionStorage.setItem("token", token || "");
@@ -64,7 +52,6 @@ function useSessionManager(): SessionManagerReturn {
 
     // Si la session a expiré
     if (lastActivity && timeSinceLastActivity > sessionTimeout) {
-      console.log("useSessionManager - Session expirée, affichage popup");
       setSessionExpired(true);
       setShowWarning(true);
       return;
@@ -72,15 +59,11 @@ function useSessionManager(): SessionManagerReturn {
 
     // Si la session va expirer bientôt (dans les 30 secondes pour le test)
     if (lastActivity && timeSinceLastActivity > sessionTimeout - 30000) {
-      console.log(
-        "useSessionManager - Session va expirer, affichage avertissement"
-      );
       setShowWarning(true);
       setTimeUntilExpiry(
         Math.max(0, Math.floor((sessionTimeout - timeSinceLastActivity) / 1000))
       );
     } else {
-      console.log("useSessionManager - Session OK, pas de popup");
       setShowWarning(false);
       setSessionExpired(false);
     }
@@ -98,12 +81,11 @@ function useSessionManager(): SessionManagerReturn {
 
   // Rafraîchir la session
   const refreshSession = useCallback((): void => {
-    console.log("useSessionManager - Rafraîchissement de session...");
-
     // Utiliser les valeurs actuelles de sessionStorage ou localStorage
     const currentUser: User | null =
       user || JSON.parse(sessionStorage.getItem("user") || "null");
-    const currentToken: string | null = token || sessionStorage.getItem("token");
+    const currentToken: string | null =
+      token || sessionStorage.getItem("token");
 
     if (currentUser && currentToken) {
       // Synchroniser sessionStorage avec localStorage
@@ -118,12 +100,7 @@ function useSessionManager(): SessionManagerReturn {
       // Réinitialiser les états
       setSessionExpired(false);
       setShowWarning(false);
-
-      console.log("useSessionManager - Session rafraîchie avec succès");
     } else {
-      console.log(
-        "useSessionManager - Impossible de rafraîchir la session (user ou token manquant)"
-      );
       // Si pas de données valides, déconnecter directement
       try {
         sessionStorage.clear();
@@ -145,18 +122,14 @@ function useSessionManager(): SessionManagerReturn {
 
   // Déconnecter l'utilisateur
   const forceLogout = useCallback((): void => {
-    console.log("useSessionManager - Déconnexion complète en cours...");
-
     try {
       // Supprimer sessionStorage
       sessionStorage.clear();
-      console.log("useSessionManager - sessionStorage supprimé");
 
       // Supprimer localStorage
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("lastActivity");
-      console.log("useSessionManager - localStorage supprimé");
 
       // Réinitialiser les états
       setSessionExpired(false);
@@ -167,8 +140,6 @@ function useSessionManager(): SessionManagerReturn {
 
       // Rediriger vers login
       window.location.href = "/login";
-
-      console.log("useSessionManager - Déconnexion complète terminée");
     } catch (error) {
       console.error(
         "useSessionManager - Erreur lors de la déconnexion:",
@@ -182,9 +153,6 @@ function useSessionManager(): SessionManagerReturn {
     const handleUserActivity = (event: Event): void => {
       const modal = document.querySelector(".modal.show");
       if (modal && modal.contains(event.target as Node)) {
-        console.log(
-          "useSessionManager - Clic sur la modale, pas de mise à jour d'activité"
-        );
         return;
       }
       updateActivity();
@@ -192,9 +160,6 @@ function useSessionManager(): SessionManagerReturn {
 
     // DÉSACTIVER complètement les événements d'activité quand la modale est affichée
     if (showWarning) {
-      console.log(
-        "useSessionManager - Modale affichée, événements d'activité désactivés"
-      );
       return;
     }
 

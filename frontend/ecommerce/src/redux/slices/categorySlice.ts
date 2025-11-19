@@ -11,7 +11,7 @@ import { fetchCategories, fetchCategoryById } from "../thunks/categoryThunk";
 // } from "../thunks/categoryThunk";
 
 // ====================================================
-// 🧠 ÉTAT INITIAL
+// 🧠 INITIAL STATE
 // ====================================================
 const initialState: CategoryState = {
   categories: [],
@@ -20,18 +20,18 @@ const initialState: CategoryState = {
   error: null,
 };
 // ====================================================
-// 🧩 SLICE CATÉGORIES
+// 🧩 CATEGORY SLICE
 // ====================================================
 const categorySlice: Slice<CategoryState> = createSlice({
   name: "categories",
   initialState,
   // ----------------------------------------------------
-  // 🔹 Reducers synchrones
+  // 🔹 Synchronous reducers
   // ----------------------------------------------------
   reducers: {
     /**
-     * Vide complètement la liste des catégories
-     * (utile lors du logout ou d’un refresh complet)
+     * Completely clears the list of categories
+     * (useful during logout or a full refresh)
      */
     clearCategories: (state) => {
       state.categories = [];
@@ -40,14 +40,14 @@ const categorySlice: Slice<CategoryState> = createSlice({
       state.error = null;
     },
     /**
-     * Définit une catégorie sélectionnée (ex: page détail)
+     * Sets a selected category (e.g., detail page)
      */
     setSelectedCategory: (state, action: PayloadAction<any>) => {
       state.selectedCategory = action.payload;
     },
   },
   // ----------------------------------------------------
-  // 🔸 Extra reducers asynchrones (thunks)
+  // 🔸 Extra asynchronous reducers (thunks)
   // ----------------------------------------------------
   extraReducers: (builder) => {
     builder

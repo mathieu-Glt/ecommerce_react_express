@@ -20,7 +20,7 @@ const path = require("path");
  * @returns {Object} 500 - Internal server error
  */
 exports.generateInvoice = asyncHandler(async (req, res) => {
-  const { order } = req.body; // récupérer les infos du paiement
+  const { order } = req.body; // retrieve the payment information
   if (!order) return res.status(400).json({ error: "Order data required" });
   const fileName = `invoice-${Date.now()}.pdf`;
   const filePath = path.join(__dirname, "..", "invoices", fileName);

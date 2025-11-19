@@ -25,7 +25,6 @@ class CategoryServiceFactory {
       const categoryRepository = new MongooseCategoryRepository(Category);
       return new CategoryService(categoryRepository);
     } catch (error) {
-      console.error("Error creating Mongoose category service:", error);
       throw new Error("Failed to create Mongoose category service");
     }
   }
@@ -52,7 +51,6 @@ class CategoryServiceFactory {
       const categoryRepository = new MySQLCategoryRepository(connection);
       return new CategoryService(categoryRepository);
     } catch (error) {
-      console.error("Error creating MySQL category service:", error);
       throw new Error("Failed to create MySQL category service");
     }
   }
@@ -66,19 +64,12 @@ class CategoryServiceFactory {
    * @returns {CategoryService} An instance of CategoryService with the appropriate repository
    */
   static createCategoryService(databaseType = "mongoose") {
-    console.log(
-      `Creating category service with database type: ${databaseType}`
-    );
-
     switch (databaseType.toLowerCase()) {
       case "mongoose":
         return this.createMongooseCategoryService();
       case "mysql":
         return this.createMySQLCategoryService();
       default:
-        console.warn(
-          `Unsupported database type: ${databaseType}, falling back to mongoose`
-        );
         return this.createMongooseCategoryService();
     }
   }

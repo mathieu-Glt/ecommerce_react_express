@@ -1,7 +1,9 @@
 const ICommentRepository = require("./ICommentRepository");
 
 /**
- * Implémentation Mongoose du repository comment
+ * Implementation Mongoose of the comment repository
+ * @extends {ICommentRepository}
+ * @module repositories/MongooseCommentRepository
  */
 class MongooseCommentRepository extends ICommentRepository {
   constructor(CommentModel) {
@@ -28,6 +30,24 @@ class MongooseCommentRepository extends ICommentRepository {
    */
   async getAllComments() {
     return await this.Comment.find()
+      // populate() is a Mongoose method that automatically fills references between MongoDB documents.
+      // It's the equivalent of a JOIN in SQL, but for a NoSQL database.
+      //  Result after populate()  :  {
+      //   _id: "comment123",
+      //   text: "Super produit !",
+      //   user: {                          // ← Full object!
+      //     _id: "user456",
+      //     firstname: "John",
+      //     lastname: "Doe",
+      //     picture: "avatar.jpg"
+      //   },
+      //   product: {                       // ← Full object!
+      //     _id: "product789",
+      //     name: "iPhone 15",
+      //     price: 999
+      //   },
+      //   rating: 5
+      // }
       .populate("user", "firstname lastname picture")
       .populate("product", "name price")
       .exec();
@@ -39,7 +59,6 @@ class MongooseCommentRepository extends ICommentRepository {
    * @returns {Promise<Object>} The created comment
    */
   async addComment(commentData) {
-    console.log("commentData dans repository :", commentData);
     const comment = new this.Comment(commentData);
     return await comment.save();
   }

@@ -36,9 +36,8 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
 
     try {
       await onConfirm(product._id);
-      // Le parent fermera le modal après succès
+      // The parent will close the modal after success
     } catch (err: any) {
-      console.error("❌ Error deleting product:", err);
       setError(err?.message || "Erreur lors de la suppression");
     } finally {
       setLoading(false);
@@ -46,7 +45,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Fermer le modal si on clique sur le backdrop (pas sur le contenu)
+    // Close the modal if clicking on the backdrop (not on the content)
     if (e.target === e.currentTarget && !loading) {
       onCancel();
     }
@@ -57,7 +56,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
       <div className="modal-content delete-modal">
         {/* Header */}
         <div className="modal-header">
-          <h2>🗑️ Confirmer la suppression</h2>
+          <h2>🗑️ Confirm Deletion</h2>
           {!loading && (
             <button
               className="modal-close"
@@ -73,10 +72,10 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         <div className="alert alert-warning">
           <span className="alert-icon">⚠️</span>
           <div>
-            <strong>Attention !</strong>
+            <strong>Warning!</strong>
             <p style={{ marginTop: "0.5rem", marginBottom: 0 }}>
-              Cette action est irréversible et supprimera définitivement le
-              produit.
+              This action is irreversible and will permanently delete the
+              product.
             </p>
           </div>
         </div>
@@ -92,7 +91,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         {/* Product Details */}
         <div className="modal-body">
           <p className="confirmation-text">
-            Voulez-vous vraiment supprimer ce produit ?
+            Do you really want to delete this product?
           </p>
 
           <div className="product-preview">
@@ -108,18 +107,18 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
               <h3>{product.title}</h3>
               <div className="product-preview-details">
                 <div className="detail-item">
-                  <span className="detail-label">Prix :</span>
+                  <span className="detail-label">Price:</span>
                   <span className="detail-value">{product.price} €</span>
                 </div>
                 {product.brand && (
                   <div className="detail-item">
-                    <span className="detail-label">Marque :</span>
+                    <span className="detail-label">Brand:</span>
                     <span className="detail-value">{product.brand}</span>
                   </div>
                 )}
                 {product.color && (
                   <div className="detail-item">
-                    <span className="detail-label">Couleur :</span>
+                    <span className="detail-label">Color:</span>
                     <span className="detail-value">{product.color}</span>
                   </div>
                 )}
@@ -138,10 +137,10 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
               <strong>Conséquences :</strong>
             </p>
             <ul className="consequences-list">
-              <li>Le produit sera supprimé définitivement</li>
-              <li>Toutes les images seront supprimées</li>
-              <li>Les avis associés seront perdus</li>
-              <li>Cette action ne peut pas être annulée</li>
+              <li>The product will be permanently deleted</li>
+              <li>All images will be deleted</li>
+              <li>Associated reviews will be lost</li>
+              <li>This action cannot be undone</li>
             </ul>
           </div>
         </div>
@@ -154,7 +153,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             onClick={onCancel}
             disabled={loading}
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="button"
@@ -165,12 +164,12 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             {loading ? (
               <>
                 <span className="spinner"></span>
-                Suppression...
+                Deleting...
               </>
             ) : (
               <>
                 <span>🗑️</span>
-                Supprimer définitivement
+                Delete permanently
               </>
             )}
           </button>

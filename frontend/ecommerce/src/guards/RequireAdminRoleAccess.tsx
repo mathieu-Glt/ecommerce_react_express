@@ -11,25 +11,18 @@ export const RequireAdminRoleAccess: React.FC<RequireAdminRoleAccessProps> = ({
   children,
 }) => {
   const { user, isAuthenticated, loading } = useUserContext();
-  console.log("RequireAdminRoleAccess - user:", user?.role);
 
-  console.log("🔍 GUARD DEBUG:");
-  console.log("  - loading:", loading);
-  console.log("  - isAuthenticated:", isAuthenticated);
-  console.log("  - user:", user);
-  console.log("  - user?.role:", user?.role);
-
-  // Attente pendant le chargement
+  // Wait loading state
   if (loading) {
     return <PageLoader />;
   }
 
-  // Pas connecté → Redirige vers login
+  // Not authenticated → Redirect to login
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace state={{ from: "/admin" }} />;
   }
 
-  // Pas admin → Redirige vers accueil
+  // Not admin → Redirect to home
   if (user.role !== "admin") {
     return <Navigate to="/" replace />;
   }

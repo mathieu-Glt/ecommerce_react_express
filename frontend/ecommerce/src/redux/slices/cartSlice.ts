@@ -22,7 +22,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     // ===========================================
-    // ➕ Ajouter un produit
+    // ➕ Add a product to cart
     // ===========================================
     addToCart: (
       state,
@@ -34,7 +34,7 @@ const cartSlice = createSlice({
     ) => {
       const { product, quantity, orderBy } = action.payload;
 
-      // On cherche si ce produit est déjà dans le panier pour ce user
+      // Check if this product is already in the cart for this user
       const existing = state.items.find(
         (item) => item.product._id === product._id && item.orderBy === orderBy
       );
@@ -42,7 +42,7 @@ const cartSlice = createSlice({
       if (existing) {
         existing.quantity += quantity;
       } else {
-        // ✅ Ici, on pousse un vrai CartItem (product + quantity + orderBy)
+        // ✅ Here, we push a real CartItem (product + quantity + orderBy)
         state.items.push({ product, quantity, orderBy });
       }
 
@@ -50,13 +50,12 @@ const cartSlice = createSlice({
     },
 
     // ===========================================
-    // 🔁 Mettre à jour la quantité d’un produit
+    // 🔁 Update the quantity of a product
     // ===========================================
     updateToCart: (
       state,
       action: PayloadAction<{ productId: string; quantity: number }>
     ) => {
-      console.log("updateToCart action payload:", action.payload);
       const item = state.items.find(
         (i) => i.product._id === action.payload.productId
       );
@@ -67,7 +66,7 @@ const cartSlice = createSlice({
     },
 
     // ===========================================
-    // ❌ Supprimer un produit
+    // ❌ Remove a product from cart
     // ===========================================
     removeFromCart: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter((i) => i.product._id !== action.payload);
@@ -75,7 +74,7 @@ const cartSlice = createSlice({
     },
 
     // ===========================================
-    // 🧹 Vider le panier
+    // 🧹 Clear the cart
     // ===========================================
     clearCart: (state) => {
       state.items = [];
@@ -85,7 +84,7 @@ const cartSlice = createSlice({
     },
 
     // ===========================================
-    // 👤 Définir l’utilisateur lié au panier
+    // 👤 Set the user associated with the cart
     // ===========================================
     setOrderedBy: (state, action: PayloadAction<string | null>) => {
       state.orderedBy = action.payload;
@@ -97,7 +96,7 @@ const cartSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // (à compléter plus tard pour les thunks si besoin)
+    // (to be completed later for thunks if needed)
   },
 });
 

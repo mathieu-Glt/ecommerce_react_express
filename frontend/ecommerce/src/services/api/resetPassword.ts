@@ -11,20 +11,12 @@ export const resetPasswordApi = async (data: {
   token: string;
 }): Promise<any> => {
   try {
-    console.log("=== SENDING TO API ===");
-    console.log("data:", data);
-    console.log("data.password:", data.password);
     const response = await api.post(
       API_ROUTES.AUTH.SENT_EMAIL_RESET_PASSWORD.replace(":token", data.token),
       { password: data.password }
     );
     return response.data;
   } catch (error) {
-    console.log("=== API ERROR ===");
-    console.log("error.response?.data:", error.response?.data);
-    console.log("error auth" + error);
-
-    console.error("Error sending reset password email:", error);
     throw error;
   }
 };

@@ -26,7 +26,7 @@ const RegisterForm: React.FC<RegisterProps> = ({
     email: "",
     password: "",
     confirmPassword: "",
-    picture: null, // ✅ null au lieu de ""
+    picture: null,
     address: "",
   };
 
@@ -36,21 +36,21 @@ const RegisterForm: React.FC<RegisterProps> = ({
     validationSchema: signUpValidationSchema,
     onSubmit: async (values, { setErrors, setFieldError }) => {
       try {
-        // Préparer les données pour l'API (sans confirmPassword)
+        // Prepare data for API (without confirmPassword)
         const { confirmPassword, ...registerData } = values;
 
-        // Passer directement les données avec le File
+        // Pass data directly with the File
         await handleRegister({
           ...values,
           confirmPassword: values.confirmPassword ?? "",
         });
       } catch (error: any) {
-        // Gérer les erreurs du backend
+        // Handle backend errors
         if (error.response?.data?.errors) {
-          // Si le backend renvoie des erreurs par champ
+          // If the backend returns field-specific errors
           setErrors(error.response.data.errors);
         } else if (error.response?.data?.error) {
-          // Si c'est une erreur globale, l'afficher sur email (ou autre champ)
+          // If it's a global error, display it on email (or another field)
           setFieldError("email", error.response.data.error);
         }
       }
@@ -59,10 +59,9 @@ const RegisterForm: React.FC<RegisterProps> = ({
     validateOnBlur: true,
   });
 
-  // Handler pour l'upload de fichier
+  // Handler for file upload
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0];
-    console.log("Selected file:", file);
     if (file) {
       formik.setFieldValue("picture", file);
       formik.setFieldTouched("picture", true);
@@ -71,17 +70,9 @@ const RegisterForm: React.FC<RegisterProps> = ({
     }
   };
 
-  console.log("Formik state:", {
-    values: formik.values,
-    errors: formik.errors,
-    touched: formik.touched,
-    isValid: formik.isValid,
-    dirty: formik.dirty,
-  });
-
   return (
     <div className="register-form-wrapper">
-      {/* Erreur locale (errors) */}
+      {/* Local error (errors) */}
       {errors && errors.error && (
         <Alert variant="danger" dismissible className="mb-3">
           <Alert.Heading>Registration Failed</Alert.Heading>
@@ -89,7 +80,7 @@ const RegisterForm: React.FC<RegisterProps> = ({
         </Alert>
       )}
 
-      {/* Erreur Redux (error) - fallback */}
+      {/* Redux error (error) - fallback */}
       {!errors && error && (
         <Alert variant="danger" dismissible className="mb-3">
           <Alert.Heading>Registration Failed</Alert.Heading>

@@ -38,7 +38,6 @@ exports.getSubs = asyncHandler(async (req, res) => {
     }
     res.status(200).json({ success: true, results: subs });
   } catch (error) {
-    console.error("Error in getSubs:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -66,7 +65,6 @@ exports.getSubBySlug = asyncHandler(async (req, res) => {
     }
     res.status(200).json({ success: true, results: sub });
   } catch (error) {
-    console.error("Error in getSubBySlug:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -95,7 +93,6 @@ exports.createSub = asyncHandler(async (req, res) => {
     }
     res.status(201).json({ success: true, results: sub });
   } catch (error) {
-    console.error("Error creating sub:", error.message);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -126,7 +123,6 @@ exports.updateSub = asyncHandler(async (req, res) => {
     }
     res.status(200).json({ success: true, results: sub });
   } catch (error) {
-    console.error("Error updating sub:", error.message);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -158,7 +154,6 @@ exports.deleteSub = asyncHandler(async (req, res) => {
       .status(204)
       .send({ success: true, message: "Sub deleted successfully" });
   } catch (error) {
-    console.error("Error deleting sub:", error.message);
     res.status(500).json({
       success: false,
       message: "Internal server error",

@@ -238,7 +238,6 @@ exports.resetPassword = asyncHandler(async (req, res) => {
     userEmail,
     userName
   );
-  console.log("Password reset token result:", result);
 
   if (result.success) {
     const frontendUrl = process.env.FRONTEND_URL;
@@ -266,9 +265,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
  */
 exports.resetPasswordToken = asyncHandler(async (req, res) => {
   const { token } = req.params;
-  console.log("Received token:", token);
   const { password } = req.body;
-  console.log("Received new password:", password);
 
   if (!password || password.length < 6) {
     return res.status(400).json({

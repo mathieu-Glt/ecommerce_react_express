@@ -29,11 +29,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     updateCartItem,
   } = useCartHook();
 
-  // ✅ Optionnel : si tu veux maintenir un petit état local (ex: open/close cart drawer)
+  // ✅ Optional: if you want to maintain a small local state (e.g., open/close cart drawer)
   const [isCartOpen, setIsCartOpen] = useState(false);
   const toggleCart = () => setIsCartOpen((prev) => !prev);
-
-  console.log("🛒 CartProvider rendered, cart:", cart);
 
   return (
     <CartContext.Provider

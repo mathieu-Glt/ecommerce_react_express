@@ -2,9 +2,6 @@ const express = require("express");
 const router = express.Router();
 const passport = require("../config/passport");
 const {
-  createOrUpdateUser,
-  registerOrUpdateUser,
-  updateUserProfile,
   deleteUser,
   currentUser,
   resetPassword,
@@ -18,7 +15,7 @@ const {
   logout,
   handleOAuthCallback,
 } = require("../controllers/auth.controllers");
-const User = require("../models/User"); // 🟢 Ton modèle Mongoose User
+const User = require("../models/User");
 const MongooseUserRepository = require("../repositories/MongooseUserRepository");
 const AuthService = require("../services/authService");
 // Middlewares
@@ -30,9 +27,6 @@ const {
   registerValidation,
   resetPasswordValidation,
   resetPasswordTokenValidation,
-  createOrUpdateUserValidation,
-  updateUserProfileValidation,
-  getUserProfileValidation,
   deleteUserValidation,
 } = require("../validators");
 const { uploadAvatar, handleMulterError } = require("../utils/multerPicture");
@@ -43,6 +37,8 @@ const { uploadAvatar, handleMulterError } = require("../utils/multerPicture");
  * Handles authentication and user session management.
  * Includes Google OAuth, Azure AD OAuth, local login/register,
  * password reset, and user profile routes.
+ * References User model and AuthService for business logic.
+ *
  *
  * @module routes/authRoutes
  */
@@ -99,34 +95,34 @@ router.post("/login", loginValidation, login);
  * @access Public
  */
 
-// Login avec Passport Local
+// Login with Passport Local
 router.post("/login-passport", async (req, res, next) => {
   const { email, password } = req.body;
 
-  // Validation simple côté serveur
+  // Simple server-side validation
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "Email et mot de passe sont requis",
+      message: "Email and password are required",
     });
   }
 
-  // Utilisation de passport.authenticate en callback pour gérer l'erreur
+  // Use passport.authenticate with a callback to handle errors and responses
   passport.authenticate("local", (err, user, info) => {
-    if (err) return next(err); // Erreur serveur
+    if (err) return next(err); // Server error
     if (!user) {
-      // Auth échouée
+      // Authentication failed
       return res.status(401).json({
         success: false,
-        message: info?.message || "Échec de l'authentification",
+        message: info?.message || "Authentication failed",
       });
     }
 
-    // Crée la session Passport
+    // Create Passport session
     req.logIn(user, (err) => {
       if (err) return next(err);
 
-      // Retourne l'utilisateur connecté (sans le password)
+      // Return the logged-in user (without the password)
       const {
         _id,
         email,
@@ -139,7 +135,7 @@ router.post("/login-passport", async (req, res, next) => {
       } = user;
       res.json({
         success: true,
-        message: "Connexion réussie",
+        message: "Login successful",
         user: {
           _id,
           email,
@@ -185,7 +181,9 @@ router.post(
  */
 router.get("/refresh-token", async (req, res) => {
   try {
-    // Extraire le refresh token depuis les headers
+    // Extract the refresh token from the Authorization headers and remove the "Bearer " prefix
+    // .split(" ")[1] allows to get the second part after the space
+    // the method creates an array with two elements ["Bearer", "the_token_value"]
     const refreshToken = req.headers["authorization"]?.split(" ")[1];
     if (!refreshToken) {
       return res
@@ -193,11 +191,11 @@ router.get("/refresh-token", async (req, res) => {
         .json({ success: false, error: "Refresh token required" });
     }
 
-    // 🟢 Instanciation correcte du repository avec le modèle User
+    // Correct instantiation of the repository with the User model
     const userRepository = new MongooseUserRepository(User);
     const authSvc = new AuthService(userRepository);
 
-    // Appel du refresh token
+    // Call the refresh token method
     const result = await authSvc.refreshToken(refreshToken);
 
     if (!result.success) {
@@ -212,7 +210,6 @@ router.get("/refresh-token", async (req, res) => {
       refreshToken: result.refreshToken,
     });
   } catch (error) {
-    console.error("Error in /auth/refresh-token:", error);
     res.status(500).json({ success: false, error: "Server error" });
   }
 });

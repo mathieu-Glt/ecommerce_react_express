@@ -63,7 +63,6 @@ exports.searchProductByPriceRange = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error searching products by price range:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -96,7 +95,6 @@ exports.getLatestProducts = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching latest products:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -129,7 +127,6 @@ exports.getBestSoldProducts = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching best sold products:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -161,7 +158,6 @@ exports.getBestRatedProducts = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching best rated products:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -195,7 +191,6 @@ exports.getProductsByCategoryAcesories = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching products by category acesories:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -228,7 +223,6 @@ exports.getProductsByCategoryOutillage = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching products by category outillage:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -250,7 +244,6 @@ exports.getProductsByCategoryOutillage = asyncHandler(async (req, res) => {
  */
 exports.searchProducts = asyncHandler(async (req, res) => {
   const { title, slug } = req.query;
-  console.log("Search parameters received:", { title, slug });
   try {
     if (!title && !slug) {
       return res.status(400).json({
@@ -259,9 +252,7 @@ exports.searchProducts = asyncHandler(async (req, res) => {
       });
     }
     if (slug) {
-      console.log("Searching product by slug:", slug);
       const product = await productService.getProductBySlug(slug);
-      console.log("Product found by slug:", product);
 
       if (!product) {
         return res
@@ -273,9 +264,7 @@ exports.searchProducts = asyncHandler(async (req, res) => {
         results: [product],
       });
     } else if (title) {
-      console.log("Searching products by title:", title);
       const product = await productService.getProductByTitle(title);
-      console.log("Product found by slug:", product);
 
       if (!product) {
         return res
@@ -301,7 +290,6 @@ exports.searchProducts = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error searching products:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -334,7 +322,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -399,19 +386,12 @@ exports.getProductById = asyncHandler(async (req, res) => {
  * @returns {Object} 400 - Validation errors
  */
 exports.createProduct = asyncHandler(async (req, res) => {
-  console.log("Data received in createProduct:");
-  console.log("Body:", req.body);
-  console.log("Files:", req.files);
-  console.log("Cloudinary Images:", req.cloudinaryImages);
-
   const productData = {
     ...req.body,
     images: req.cloudinaryImages
       ? req.cloudinaryImages.map((img) => img.url) // Extract object img of the request array to get only the url property
       : [],
   };
-
-  console.log("📦 Final ProductData:", productData);
 
   const product = await productService.createProduct(productData);
   res.status(201).json(product);
@@ -432,19 +412,12 @@ exports.createProduct = asyncHandler(async (req, res) => {
 exports.updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  console.log("🔍 Data received in updateProduct:");
-  console.log("📝 Body:", req.body);
-  console.log("📸 Files:", req.files);
-  console.log("☁️ Cloudinary Images:", req.cloudinaryImages);
-
   const productData = {
     ...req.body,
     images: req.cloudinaryImages
       ? req.cloudinaryImages.map((img) => img.url)
       : [],
   };
-
-  console.log("📦 Final ProductData for update:", productData);
 
   const product = await productService.updateProduct(id, productData);
   res.status(200).json(product);
@@ -480,7 +453,6 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
       });
 
     if (publicIds.length > 0) {
-      console.log("🗑️ Deleting Cloudinary images:", publicIds);
       await deleteFromCloudinary(publicIds);
     }
   }
@@ -541,7 +513,6 @@ exports.rateProduct = asyncHandler(async (req, res) => {
       results: updatedProduct,
     });
   } catch (error) {
-    console.error("Error adding rating to product:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -569,16 +540,7 @@ exports.updateProductRating = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { star } = req.body;
   const { isUpdate } = req.body;
-  console.log("isUpdate received:", isUpdate);
   const userId = req.user?.userId;
-  console.log(
-    "Updating rating for product:",
-    id,
-    "by user:",
-    userId,
-    "with star:",
-    star
-  );
   if (!userId) {
     return res.status(401).json({
       success: false,
@@ -608,7 +570,6 @@ exports.updateProductRating = asyncHandler(async (req, res) => {
       results: updatedProduct,
     });
   } catch (error) {
-    console.error("Error updating rating on product:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -630,7 +591,6 @@ exports.findProductsByCategoryId = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
     const products = await productService.findProductsByCategorySlugService(id);
-    console.log("Products found for category ID", id, ":", products);
     if (!products || products.length === 0) {
       return res.status(404).json({
         success: false,
@@ -642,7 +602,6 @@ exports.findProductsByCategoryId = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching products by category slug:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -666,7 +625,6 @@ exports.findProductsBySubsCategoryId = asyncHandler(async (req, res) => {
     const products = await productService.findProductsBySubCategoryIdService(
       id
     );
-    console.log("Products found for subsCategory ID", id, ":", products);
     if (!products || products.length === 0) {
       return res.status(404).json({
         success: false,
@@ -678,7 +636,6 @@ exports.findProductsBySubsCategoryId = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching products by subs category id:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -750,14 +707,12 @@ exports.takeProductRating = asyncHandler(async (req, res) => {
 
   try {
     const product = await productService.takeRatingFromProduct(id, userId);
-    console.log(" Controoler - Product retrieved for rating check:", product);
 
     if (!product)
       return res.status(200).json({ success: false, hasRated: false });
 
     const userRating =
       product.postedBy._id.toString() === userId ? product : null;
-    console.log("Controller - User rating found:", userRating);
 
     if (!userRating) {
       return res.status(200).json({ success: true, hasRated: false });
@@ -795,7 +750,6 @@ exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
         limit: limit ? parseInt(limit) : 10,
       }
     );
-    console.log("Products found by average rate range A:", products);
     if (!products || products.length === 0) {
       return res.status(404).json({
         success: false,
@@ -808,7 +762,6 @@ exports.findProductsByAverageRateRange = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching products by average rate range:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -834,7 +787,6 @@ exports.findProductsByPriceRange = asyncHandler(async (req, res) => {
       minPrice ? parseFloat(minPrice) : undefined,
       maxPrice ? parseFloat(maxPrice) : undefined
     );
-    console.log("Products found by price range Controller:", products);
     if (!products || products.length === 0) {
       return res.status(404).json({
         success: false,
@@ -846,7 +798,6 @@ exports.findProductsByPriceRange = asyncHandler(async (req, res) => {
       results: products,
     });
   } catch (error) {
-    console.error("Error fetching products by price range:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

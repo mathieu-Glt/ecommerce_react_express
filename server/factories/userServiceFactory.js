@@ -25,7 +25,6 @@ class UserServiceFactory {
       const userRepository = new MongooseUserRepository(User);
       return new UserService(userRepository);
     } catch (error) {
-      console.error("Error creating Mongoose user service:", error);
       throw new Error("Failed to create Mongoose user service");
     }
   }
@@ -52,7 +51,6 @@ class UserServiceFactory {
       const userRepository = new MySQLUserRepository(connection);
       return new UserService(userRepository);
     } catch (error) {
-      console.error("Error creating MySQL user service:", error);
       throw new Error("Failed to create MySQL user service");
     }
   }
@@ -66,17 +64,12 @@ class UserServiceFactory {
    * @returns {UserService} An instance of UserService with the appropriate repository
    */
   static createUserService(databaseType = "mongoose") {
-    console.log(`Creating user service with database type: ${databaseType}`);
-
     switch (databaseType.toLowerCase()) {
       case "mongoose":
         return this.createMongooseUserService();
       case "mysql":
         return this.createMySQLUserService();
       default:
-        console.warn(
-          `Unsupported database type: ${databaseType}, falling back to mongoose`
-        );
         return this.createMongooseUserService();
     }
   }

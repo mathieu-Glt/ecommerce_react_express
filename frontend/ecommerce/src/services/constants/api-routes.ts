@@ -1,3 +1,11 @@
+/**
+ * API route constants for the eCommerce frontend application.
+ * These constants define the endpoints for various services such as
+ * authentication, products, users, categories, sub-categories, and comments.
+ * Each route is organized under its respective service for easy access and maintenance.
+ * @module api-routes
+ */
+
 export const API_ROUTES = {
   AUTH: {
     LOGIN: "auth/login",

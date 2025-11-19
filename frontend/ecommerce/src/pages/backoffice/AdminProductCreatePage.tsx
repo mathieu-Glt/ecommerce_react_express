@@ -27,7 +27,7 @@ const AdminProductCreatePage = () => {
   const { getAllSubCategories, subCategories } = useSubCategory();
   const { createProduct } = useProduct();
 
-  // State pour les sous-catégories filtrées
+  // State for the filtered subcategoriess
   const [filteredSubs, setFilteredSubs] = useState<SubCategory[]>([]);
   let csrfToken: string | null = null;
 
@@ -37,7 +37,7 @@ const AdminProductCreatePage = () => {
   const [success, setSuccess] = useState("");
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
-  // Couleurs disponibles
+  // Available colors
   const colors = [
     "Black",
     "White",
@@ -52,7 +52,7 @@ const AdminProductCreatePage = () => {
     "Gray",
   ];
 
-  // Marques disponibles
+  // Available brands
   const brands = [
     "Apple",
     "Samsung",
@@ -80,8 +80,7 @@ const AdminProductCreatePage = () => {
     try {
       await getAllCategories();
     } catch (err) {
-      console.error("❌ Error fetching categories:", err);
-      setError("Erreur lors du chargement des catégories");
+      setError("Error loading categories");
     }
   };
 
@@ -89,8 +88,7 @@ const AdminProductCreatePage = () => {
     try {
       await getAllSubCategories();
     } catch (err) {
-      console.error("❌ Error fetching subcategories:", err);
-      setError("Erreur lors du chargement des sous-catégories");
+      setError("Error loading subcategories");
     }
   };
 
@@ -141,65 +139,43 @@ const AdminProductCreatePage = () => {
         formDataToSend.append("shipping", values.shipping);
         formDataToSend.append("color", values.color);
         formDataToSend.append("brand", values.brand);
-        // ✅ LOGS DE DEBUG COMPLETS
-        console.log("=== DEBUG IMAGES ===");
-        console.log("1. values.images:", values.images);
-        console.log("2. values.images type:", typeof values.images);
-        console.log("3. Is array?:", Array.isArray(values.images));
-        console.log("4. Length:", values.images?.length);
-        // Ajouter les images
+        // Add images
         if (values.images && values.images.length > 0) {
           values.images.forEach((image) => {
             formDataToSend.append("images", image as File);
           });
         }
-        console.log("📦 FormData prepared for submission: ", values);
-        console.log("🔄 Submitting product : ", formDataToSend);
 
-        // ✅ VÉRIFIER LE CONTENU DU FORMDATA
-        console.log("6. FormData contents:");
+        // VERIFY FORM DATA CONTENTS
         for (let [key, value] of formDataToSend.entries()) {
           if (value instanceof File) {
-            console.log(
-              `   - ${key}:`,
-              value.name,
-              value.size,
-              "bytes",
-              value.type
-            );
           } else {
-            console.log(`   - ${key}:`, value);
+            console.log(`${key}: ${value}`);
           }
         }
-        console.log("===================");
-
-        console.log("🔄 Calling createProduct...");
 
         try {
           await createProduct(formDataToSend);
         } catch (err) {
-          console.error("❌ Error post product:", err);
-          setError("Erreur lors de la création du produit");
+          setError("Error creating product");
         }
 
-        setSuccess("Produit créé avec succès !");
+        setSuccess("Product created successfully!");
 
-        // Réinitialiser le formulaire
+        // Reset the form
         resetForm();
         setImagePreviews([]);
 
-        // Faire défiler vers le haut pour voir le message de succès
+        // Scroll to top to see the success message
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (err: any) {
-        console.error("❌ Error creating product:", err);
-
-        // Gérer les erreurs du backend
+        // Handle backend errors
         if (err.response?.data?.errors) {
           setErrors(err.response.data.errors);
         } else if (err.response?.data?.message) {
           setError(err.response.data.message);
         } else {
-          setError("Erreur lors de la création du produit");
+          setError("Error creating product");
         }
       } finally {
         setLoading(false);
@@ -219,88 +195,48 @@ const AdminProductCreatePage = () => {
   // ==================== IMAGE UPLOAD HANDLER ====================
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      console.log("=== 🖼️ handleImageChange START ===");
-
-      // ✅ CORRECTION : Récupérer TOUS les fichiers
+      // CORRECTION: Retrieve ALL files
       const files = e.currentTarget.files;
-      console.log("1. files:", files);
-      console.log("2. files type:", typeof files);
-      console.log("3. files instanceof FileList:", files instanceof FileList);
 
       if (!files || files.length === 0) {
-        console.log("❌ No files, returning");
         return;
       }
 
-      console.log("4. Converting files to array...");
-      const fileArray = Array.from(files); // ✅ Maintenant ça fonctionne correctement
-      console.log("5. fileArray:", fileArray);
-      console.log("6. fileArray length:", fileArray.length);
-      console.log("7. Getting currentImages from formik...");
+      const fileArray = Array.from(files); // Now it works correctly
       const currentImages = formik.values.images || [];
-      console.log("8. currentImages:", currentImages);
-      console.log("9. currentImages length:", currentImages.length);
 
-      // Vérifie le nombre total d'images
-      console.log("10. Checking total images count...");
+      // Verify total number of images
       if (fileArray.length + currentImages.length > 5) {
-        console.log("❌ Too many images");
-        formik.setFieldError("images", "Maximum 5 images autorisées");
+        formik.setFieldError("images", "Maximum 5 images allowed");
         return;
       }
-      console.log("✅ Images count OK");
 
-      // Vérifie la taille de chaque fichier
-      console.log("11. Checking file sizes...");
       const maxSize = 5 * 1024 * 1024;
       for (const file of fileArray) {
-        console.log(`   Checking ${file.name}: ${file.size} bytes`);
         if (file.size > maxSize) {
-          console.log(`❌ File ${file.name} too large`);
-          formik.setFieldError("images", `L'image ${file.name} dépasse 5MB`);
+          formik.setFieldError("images", `Image ${file.name} exceeds 5MB`);
           return;
         }
       }
-      console.log("✅ All file sizes OK");
 
-      // Créer le nouveau tableau d'images
-      console.log("12. Creating updatedImages...");
+      // Create the new images array
       const updatedImages = [...currentImages, ...fileArray];
-      console.log("13. updatedImages:", updatedImages);
-      console.log("14. updatedImages length:", updatedImages.length);
 
-      // Mettre à jour Formik
-      console.log("15. Calling formik.setFieldValue...");
+      // Update Formik
       formik.setFieldValue("images", updatedImages);
-      console.log("16. setFieldValue done");
 
-      console.log("17. Calling formik.setFieldTouched...");
       formik.setFieldTouched("images", true);
-      console.log("18. setFieldTouched done");
 
-      // Créer les aperçus
-      console.log("19. Creating previews...");
+      // Create previews
       const newPreviews = fileArray.map((file) => {
-        console.log(`   Creating preview for ${file.name}`);
         return URL.createObjectURL(file);
       });
-      console.log("20. newPreviews:", newPreviews);
-
-      console.log("21. Updating imagePreviews state...");
       setImagePreviews((prev) => {
         const updated = [...prev, ...newPreviews];
-        console.log("22. New imagePreviews state:", updated);
         return updated;
       });
-
-      console.log(
-        "23. Final check - formik.values.images:",
-        formik.values.images
-      );
-      console.log("=== 🖼️ handleImageChange END ===");
     } catch (error) {
-      console.error("❌ ERROR in handleImageChange:", error);
-      console.error("Error stack:", error.stack);
+      formik.setFieldError("images", "Error uploading images");
     }
   };
   // ==================== REMOVE IMAGE ====================
@@ -314,16 +250,13 @@ const AdminProductCreatePage = () => {
   // ==================== FILTER SUBCATEGORIES BY CATEGORY ====================
   useEffect(() => {
     if (formik.values.category) {
-      console.log("🔍 Filtering subs for category:", formik.values.category);
-
       const filtered = subCategories.filter(
         (sub) => sub.parent === formik.values.category
       );
 
-      console.log("🔍 Filtered subs:", filtered);
       setFilteredSubs(filtered);
 
-      // Réinitialiser la sous-catégorie si elle n'est plus valide
+      // Reset subcategory if it is no longer valid
       if (
         formik.values.sub &&
         !filtered.find((s) => s._id === formik.values.sub)
@@ -336,28 +269,15 @@ const AdminProductCreatePage = () => {
     }
   }, [formik.values.category, subCategories]);
 
-  // Log pour debug
-  console.log("📊 Formik state:", {
-    values: formik.values,
-    errors: formik.errors,
-    touched: formik.touched,
-    isValid: formik.isValid,
-    dirty: formik.dirty,
-  });
-
-  console.log("📊 Categories:", categories);
-  console.log("📊 SubCategories:", subCategories);
-  console.log("📊 Filtered subs:", filteredSubs);
-
   // ==================== RENDER ====================
   return (
     <div className="product-create-page">
       <div className="page-header">
-        <h1>📱 Créer un nouveau produit</h1>
-        <p>Ajoutez un nouveau produit à votre catalogue</p>
+        <h1>📱 Create a new product</h1>
+        <p>Add a new product to your catalog</p>
       </div>
 
-      {/* Message d'erreur global */}
+      {/* Global error message */}
       {error && (
         <div className="alert alert-error">
           <span className="alert-icon">❌</span>
@@ -365,7 +285,7 @@ const AdminProductCreatePage = () => {
         </div>
       )}
 
-      {/* Message de succès */}
+      {/* Success message */}
       {success && (
         <div className="alert alert-success">
           <span className="alert-icon">✅</span>
@@ -374,14 +294,14 @@ const AdminProductCreatePage = () => {
       )}
 
       <form onSubmit={formik.handleSubmit} className="product-form-create">
-        {/* INFORMATIONS GÉNÉRALES */}
+        {/* GENERAL INFORMATION */}
         <div className="form-section">
-          <h2 className="section-title">📝 Informations générales</h2>
+          <h2 className="section-title">📝 General Information</h2>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="title">
-                Titre du produit <span className="required">*</span>
+                Product Title <span className="required">*</span>
               </label>
               <input
                 type="text"
@@ -430,7 +350,7 @@ const AdminProductCreatePage = () => {
                 <span className="error-message">{formik.errors.slug}</span>
               )}
               <small className="form-hint">
-                Généré automatiquement à partir du titre
+                Automatically generated from the title, but you can edit it.
               </small>
             </div>
           </div>
@@ -462,14 +382,14 @@ const AdminProductCreatePage = () => {
           </div>
         </div>
 
-        {/* CATÉGORISATION */}
+        {/* CATEGORIZATION */}
         <div className="form-section">
-          <h2 className="section-title">🏷️ Catégorisation</h2>
+          <h2 className="section-title">🏷️ Categorization</h2>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="category">
-                Catégorie <span className="required">*</span>
+                Category <span className="required">*</span>
               </label>
               <select
                 id="category"
@@ -486,7 +406,7 @@ const AdminProductCreatePage = () => {
                 }
                 disabled={loading}
               >
-                <option value="">Sélectionnez une catégorie</option>
+                <option value="">Select a category</option>
                 {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.name}
@@ -498,13 +418,13 @@ const AdminProductCreatePage = () => {
               )}
               {categories.length === 0 && (
                 <small className="form-hint text-warning">
-                  ⚠️ Aucune catégorie disponible
+                  ⚠️ No categories available. Please create one first.
                 </small>
               )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="sub">Sous-catégorie</label>
+              <label htmlFor="sub">Sub-category</label>
               <select
                 id="sub"
                 name="sub"
@@ -520,7 +440,7 @@ const AdminProductCreatePage = () => {
                     : ""
                 }
               >
-                <option value="">Sélectionnez une sous-catégorie</option>
+                <option value="">Select a sub-category</option>
                 {subCategories.map((sub) => (
                   <option key={sub._id} value={sub._id}>
                     {sub.name}
@@ -532,12 +452,12 @@ const AdminProductCreatePage = () => {
               )}
               {!formik.values.category && (
                 <small className="form-hint">
-                  Sélectionnez d'abord une catégorie
+                  Please select a category first
                 </small>
               )}
               {formik.values.category && filteredSubs.length === 0 && (
                 <small className="form-hint text-warning">
-                  ⚠️ Aucune sous-catégorie pour cette catégorie
+                  ⚠️ No sub-categories for this category
                 </small>
               )}
             </div>
@@ -546,7 +466,7 @@ const AdminProductCreatePage = () => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="brand">
-                Marque <span className="required">*</span>
+                Brand <span className="required">*</span>
               </label>
               <select
                 id="brand"
@@ -563,7 +483,7 @@ const AdminProductCreatePage = () => {
                 }
                 disabled={loading}
               >
-                <option value="">Sélectionnez une marque</option>
+                <option value="">Select a brand</option>
                 {brands.map((brand) => (
                   <option key={brand} value={brand}>
                     {brand}
@@ -577,7 +497,7 @@ const AdminProductCreatePage = () => {
 
             <div className="form-group">
               <label htmlFor="color">
-                Couleur <span className="required">*</span>
+                Color <span className="required">*</span>
               </label>
               <select
                 id="color"
@@ -594,7 +514,7 @@ const AdminProductCreatePage = () => {
                 }
                 disabled={loading}
               >
-                <option value="">Sélectionnez une couleur</option>
+                <option value="">Select a color</option>
                 {colors.map((color) => (
                   <option key={color} value={color}>
                     {color}
@@ -608,14 +528,14 @@ const AdminProductCreatePage = () => {
           </div>
         </div>
 
-        {/* PRIX ET STOCK */}
+        {/* PRICE AND STOCK */}
         <div className="form-section">
-          <h2 className="section-title">💰 Prix et stock</h2>
+          <h2 className="section-title">Price and Stock</h2>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="price">
-                Prix (€) <span className="required">*</span>
+                Price (€) <span className="required">*</span>
               </label>
               <input
                 type="number"
@@ -643,7 +563,7 @@ const AdminProductCreatePage = () => {
 
             <div className="form-group">
               <label htmlFor="quantity">
-                Quantité en stock <span className="required">*</span>
+                Quantity in stock <span className="required">*</span>
               </label>
               <input
                 type="number"
@@ -669,7 +589,7 @@ const AdminProductCreatePage = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="shipping">Livraison</label>
+              <label htmlFor="shipping">Shipping</label>
               <select
                 id="shipping"
                 name="shipping"
@@ -678,8 +598,8 @@ const AdminProductCreatePage = () => {
                 onBlur={formik.handleBlur}
                 disabled={loading}
               >
-                <option value="No">Non disponible</option>
-                <option value="Yes">Disponible</option>
+                <option value="No">Not available</option>
+                <option value="Yes">Available</option>
               </select>
             </div>
           </div>
@@ -687,16 +607,14 @@ const AdminProductCreatePage = () => {
 
         {/* IMAGES */}
         <div className="form-section">
-          <h2 className="section-title">📸 Images du produit</h2>
+          <h2 className="section-title">Product Images</h2>
 
           <div className="form-group">
-            <label htmlFor="images">
-              Ajouter des images (Max: 5 images, 5MB chacune)
-            </label>
+            <label htmlFor="images">Add images (Max: 5 images, 5MB each)</label>
             <div className="image-upload-container">
               <label htmlFor="images" className="image-upload-label">
                 <div className="upload-icon">📁</div>
-                <span>Cliquez pour sélectionner des images</span>
+                <span>Click to select images</span>
                 <small>PNG, JPG, WEBP jusqu'à 5MB</small>
               </label>
               <input
@@ -737,7 +655,7 @@ const AdminProductCreatePage = () => {
 
             {formik.values.images && formik.values.images.length > 0 && (
               <small className="form-hint text-success">
-                ✓ {formik.values.images.length} image(s) sélectionnée(s)
+                ✓ {formik.values.images.length} image(s) selected
               </small>
             )}
           </div>
@@ -751,7 +669,7 @@ const AdminProductCreatePage = () => {
             onClick={() => window.history.back()}
             disabled={loading}
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="submit"
@@ -761,12 +679,12 @@ const AdminProductCreatePage = () => {
             {loading ? (
               <>
                 <span className="spinner"></span>
-                Création en cours...
+                Creating...
               </>
             ) : (
               <>
                 <span>✅</span>
-                Créer le produit
+                Create Product
               </>
             )}
           </button>

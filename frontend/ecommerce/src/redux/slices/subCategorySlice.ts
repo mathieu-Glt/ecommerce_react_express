@@ -14,7 +14,7 @@ import {
 // } from "../thunks/subCategoryThunk";
 
 // ====================================================
-// 🧠 ÉTAT INITIAL
+// 🧠 INITIAL STATE
 // ====================================================
 const initialState: SubCategoryState = {
   subCategories: [],
@@ -24,19 +24,19 @@ const initialState: SubCategoryState = {
 };
 
 // ====================================================
-// 🧩 SLICE SOUS-CATÉGORIES
+// 🧩 SUB-CATEGORY SLICE
 // ====================================================
 const subCategorySlice: Slice<SubCategoryState> = createSlice({
   name: "subCategories",
   initialState,
 
   // ----------------------------------------------------
-  // 🔹 Reducers synchrones
+  // 🔹 Synchronous reducers
   // ----------------------------------------------------
   reducers: {
     /**
-     * Vide complètement la liste des sous-catégories
-     * (utile lors du logout ou d’un refresh complet)
+     * Completely clears the list of sub-categories
+     * (useful during logout or a full refresh)
      */
     clearSubCategories: (state) => {
       state.subCategories = [];
@@ -46,7 +46,7 @@ const subCategorySlice: Slice<SubCategoryState> = createSlice({
     },
 
     /**
-     * Définit une sous-catégorie sélectionnée (ex: page détail)
+     * Sets a selected sub-category (e.g., detail page)
      */
     setSelectedSubCategory: (state, action: PayloadAction<any>) => {
       state.selectedSubCategory = action.payload;
@@ -54,12 +54,12 @@ const subCategorySlice: Slice<SubCategoryState> = createSlice({
   },
 
   // ----------------------------------------------------
-  // 🔸 Extra reducers asynchrones (thunks)
+  // 🔸 Extra asynchronous reducers (thunks)
   // ----------------------------------------------------
   extraReducers: (builder) => {
     builder
       // ==========================================
-      // FETCH SOUS-CATÉGORIES
+      // FETCH SUB-CATEGORIES
       // ==========================================
       .addCase(fetchSubCategories.pending, (state) => {
         state.loading = true;
@@ -75,7 +75,7 @@ const subCategorySlice: Slice<SubCategoryState> = createSlice({
       });
 
     // ==========================================
-    // FETCH SOUS-CATÉGORIE PAR ID
+    // FETCH SUB-CATEGORY BY ID
     // ==========================================
     builder
       .addCase(fetchSubCategoryById.pending, (state) => {

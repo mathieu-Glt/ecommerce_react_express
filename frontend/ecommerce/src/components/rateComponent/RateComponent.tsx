@@ -18,7 +18,6 @@ const RateComponent: React.FC<RateComponentProps> = ({
   onRateChange,
 }) => {
   const handleRatingChange = (newRating: number) => {
-    console.log("Rating changed to:", newRating);
     if (onRateChange) onRateChange(newRating);
   };
 

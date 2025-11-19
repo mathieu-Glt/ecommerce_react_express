@@ -20,14 +20,6 @@ export const LoginPage = () => {
     clearTokens,
   } = useLocalStorage();
 
-  console.log("LoginPage - auth state:", {
-    loading,
-    error,
-    user,
-    token,
-    refreshToken,
-  });
-
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [validated, setValidated] = useState(false);
@@ -38,30 +30,22 @@ export const LoginPage = () => {
   ): Promise<void> => {
     try {
       const result = await login(email, password);
-      console.log("Login result:", result);
 
-      // Vérifie directement le succès
+      // Directly check success property
       if (result.success) {
         if (rememberMe) {
-          // Stocke dans le localStorage via useLocalStorage
+          // Store in localStorage via useLocalStorage
           setUserStorage(result.results.user);
           setToken(result.results.token);
           setRefreshToken(result.results.refreshToken);
         }
 
-        console.log(
-          "Login successful:",
-          result.results.user,
-          result.results.token,
-          result.results.refreshToken
-        );
-
         navigate("/");
       } else {
-        console.error("Login failed:", result);
+        console.error("Login failed:", result.message);
       }
     } catch (err) {
-      console.error("Unexpected error during login:", err);
+      console.error("Login error:", err);
     }
   };
   // Wrapper to match expected signature
@@ -71,7 +55,6 @@ export const LoginPage = () => {
   ) => {
     setValidated(true);
     const { email, password, rememberMe } = values;
-    console.log("Form values:", values);
     await handleLogin(email, password, rememberMe);
   };
 
@@ -87,12 +70,8 @@ export const LoginPage = () => {
         loading={loading}
         formData={{ email: "", password: "" }}
         onFormDataChange={() => {}}
-        onGoogleLogin={() => {
-          console.log("Google login clicked");
-        }}
-        onAzureLogin={() => {
-          console.log("Azure login clicked");
-        }}
+        onGoogleLogin={() => {}}
+        onAzureLogin={() => {}}
         error={
           typeof error === "string" || error === null
             ? error

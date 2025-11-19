@@ -11,14 +11,9 @@ export async function sentEmailResetPasswordApi(body: {
   email: string;
 }): Promise<any> {
   try {
-    console.log("=== SENDING TO API ===");
-    console.log("body:", body);
-    console.log("body.email:", body.email);
     const sentEmail = await api.post(API_ROUTES.AUTH.RESET_PASSWORD, body);
     return sentEmail.data;
   } catch (error) {
-    console.log("=== API ERROR ===");
-    console.log("error.response?.data:", error.response?.data);
-    console.log("error auth" + error);
+    throw error;
   }
 }

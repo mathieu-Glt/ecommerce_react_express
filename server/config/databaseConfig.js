@@ -80,23 +80,17 @@ NODE_ENV=development
 function checkDatabaseConfig() {
   const databaseType = process.env.DATABASE_TYPE || "mongoose";
 
-  console.log("🔍 Vérification de la configuration :");
-  console.log(`📊 Type de base de données : ${databaseType}`);
 
   if (databaseType === "mongoose") {
     if (process.env.MONGODB_URI) {
-      console.log("✅ MONGODB_URI configuré");
     } else {
-      console.log("❌ MONGODB_URI manquant");
     }
   } else if (databaseType === "mysql") {
     const requiredVars = ["DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME"];
     const missingVars = requiredVars.filter((varName) => !process.env[varName]);
 
     if (missingVars.length === 0) {
-      console.log("✅ Toutes les variables MySQL sont configurées");
     } else {
-      console.log(`❌ Variables MySQL manquantes : ${missingVars.join(", ")}`);
     }
   }
 }

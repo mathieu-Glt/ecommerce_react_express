@@ -9,7 +9,6 @@ import { useFilter } from "../../context/FilterSearchBarContext";
 import { useNavigate } from "react-router-dom";
 export const ListProduct = () => {
   const navigate = useNavigate();
-  console.log("navigate : ", navigate);
   const { products, loading, getAllProducts, getProductById } = useProduct();
   const {
     getProducts,
@@ -28,10 +27,6 @@ export const ListProduct = () => {
   const pageSize = 3;
   const [clicked, setClicked] = useState(false);
 
-  // console.log("Products in ListProduct : ", getProducts);
-  // console.log("listProducts state : ", listProducts);
-  // console.log("products state : ", products);
-  console.log("searchProducts state : ", searchProducts);
   if (backList) {
     window.location.reload();
   }
@@ -95,18 +90,17 @@ export const ListProduct = () => {
   const paginatedProducts = (
     searchProducts && searchProducts.length > 0 ? searchProducts : products
   ).slice(startIndex, endIndex);
-  console.log("Current Products : ", paginatedProducts);
 
   return (
     <div className="product-list-container">
-      <h1 className="product-list-title">Liste des produits</h1>
+      <h1 className="product-list-title">Product List</h1>
       <h3></h3>
       {clicked && (
         <button
           onClick={() => setBackList(!backList)}
           className="toggle-list-button"
         >
-          Liste de produits
+          Product List
         </button>
       )}
 

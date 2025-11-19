@@ -25,7 +25,6 @@ class SubServiceFactory {
       const subRepository = new MongooseSubRepository(Sub);
       return new SubService(subRepository);
     } catch (error) {
-      console.error("Error creating Mongoose sub service:", error);
       throw new Error("Failed to create Mongoose sub service");
     }
   }
@@ -51,7 +50,6 @@ class SubServiceFactory {
       const subRepository = new MySQLSubRepository(connection);
       return new SubService(subRepository);
     } catch (error) {
-      console.error("Error creating MySQL sub service:", error);
       throw new Error("Failed to create MySQL sub service");
     }
   }

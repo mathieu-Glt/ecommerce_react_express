@@ -35,6 +35,11 @@ const LocalStrategy = require("passport-local").Strategy;
  * @description
  * Local Strategy for username/password authentication
  * - Verifies user credentials against MongoDB
+ * useful link:
+ * - https://www.passportjs.org/packages/passport-local/
+ * - https://www.passportjs.org/concepts/authentication/strategies/
+ * - https://www.passportjs.org/concepts/authentication/sessions/
+ * - https://github.com/jaredhanson/passport-local
  */
 passport.use(
   new LocalStrategy(
@@ -94,7 +99,6 @@ passport.use(
     },
     // Function to fetch user profile from Microsoft Graph API
     async (accessToken, refreshToken, params, profile, done) => {
-      console.log("Azure profile:", profile);
       try {
         // Retrieves of user information with Microsoft Graph
         const response = await fetch("https://graph.microsoft.com/v1.0/me", {
@@ -108,7 +112,6 @@ passport.use(
         }
 
         const userData = await response.json();
-        console.log("Microsoft Graph userData:", userData);
 
         const email = (userData.mail || userData.userPrincipalName || "")
           .trim()
@@ -116,7 +119,6 @@ passport.use(
         let user = await User.findOne({
           $or: [{ azureId: profile.id }, { email }],
         });
-        console.log("Azure profile data:", user);
 
         if (!user && normalizedEmail)
           user = await User.findOne({ email: normalizedEmail });
@@ -132,8 +134,6 @@ passport.use(
 
           await user.save();
         } else {
-          console.log("Creating new user from Azure profile...");
-
           const randomPassword = crypto.randomBytes(16).toString("hex");
           const hashedPassword = await bcrypt.hash(randomPassword, 10);
 

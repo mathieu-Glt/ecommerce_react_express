@@ -1,6 +1,9 @@
 /**
- * Interface/Abstraction pour le repository produit
- * Définit les méthodes que toutes les implémentations doivent avoir
+ * Interface/Abstraction for the product repository
+ * Set the methods that all implementations must have
+ * (e.g., Mongoose, MySQL) to manage products.
+ *
+ * @interface IProductRepository
  */
 class IProductRepository {
   async takeNoteOfUserForProductRepo(productId, userId, star) {

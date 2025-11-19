@@ -1,6 +1,9 @@
 /**
- * Interface/Abstraction pour le repository sous-catégorie
- * Définit les méthodes que toutes les implémentations doivent avoir
+ * Interface/Abstraction for the subcategory repository
+ * Set the methods that all implementations must have
+ * (e.g., Mongoose, MySQL) to manage subcategories.
+ *
+ * @interface ISubRepository
  */
 class ISubRepository {
   async findOrCreateSub(subData) {

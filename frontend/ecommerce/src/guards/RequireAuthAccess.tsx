@@ -18,18 +18,12 @@ export const RequireAuthAccess: React.FC<RequireAuthAccessProps> = ({
   const { user, isAuthenticated, loading } = useUserContext();
   const location = useLocation();
 
-  console.log("🔐 RequireAuthAccess Guard:");
-  console.log("  - loading:", loading);
-  console.log("  - isAuthenticated:", isAuthenticated);
-  console.log("  - user:", user);
-  console.log("  - location:", location.pathname);
-
-  // 1️⃣ Attente pendant le chargement
+  // Wait loading state
   if (loading) {
     return <PageLoader />;
   }
 
-  // 2️⃣ Pas authentifié → Redirige vers login
+  // Not authenticated → Redirect to login
   if (!isAuthenticated || !user) {
     return (
       <Navigate
@@ -43,7 +37,7 @@ export const RequireAuthAccess: React.FC<RequireAuthAccessProps> = ({
     );
   }
 
-  // 3️⃣ Admin essaie d'accéder à une page utilisateur → Redirige vers dashboard admin
+  // Admin tries to access a user page → Redirect to admin dashboard
   if (user.role === "admin") {
     return (
       <Navigate
@@ -57,6 +51,6 @@ export const RequireAuthAccess: React.FC<RequireAuthAccessProps> = ({
     );
   }
 
-  // 4️⃣ ✅ Utilisateur normal connecté → Affiche le contenu
+  // Normal user authenticated → Show content
   return <>{children}</>;
 };

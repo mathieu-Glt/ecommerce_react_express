@@ -1,6 +1,19 @@
 /**
  * User service that depends on the abstraction (IUserRepository).
  * Does not know the implementation details (Mongoose, MySQL, etc.).
+ * Follows the Dependency Inversion Principle (SOLID).
+ *
+ * Responsibilities:
+ *  - Fetching users (all, by email, by ID)
+ *  - Creating new users
+ *  - Updating existing users (by email, by ID)
+ *  - Deleting users
+ *  - Finding or creating users
+ *  - Managing user profiles and passwords
+ *
+ * Dependencies:
+ *  - IUserRepository (interface/abstraction)
+ *
  * @class UserService
  */
 class UserService {
@@ -55,19 +68,12 @@ class UserService {
    * @returns {Promise<Object>} Update result.
    */
   async updateUserById(userId, updateData) {
-    console.log("🔍 Service: Updating user with ID:", userId);
-    console.log("📝 Service: Data to update:", updateData);
-
     const result = await this.userRepository.updateUserById(userId, updateData);
 
     if (result.success) {
-      console.log(`User updated successfully for ID: ${userId}`);
     } else {
-      console.error(
-        `Failed to update user for ID: ${userId}. Error: ${result.error}`
-      );
+      return { success: false, error: result.error };
     }
-
     return result;
   }
 
@@ -106,9 +112,6 @@ class UserService {
    */
   async updateUserProfile(email, profileData) {
     const result = await this.userRepository.updateUser(email, profileData);
-    if (result.success) {
-      console.log(`Profile updated for user: ${email}`);
-    }
     return result;
   }
 
@@ -156,7 +159,6 @@ class UserService {
       );
 
       if (result.success) {
-        console.log(`Password updated for user ID: ${userId}`);
         return {
           success: true,
           message: "Password updated successfully",
@@ -165,7 +167,6 @@ class UserService {
         return { success: false, error: result.error };
       }
     } catch (error) {
-      console.error("Error updating password:", error);
       return {
         success: false,
         error: "Error while updating password",

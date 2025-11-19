@@ -20,7 +20,6 @@ export async function getCategories(): Promise<CategoryResponse> {
     const response: AxiosResponse<CategoryResponse> = await api.get(
       API_ROUTES.CATEGORIES.LIST
     );
-    console.log("Categories fetched:", response.data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {

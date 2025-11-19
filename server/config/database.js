@@ -9,17 +9,14 @@ const connectDB = async () => {
   try {
     if (databaseType === "mongoose") {
       const conn = await mongoose.connect(process.env.MONGODB_URI);
-      console.log("✅ Connected to MongoDB");
       return conn;
     } else if (databaseType === "mysql") {
       // Pour MySQL, la connexion sera gérée par le repository
-      console.log("✅ MySQL configuration ready");
       return null;
     } else {
       throw new Error(`Unsupported database type: ${databaseType}`);
     }
   } catch (error) {
-    console.error("❌ Error connecting to database:", error);
     process.exit(1);
   }
 };
@@ -47,7 +44,6 @@ const validateDatabaseConfig = () => {
     }
   }
 
-  console.log(`✅ Database configuration validated for: ${databaseType}`);
 };
 
 module.exports = { connectDB, validateDatabaseConfig };

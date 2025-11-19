@@ -110,7 +110,7 @@ const FailedTransctionPaypal = lazy(() =>
 // ==================== ROUTES CONFIGURATION ====================
 export const AppRoutes = () => {
   const routes = useRoutes([
-    // ==================== ROUTES AVEC HEADER + FOOTER ====================
+    // ==================== ROUTES WITH HEADER + FOOTER ====================
     {
       element: React.createElement(
         // RequireAuthAccess,
@@ -171,7 +171,7 @@ export const AppRoutes = () => {
       ],
     },
 
-    // ==================== ADMIN ROUTES (Layout avec RequireAdminRoleAccess) ====================
+    // ==================== ADMIN ROUTES (Layout with RequireAdminRoleAccess) ====================
     {
       path: "/admin",
       element: React.createElement(

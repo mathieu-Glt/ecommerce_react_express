@@ -29,24 +29,22 @@ export const useCategory = () => {
   );
 
   // ============================================
-  // 🔹 FETCH ALL CATEGORIES
+  // FETCH ALL CATEGORIES
   // ============================================
   const getAllCategories = useCallback(async (): Promise<
     Category[] | undefined
   > => {
     try {
       const results = await dispatch(fetchCategories()).unwrap();
-      console.log("Fetched categories:", results);
       toast.showSuccess("Categories loaded successfully");
       return results;
     } catch (err: any) {
-      console.error("❌ Failed to fetch categories:", err);
       toast.showError(err?.message || "Failed to fetch categories");
     }
   }, [dispatch, toast]);
 
   // ============================================
-  // 🔹 FETCH CATEGORY BY ID
+  // FETCH CATEGORY BY ID
   // ============================================
   const getCategoryById = useCallback(
     async (id: string): Promise<Category | null> => {
@@ -62,7 +60,7 @@ export const useCategory = () => {
   );
 
   // ============================================
-  // 🔹 FETCH CATEGORY BY SLUG
+  // FETCH CATEGORY BY SLUG
   // ============================================
   const getCategoryBySlug = useCallback(
     async (slug: string): Promise<Category | null> => {
@@ -78,7 +76,7 @@ export const useCategory = () => {
   );
 
   // ============================================
-  // 🔹 CREATE CATEGORY
+  // CREATE CATEGORY
   // ============================================
   const createCategory = useCallback(
     async (data: Record<string, any> | FormData): Promise<Category | null> => {
@@ -95,7 +93,7 @@ export const useCategory = () => {
   );
 
   // ============================================
-  // 🔹 UPDATE CATEGORY
+  // UPDATE CATEGORY
   // ============================================
   const updateCategory = useCallback(
     async (
@@ -115,7 +113,7 @@ export const useCategory = () => {
   );
 
   // ============================================
-  // 🔹 DELETE CATEGORY
+  // DELETE CATEGORY
   // ============================================
   const deleteCategory = useCallback(
     async (id: string): Promise<boolean> => {
@@ -132,7 +130,7 @@ export const useCategory = () => {
   );
 
   // ============================================
-  // 🔹 MEMOIZED RETURN VALUE
+  // MEMOIZED RETURN VALUE
   // ============================================
   const categoryContextValue = useMemo(
     () => ({

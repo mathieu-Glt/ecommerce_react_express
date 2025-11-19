@@ -6,32 +6,32 @@ import * as Yup from "yup";
  */
 export const productValidationSchema = Yup.object().shape({
   title: Yup.string()
-    .min(3, "Le titre doit contenir au moins 3 caractères")
-    .max(100, "Le titre ne doit pas dépasser 100 caractères")
-    .required("Le titre est requis"),
+    .min(3, "The title must contain at least 3 characters")
+    .max(100, "The title must not exceed 100 characters")
+    .required("The title is required"),
 
   slug: Yup.string()
-    .min(3, "Le slug doit contenir au moins 3 caractères")
-    .max(120, "Le slug ne doit pas dépasser 120 caractères")
+    .min(3, "The slug must contain at least 3 characters")
+    .max(120, "The slug must not exceed 120 characters")
     .matches(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "Le slug ne peut contenir que des lettres minuscules, chiffres et tirets"
+      "The slug can only contain lowercase letters, numbers, and hyphens"
     )
-    .required("Le slug est requis"),
+    .required("The slug is required"),
 
   price: Yup.number()
-    .min(0.01, "Le prix doit être supérieur à 0")
-    .max(1000000, "Le prix ne peut pas dépasser 1 000 000")
-    .required("Le prix est requis")
-    .typeError("Le prix doit être un nombre"),
+    .min(0.01, "The price must be greater than 0")
+    .max(1000000, "The price must not exceed 1,000,000")
+    .required("The price is required")
+    .typeError("The price must be a number"),
 
   description: Yup.string()
-    .min(10, "La description doit contenir au moins 10 caractères")
-    .max(2000, "La description ne doit pas dépasser 2000 caractères")
-    .required("La description est requise"),
+    .min(10, "The description must contain at least 10 characters")
+    .max(2000, "The description must not exceed 2000 characters")
+    .required("The description is required"),
 
   category: Yup.string()
-    .required("La catégorie est requise")
+    .required("The category is required")
     .test(
       "is-valid-id",
       "ID de catégorie invalide",
@@ -48,15 +48,14 @@ export const productValidationSchema = Yup.object().shape({
     ),
 
   quantity: Yup.number()
-    .min(0, "La quantité ne peut pas être négative")
-    .max(100000, "La quantité ne peut pas dépasser 100 000")
-    .integer("La quantité doit être un nombre entier")
-    .required("La quantité est requise")
-    .typeError("La quantité doit être un nombre"),
-
+    .min(0, "The quantity cannot be negative")
+    .max(100000, "The quantity must not exceed 100,000")
+    .integer("The quantity must be an integer")
+    .required("The quantity is required")
+    .typeError("The quantity must be a number"),
   shipping: Yup.string()
-    .oneOf(["Yes", "No"], "La livraison doit être Yes ou No")
-    .required("La livraison est requise"),
+    .oneOf(["Yes", "No"], "Shipping must be Yes or No")
+    .required("Shipping is required"),
 
   color: Yup.string()
     .oneOf(
@@ -73,9 +72,9 @@ export const productValidationSchema = Yup.object().shape({
         "Brown",
         "Gray",
       ],
-      "Couleur invalide"
+      "Invalid color"
     )
-    .required("La couleur est requise"),
+    .required("Color is required"),
 
   brand: Yup.string()
     .oneOf(
@@ -95,20 +94,20 @@ export const productValidationSchema = Yup.object().shape({
         "Transsion",
         "Autre",
       ],
-      "Marque invalide"
+      "Invalid brand"
     )
-    .required("La marque est requise"),
+    .required("Brand is required"),
 
   images: Yup.array()
     .of(
       Yup.mixed<File>()
-        .test("fileSize", "Chaque image ne doit pas dépasser 5MB", (value) => {
+        .test("fileSize", "Each image must not exceed 5MB", (value) => {
           if (!value) return true;
           return (value as File).size <= 5 * 1024 * 1024;
         })
         .test(
           "fileType",
-          "Seules les images sont autorisées (JPEG, PNG, GIF, WebP)",
+          "Only images are allowed (JPEG, PNG, GIF, WebP)",
           (value) => {
             if (!value) return true;
             return [
@@ -121,7 +120,7 @@ export const productValidationSchema = Yup.object().shape({
           }
         )
     )
-    .max(5, "Maximum 5 images autorisées")
+    .max(5, "Maximum 5 images allowed")
     .optional(),
 });
 

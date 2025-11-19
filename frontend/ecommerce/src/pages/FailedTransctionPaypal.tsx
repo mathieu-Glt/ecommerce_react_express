@@ -8,22 +8,19 @@ export default function PaypalCancelPage() {
   return (
     <div className="paypal-cancel-page">
       <div className="cancel-card">
-        <h1>❌ Échec de la transaction PayPal</h1>
+        <h1>❌ PayPal Transaction Failed</h1>
+        <p>It seems that your payment was cancelled or an error occurred.</p>
         <p>
-          Il semble que votre paiement ait été annulé ou qu’une erreur se soit
-          produite.
-        </p>
-        <p>
-          Aucun montant n’a été débité. Vous pouvez réessayer ou retourner à
-          votre panier pour modifier votre commande.
+          No amount has been charged. You can retry or return to your cart to
+          modify your order.
         </p>
 
         <div className="cancel-actions">
           <button className="btn-retry" onClick={() => navigate("/checkout")}>
-            🔁 Réessayer le paiement
+            🔁 Retry Payment
           </button>
           <button className="btn-cart" onClick={() => navigate("/cart")}>
-            🛒 Retourner au panier
+            🛒 Return to Cart
           </button>
         </div>
       </div>

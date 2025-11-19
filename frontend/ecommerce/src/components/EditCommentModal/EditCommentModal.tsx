@@ -23,7 +23,6 @@ export default function EditCommentModal({
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  console.log("user dans edit comment :", user?._id);
 
   const [text, setText] = useState("");
   const [rating, setRating] = useState(0);
@@ -38,13 +37,10 @@ export default function EditCommentModal({
   }, [comment]);
 
   const handleUpdate = async () => {
-    console.log("Mise à jour du commentaire :", comment);
     if (!comment?._id) return;
-    console.log("Nouveau texte :", text);
-    console.log("Nouvelle note :", rating);
 
     if (!text.trim() || !rating) {
-      message.warning("Veuillez donner une note et un texte valide.");
+      message.warning("Please provide a valid rating and text.");
       return;
     }
 
@@ -55,11 +51,10 @@ export default function EditCommentModal({
         text,
         rating,
       });
-      result.success("✅ Commentaire mis à jour avec succès !");
+      result.success("Comment updated successfully!");
       onClose();
     } catch (err: any) {
-      console.error("❌ Erreur lors de la mise à jour :", err);
-      message.error(err?.message || "Erreur lors de la mise à jour.");
+      message.error(err?.message || "Error updating comment.");
     } finally {
       setLoading(false);
     }
@@ -69,17 +64,17 @@ export default function EditCommentModal({
     <Modal
       open={open}
       onCancel={onClose}
-      title="✏️ Modifier votre commentaire"
+      title="Edit your comment"
       footer={null}
       centered
       width={500}
       className="edit-comment-modal"
     >
       <div className="edit-comment-body">
-        <p className="text-gray-600 mb-2">Votre note :</p>
+        <p className="text-gray-600 mb-2">Your rating:</p>
         <Rate value={rating} onChange={setRating} />
 
-        <p className="text-gray-600 mt-4 mb-2">Votre commentaire :</p>
+        <p className="text-gray-600 mt-4 mb-2">Your comment:</p>
         <TextArea
           rows={4}
           value={text}
@@ -89,7 +84,7 @@ export default function EditCommentModal({
 
         <div className="flex justify-end gap-3 mt-5">
           <Button onClick={onClose} disabled={loading}>
-            Annuler
+            Cancel
           </Button>
           <Button
             type="primary"
@@ -97,7 +92,7 @@ export default function EditCommentModal({
             onClick={handleUpdate}
             className="btn-submit"
           >
-            Mettre à jour
+            Update Comment
           </Button>
         </div>
       </div>

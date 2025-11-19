@@ -23,22 +23,12 @@ const api: AxiosInstance = useApi();
  */
 export async function getProducts(): Promise<ProductListResponse> {
   try {
-    console.log(
-      "🔧 [getProducts] API_ROUTES.PRODUCTS.LIST:",
-      API_ROUTES.PRODUCTS.LIST
-    );
-    console.log(
-      "🔧 [getProducts] Full URL will be:",
-      `${api.defaults.baseURL}/${API_ROUTES.PRODUCTS.LIST}`
-    );
 
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.LIST
     );
-    console.log("Response data:", response.data);
     return response.data;
   } catch (error) {
-    console.error("❌ [getProducts] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error || "Failed to fetch products"
@@ -63,7 +53,6 @@ export async function getProducts(): Promise<ProductListResponse> {
 export async function createProduct(
   body: Record<string, any> | FormData
 ): Promise<ProductListResponse> {
-  console.log("Creating product with body:", body);
   try {
     const response: AxiosResponse<ProductListResponse> = await api.post(
       API_ROUTES.PRODUCTS.CREATE,
@@ -93,7 +82,6 @@ export async function getProductById(id: string): Promise<ProductListResponse> {
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.DETAILS_ID(id)
     );
-    console.log("Response data for product ID:", response.data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -148,7 +136,6 @@ export async function searchProductsApi(params: {
       API_ROUTES.PRODUCTS.SEARCH,
       { params }
     );
-    console.log("Search products response data:", response.data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -173,14 +160,6 @@ export async function getLatestProducts(
   limit: number
 ): Promise<ProductListResponse> {
   try {
-    console.log(
-      "🔧 [getLatestProducts] API_ROUTES.PRODUCTS.LATEST:",
-      API_ROUTES.PRODUCTS.LATEST
-    );
-    console.log(
-      "🔧 [getLatestProducts] Full URL will be:",
-      `${api.defaults.baseURL}/${API_ROUTES.PRODUCTS.LATEST}`
-    );
 
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.LATEST,
@@ -188,7 +167,6 @@ export async function getLatestProducts(
     );
     return response.data;
   } catch (error) {
-    console.error("❌ [getLatestProducts] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error || "Failed to fetch latest products"
@@ -209,21 +187,12 @@ export async function getLatestProducts(
  */
 export async function getBestSoldProducts(): Promise<ProductListResponse> {
   try {
-    console.log(
-      "🔧 [getBestSoldProducts] API_ROUTES.PRODUCTS.BEST_SOLD:",
-      API_ROUTES.PRODUCTS.BEST_SOLD
-    );
-    console.log(
-      "🔧 [getBestSoldProducts] Full URL will be:",
-      `${api.defaults.baseURL}/${API_ROUTES.PRODUCTS.BEST_SOLD}`
-    );
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.BEST_SOLD
       // { limit }
     );
     return response.data;
   } catch (error) {
-    console.error("❌ [getBestSoldProducts] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error || "Failed to fetch best sold products"
@@ -304,9 +273,6 @@ export async function addProductRating(
   star: number,
   isUpdate?: boolean
 ): Promise<ProductListResponse> {
-  console.log(
-    `Adding - addProductRating - rating for product ${id} to ${star} stars. Is update: ${isUpdate}`
-  );
 
   try {
     const response: AxiosResponse<ProductListResponse> = await api.post(
@@ -336,9 +302,6 @@ export async function updateProductRating(
   star: number,
   isUpdate?: boolean
 ): Promise<ProductListResponse> {
-  console.log(
-    `Updating - updateProductRating - rating for product ${id} to ${star} stars. Is update: ${isUpdate}`
-  );
   try {
     // Axios instance will automatically add the token from useApi
     const response: AxiosResponse<ProductListResponse> = await api.put(
@@ -357,10 +320,10 @@ export async function updateProductRating(
 }
 
 /**
- * Vérifie si l'utilisateur connecté a déjà noté un produit
- * @param id - ID du produit
- * @returns true si l'utilisateur a noté le produit, false sinon
- * @throws {Error} Si la requête échoue
+ * Check if the logged-in user has already rated a product
+ * @param id - Product ID
+ * @returns true if the user has rated the product, false otherwise
+ * @throws {Error} If the request fails
  * @example
  * const hasRated = await hasUserRatedProduct("productId");
  */
@@ -369,12 +332,10 @@ export async function hasUserRatedProduct(id: string): Promise<{}> {
     const response: AxiosResponse<{ success: boolean }> = await api.get(
       API_ROUTES.PRODUCTS.RATE_CHECK(id)
     );
-    console.log(`User has rated product ${id}:`, response.data);
 
-    // Le backend retourne true/false
+    // The backend returns true/false
     return response.data;
   } catch (error) {
-    console.error("❌ [hasUserRatedProduct] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error || "Failed to check user rating"
@@ -399,17 +360,11 @@ export async function getProductsByCategoryId(
   categoryId: string
 ): Promise<ProductListResponse> {
   try {
-    console.log(
-      "🔧 [getProductsByCategory] Fetching products for category ID:",
-      categoryId
-    );
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.BY_CATEGORY_ID(categoryId)
     );
-    console.log("🔧 [getProductsByCategory] Response data:", response.data);
     return response.data;
   } catch (error) {
-    console.error("❌ [getProductsByCategory] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error || "Failed to fetch products by category"
@@ -434,17 +389,11 @@ export async function getProductsBySubsCategoryIdApi(
   subsCategoryId: string
 ): Promise<ProductListResponse> {
   try {
-    console.log(
-      "🔧 [getProductsBySubsCategory] Fetching products for subs category ID:",
-      subsCategoryId
-    );
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.BY_SUBS_CATEGORY_ID(subsCategoryId)
     );
-    console.log("🔧 [getProductsBySubsCategory] Response data:", response.data);
     return response.data;
   } catch (error) {
-    console.error("❌ [getProductsBySubsCategory] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error ||
@@ -475,10 +424,6 @@ export async function getProductsByAverageRateRange(
       {
         params: { minRate, maxRate },
       }
-    );
-    console.log(
-      "🔧 [getProductsByAverageRateRange] Response data:",
-      response.data
     );
     return response.data;
   } catch (error) {
@@ -512,10 +457,6 @@ export async function getProductsByPriceRangeApi(
         params: { minPrice, maxPrice },
       }
     );
-    console.log(
-      "🔧 [getProductsByPriceRange] Response data product API:",
-      response.data
-    );
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -541,19 +482,11 @@ export async function getProductsByPriceRangeApi(
 
 export async function getProductsByCategoryAcesories(): Promise<ProductListResponse> {
   try {
-    console.log(
-      "🔧 [getProductsByCategoryAcesories] Fetching products for category Acesories"
-    );
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.BY_CATEGORY_SLUG("accessories")
     );
-    console.log(
-      "🔧 [getProductsByCategoryAcesories] Response data:",
-      response.data
-    );
     return response.data;
   } catch (error) {
-    console.error("❌ [getProductsByCategoryAcesories] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error ||
@@ -577,19 +510,11 @@ export async function getProductsByCategoryAcesories(): Promise<ProductListRespo
  */
 export async function getProductsByCategoryOutillage(): Promise<ProductListResponse> {
   try {
-    console.log(
-      "🔧 [getProductsByCategoryOutillage] Fetching products for category Outillage"
-    );
     const response: AxiosResponse<ProductListResponse> = await api.get(
       API_ROUTES.PRODUCTS.BY_CATEGORY_SLUG("outillage")
     );
-    console.log(
-      "🔧 [getProductsByCategoryOutillage] Response data:",
-      response.data
-    );
     return response.data;
   } catch (error) {
-    console.error("❌ [getProductsByCategoryOutillage] Error:", error);
     if (error instanceof AxiosError) {
       throw new Error(
         error.response?.data?.error ||

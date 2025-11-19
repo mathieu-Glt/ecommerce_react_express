@@ -19,6 +19,7 @@
  *
  * This service follows the Dependency Inversion Principle (SOLID),
  * ensuring it does not depend on low-level implementation details.
+ * 
  */
 
 /**

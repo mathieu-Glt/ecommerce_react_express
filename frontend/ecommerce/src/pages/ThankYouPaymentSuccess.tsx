@@ -18,10 +18,10 @@ export default function MerciPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <div className="bg-white shadow-lg rounded-2xl p-10 text-center max-w-md">
         <h1 className="text-3xl font-bold text-green-600 mb-4">
-          🎉 Merci pour votre achat !
+          🎉 Thank you for your purchase!
         </h1>
         <p className="text-gray-600 mb-6">
-          Votre paiement a bien été confirmé.
+          Your payment has been successfully confirmed.
         </p>
 
         {invoice ? (
@@ -29,17 +29,17 @@ export default function MerciPage() {
             onClick={handleDownload}
             className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition"
           >
-            📄 Télécharger ma facture
+            📄 Download my invoice
           </button>
         ) : (
-          <p className="text-gray-400">Aucune facture disponible.</p>
+          <p className="text-gray-400">No invoice available.</p>
         )}
 
         <Link
           to="/"
           className="mt-6 inline-block text-blue-600 hover:underline"
         >
-          ← Retour à la boutique
+          ← Back to shop
         </Link>
       </div>
     </div>

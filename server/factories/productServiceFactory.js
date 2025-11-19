@@ -25,7 +25,6 @@ class ProductServiceFactory {
       const productRepository = new MongooseProductRepository(Product);
       return new ProductService(productRepository);
     } catch (error) {
-      console.error("Error creating Mongoose product service:", error);
       throw new Error("Failed to create Mongoose product service");
     }
   }
@@ -51,7 +50,6 @@ class ProductServiceFactory {
       const productRepository = new MySQLProductRepository(connection);
       return new ProductService(productRepository);
     } catch (error) {
-      console.error("Error creating MySQL product service:", error);
       throw new Error("Failed to create MySQL product service");
     }
   }

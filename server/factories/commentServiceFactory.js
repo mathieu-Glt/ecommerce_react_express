@@ -21,7 +21,6 @@ class CommentServiceFactory {
       const commentRepository = new MongooseCommentRepository(Comment);
       return new CommentService(commentRepository);
     } catch (error) {
-      console.error("Error creating Mongoose comment service:", error);
       throw new Error("Failed to create Mongoose comment service");
     }
   }
@@ -45,7 +44,6 @@ class CommentServiceFactory {
       const commentRepository = new MySQLCommentRepository(connection);
       return new CommentService(commentRepository);
     } catch (error) {
-      console.error("Error creating MySQL comment service:", error);
       throw new Error("Failed to create MySQL comment service");
     }
   }

@@ -24,7 +24,6 @@ export function useLocalStorage() {
   //cart
   const [cart, setCartState] = useState<[]>(() => {
     const storedCart = localStorage.getItem("cart");
-    console.log("useLocalStorage - cart loaded:", storedCart);
     return storedCart ? JSON.parse(storedCart) : [];
   });
 

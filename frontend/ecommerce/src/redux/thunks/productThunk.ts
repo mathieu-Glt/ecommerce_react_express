@@ -27,7 +27,6 @@ export const fetchProducts = createAsyncThunk<
 >("products/fetchAll", async (_, thunkAPI) => {
   try {
     const response = await getProducts();
-    console.log("Fetched products:", response);
 
     if (!response.success) {
       return thunkAPI.rejectWithValue(response.message);
@@ -46,7 +45,6 @@ export const fetchProductById = createAsyncThunk<
 >("products/fetchById", async (id, thunkAPI) => {
   try {
     const response = await getProductById(id);
-    console.log("Fetched product by ID:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -61,7 +59,6 @@ export const fetchProductsTopRated = createAsyncThunk<
 >("products/fetchTopRated", async (_, thunkAPI) => {
   try {
     const response = await getBestSoldProducts();
-    console.log("Fetched top-rated products:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -86,10 +83,10 @@ export const fetchProductBySlug = createAsyncThunk<
 /**
  * Redux Thunk: searchProduct
  *
- * Recherche un ou plusieurs produits selon un titre (query)
- * ou un slug unique.
+ * Search for one or more products by title (query)
+ * or a unique slug.
  *
- * Exemple d'utilisation :
+ * Example usage:
  *  - dispatch(searchProduct({ query: "macbook" }))
  *  - dispatch(searchProduct({ slug: "macbook-pro-2024" }))
  */
@@ -100,7 +97,6 @@ export const searchProducts = createAsyncThunk<
 >("products/search", async (params, thunkAPI) => {
   try {
     const response = await searchProductsApi(params);
-    console.log("Search products response:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -113,7 +109,7 @@ export const searchProducts = createAsyncThunk<
 /**
  *  Redux Thunk: getLatestProducts
  *
- *  Récupère les derniers produits ajoutés.
+ *  Fetches the latest added products.
  *
  */
 export const fetchLatestProducts = createAsyncThunk<
@@ -137,7 +133,6 @@ export const createNewProduct = createAsyncThunk<
   FormData | Record<string, any>,
   { rejectValue: string }
 >("products/create", async (productData, thunkAPI) => {
-  console.log("Thunk - Creating new product with data:", productData);
   try {
     const response = await createProduct(productData);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
@@ -149,7 +144,7 @@ export const createNewProduct = createAsyncThunk<
 
 export const updateExistingProduct = createAsyncThunk<
   Product,
-  { id: string; data: Partial<Product> | FormData }, // ✅ Accepter FormData
+  { id: string; data: Partial<Product> | FormData },
   { rejectValue: string }
 >("products/update", async ({ id, data }, thunkAPI) => {
   try {
@@ -181,7 +176,7 @@ export const rateProduct = createAsyncThunk<
   { rejectValue: string }
 >("products/rateProduct", async ({ id, star, productRating }, thunkAPI) => {
   try {
-    const userId = "l'id utilisateur"; // à récupérer depuis ton store
+    const userId = "user id"; // to be retrieved from your store
     const userAlreadyRated = productRating?.some(
       (r) => r.postedBy?._id === userId
     );
@@ -193,7 +188,7 @@ export const rateProduct = createAsyncThunk<
 
     return response.data;
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.message || "Erreur lors du rating");
+    return thunkAPI.rejectWithValue(error.message || "Error rating product");
   }
 });
 
@@ -213,7 +208,6 @@ export const fetchProductsByCategoryId = createAsyncThunk<
 >("products/fetchByCategoryId", async (categoryId, thunkAPI) => {
   try {
     const response = await getProductsByCategoryId(categoryId);
-    console.log("Fetch products by category ID response:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -226,9 +220,9 @@ export const fetchProductsByCategoryId = createAsyncThunk<
 /**
  * Redux Thunk: searchProduct by subs category ID
  *
- * Recherche un ou plusieurs produits selon une sous categorie
+ * Search for one or more products by a subcategory
  *
- * Exemple d'utilisation :
+ * Example usage:
  *  - dispatch(searchProduct({ query: "samsung" }))
  */
 export const fetchProductsBySubsCategoryId = createAsyncThunk<
@@ -238,7 +232,6 @@ export const fetchProductsBySubsCategoryId = createAsyncThunk<
 >("products/fetchBySubsCategoryId", async (subsCategoryId, thunkAPI) => {
   try {
     const response = await getProductsBySubsCategoryIdApi(subsCategoryId);
-    console.log("Fetch products by subs category ID response:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -258,15 +251,8 @@ export const fetchProductsByAverageRate = createAsyncThunk<
   { minRate: number; maxRate: number },
   { rejectValue: string }
 >("products/fetchByAverageRate", async ({ minRate, maxRate }, thunkAPI) => {
-  console.log(
-    "Thunk - Fetching products by average rate with minRate:",
-    minRate,
-    "and maxRate:",
-    maxRate
-  );
   try {
     const response = await getProductsByAverageRateRange(minRate, maxRate);
-    console.log("Fetch products by average rate response thunk:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -286,15 +272,8 @@ export const fetchProductsByPriceRangeThunk = createAsyncThunk<
   { minPrice: number; maxPrice: number },
   { rejectValue: string }
 >("products/fetchByPriceRange", async ({ minPrice, maxPrice }, thunkAPI) => {
-  console.log(
-    "Thunk - Fetching products by price range with minPrice:",
-    minPrice,
-    "and maxPrice:",
-    maxPrice
-  );
   try {
     const response = await getProductsByPriceRangeApi(minPrice, maxPrice);
-    console.log("Fetch products by price range response thunk:", response);
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -305,7 +284,7 @@ export const fetchProductsByPriceRangeThunk = createAsyncThunk<
 });
 
 /**
- * Fetch products by category acesories
+ * Fetch products by category accessories
  * Example of use:
  *  - dispatch(fetchProductsByPriceRange({ minPrice: 100, maxPrice: 500 }))
  */
@@ -316,10 +295,6 @@ export const fetchProductsByCategoryAcesories = createAsyncThunk<
 >("products/fetchByCategoryAcesories", async (_, thunkAPI) => {
   try {
     const response = await getProductsByCategoryAcesories();
-    console.log(
-      "Fetch products by category acesories response thunk:",
-      response
-    );
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {
@@ -330,7 +305,7 @@ export const fetchProductsByCategoryAcesories = createAsyncThunk<
 });
 
 /**
- * Fetch products by category outillage
+ * Fetch products by category tool
  * Example of use:
  *  - dispatch(fetchProductsByPriceRange({ minPrice: 100, maxPrice: 500 }))
  */
@@ -341,10 +316,6 @@ export const fetchProductsByCategoryOutillage = createAsyncThunk<
 >("products/fetchByCategoryOutillage", async (_, thunkAPI) => {
   try {
     const response = await getProductsByCategoryOutillage();
-    console.log(
-      "Fetch products by category outillage response thunk:",
-      response
-    );
     if (!response.success) return thunkAPI.rejectWithValue(response.message);
     return response.results;
   } catch (error: any) {

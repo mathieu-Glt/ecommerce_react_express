@@ -18,7 +18,6 @@ export const Navigation: React.FC = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  console.log("🔐 NavBar - isAuthenticated:", isAuthenticated, "user:", user);
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -51,10 +50,10 @@ export const Navigation: React.FC = () => {
           <span className="toggle-line"></span>
         </button>
 
-        {/* Menu de navigation */}
+        {/* Navigation menu */}
         <div className={`navbar-menu ${isMenuOpen ? "active" : ""}`}>
           <div className="nav-links">
-            <button onClick={toggleBarFilter}>Recherche avancées</button>
+            <button onClick={toggleBarFilter}>Advanced Search</button>
             <Link to={ROUTES.HOME} className="nav-link" onClick={closeMenu}>
               Home
             </Link>

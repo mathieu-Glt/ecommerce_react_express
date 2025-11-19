@@ -8,6 +8,9 @@ const IPasswordResetRepository = require("./IPasswordResetRepository");
  * to ensure the service layer does not depend on the database implementation.
  * util link doc Mongoose :
  * https://mongoosejs.com/docs/queries.html
+ *
+ * @extends {IPasswordResetRepository}
+ * @module repositories/MongooseResetPasswordRepository
  */
 class MongooseResetPasswordRepository extends IPasswordResetRepository {
   /**

@@ -1,21 +1,20 @@
-// src/components/header/Header.tsx
 import React from "react";
 import { Navigation } from "../navigation/NavBar";
 import "./Header.css";
-import iphoneImage from "../../assets/videos/Untitled.mp4"; // Assurez-vous d'avoir cette image dans le dossier assets
+import iphoneImage from "../../assets/videos/Untitled.mp4";
 
 export const Header: React.FC = () => {
   return (
     <header className="site-header">
-      {/* Bannière principale */}
+      {/* Main banner */}
       <div className="hero-banner">
-        {/* Effet de lumière en arrière-plan */}
+        {/* Background light effect */}
         <div className="hero-glow"></div>
 
-        {/* Contenu principal */}
+        {/* Main content */}
         <div className="hero-container">
           <div className="hero-grid">
-            {/* Colonne gauche - Texte */}
+            {/* Left column - Text */}
             <div className="hero-content">
               <div className="badge-promo">🔥 Nouveautés 2025</div>
 
@@ -85,20 +84,20 @@ export const Header: React.FC = () => {
               </div>
             </div>
 
-            {/* Colonne droite - Image iPhone */}
+            {/* Right column - iPhone image */}
             <div className="hero-image-section">
               <div className="image-container">
-                {/* Effet glow derrière l'iPhone */}
+                {/* Glow effect behind the iPhone */}
                 <div className="image-glow-effect"></div>
 
-                {/* Image iPhone */}
+                {/* iPhone image */}
                 {/* <img src={iphoneImage} alt="iPhone" className="iphone-image" /> */}
                 <video className="iphone-video" autoPlay loop muted playsInline>
                   <source src={iphoneImage} type="video/mp4" />
                   Votre navigateur ne supporte pas les vidéos.
                 </video>
 
-                {/* Badge promo */}
+                {/* Promo badge */}
                 <div className="discount-badge">
                   Offers -10% -50% on reconditionned iPhones
                 </div>
@@ -110,7 +109,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Décorations */}
+        {/* DDecorations */}
         <div className="hero-bottom-gradient"></div>
       </div>
 

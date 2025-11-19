@@ -1,32 +1,30 @@
-// src/components/header/Header.tsx
 import React from "react";
 import "./admin-header.css";
-import iphoneImage from "../../../assets/videos/Untitled.mp4"; // Assurez-vous d'avoir cette image dans le dossier assets
+import iphoneImage from "../../../assets/videos/Untitled.mp4";
 import { AdminNavigation } from "../Navigation/AdminNavigation";
 
 export const AdminHeader: React.FC = () => {
   return (
     <header className="site-header-admin">
-      {/* Bannière principale */}
+      {/* Main banner */}
       <div className="hero-banner-admin">
-        {/* Effet de lumière en arrière-plan */}
+        {/* Background light effect */}
         <div className="hero-glow"></div>
 
-        {/* Contenu principal */}
+        {/* Main content */}
         <div className="hero-container-admin">
           <div className="hero-grid">
-            {/* Colonne gauche - Texte */}
+            {/* Left column - Text */}
             <div className="hero-content-admin">
-              <div className="badge-promo-admin">🔥 Nouveautés 2025</div>
+              <div className="badge-promo-admin">News 2025</div>
 
               <h1 className="hero-title-admin">
-                Trouvez votre
-                <span className="hero-title-gradient-admin">iPhone idéal</span>
+                Find your
+                <span className="hero-title-gradient-admin">ideal iPhone</span>
               </h1>
 
               <p className="hero-subtitle-admin">
-                Neufs et reconditionnés certifiés. Garantie 2 ans. Livraison
-                gratuite.
+                New and certified refurbished. 2-year warranty. Free delivery.
               </p>
 
               {/* Features */}
@@ -57,7 +55,7 @@ export const AdminHeader: React.FC = () => {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>Garantie 2 ans</span>
+                  <span>2-year warranty</span>
                 </div>
                 {/* <div className="feature-admin">
                   <svg
@@ -86,7 +84,7 @@ export const AdminHeader: React.FC = () => {
                 {/* <img src={iphoneImage} alt="iPhone" className="iphone-image" /> */}
                 <video className="iphone-video" autoPlay loop muted playsInline>
                   <source src={iphoneImage} type="video/mp4" />
-                  Votre navigateur ne supporte pas les vidéos.
+                  Your browser does not support the video tag.
                 </video>
 
                 {/* Badge promo */}

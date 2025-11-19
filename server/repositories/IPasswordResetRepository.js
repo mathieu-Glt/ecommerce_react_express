@@ -1,6 +1,9 @@
 /**
- * Interface/Abstraction pour le repository utilisateur
- * Définit les méthodes que toutes les implémentations doivent avoir
+ * Interface/Abstraction for the password reset token repository
+ * Set the methods that all implementations must have
+ * (e.g., Mongoose, MySQL) to manage password reset tokens.
+ *
+ * @interface IPasswordResetRepository
  */
 class IPasswordResetRepository {
   async createPasswordResetToken(userId, token, hashedToken) {

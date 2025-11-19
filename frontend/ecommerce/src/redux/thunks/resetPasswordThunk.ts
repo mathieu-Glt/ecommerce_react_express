@@ -11,15 +11,8 @@ export const resetPasswordThunk = createAsyncThunk<
   { password: string; token: string },
   { rejectValue: ResponseErrorInterface }
 >("resetPassword/resetPassword", async (data, thunkAPI) => {
-  console.log("=== RESET PASSWORD THUNK START ===");
-  console.log("Data:", data);
   try {
     const response = await resetPasswordApi(data);
-    // Simulating API response for demonstration purposes
-    console.log("=== RESET PASSWORD THUNK SUCCESS ===");
-    console.log("Response:", response);
-    console.log("Response type:", typeof response);
-    console.log("Response keys:", Object.keys(response || {}));
     return {
       success: true,
       status: response.status,

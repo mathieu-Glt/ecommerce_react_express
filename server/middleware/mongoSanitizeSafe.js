@@ -1,26 +1,32 @@
-// // middleware/mongoSanitizeSafe.js - Version corrigée
+// middleware/mongoSanitizeSafe.js - Fixed version
 /**
- * Middleware de sanitization MongoDB personnalisé
- * Remplace express-mongo-sanitize pour éviter les erreurs avec req.query
+ * Custom MongoDB sanitization middleware
+ * Replaces express-mongo-sanitize to avoid errors with req.query
  */
 
 /**
- * Retire les caractères dangereux MongoDB ($, .)
- * @param {*} value - Valeur à sanitiser
- * @returns {*} Valeur sanitisée
+ * Removes dangerous MongoDB characters ($, .)
+ * @param {*} value - Value to sanitize
+ * @returns {*} Sanitized value
  */
 const sanitize = (value) => {
+  // If it's not an object or array, return the value as is
+  if (typeof value !== "object" || value === null) {
+    return value;
+  }
+  // If it's an object, sanitize each element
   if (value instanceof Object) {
+    // Loop through object keys
     for (const key in value) {
-      // Supprimer les clés commençant par $
+      // Remove keys starting with $
       if (/^\$/.test(key)) {
         delete value[key];
       }
-      // Supprimer les clés contenant des points (pour éviter les injections de champs)
+      // Remove keys containing dots (to prevent field injection)
       else if (/\./.test(key)) {
         delete value[key];
       }
-      // Sanitiser récursivement
+      // Recursively sanitize
       else {
         sanitize(value[key]);
       }
@@ -30,8 +36,8 @@ const sanitize = (value) => {
 };
 
 /**
- * Middleware de sanitization MongoDB
- * Protège contre les injections MongoDB en retirant les opérateurs dangereux
+ * MongoDB sanitization middleware
+ * Protects against MongoDB injections by removing dangerous operators
  */
 const mongoSanitizeSafe = (req, res, next) => {
   try {
@@ -45,18 +51,18 @@ const mongoSanitizeSafe = (req, res, next) => {
       req.params = sanitize(req.params);
     }
 
-    // Sanitize req.query (avec gestion spéciale pour éviter le problème read-only)
+    // Sanitize req.query (with special handling to avoid read-only issue)
     if (req.query && Object.keys(req.query).length > 0) {
       const sanitizedQuery = {};
 
       for (const key in req.query) {
-        // Ne pas inclure les clés dangereuses
+        // Don't include dangerous keys
         if (!/^\$/.test(key) && !/\./.test(key)) {
           sanitizedQuery[key] = sanitize(req.query[key]);
         }
       }
 
-      // Remplacer req.query en redéfinissant la propriété
+      // Replace req.query by redefining the property
       try {
         Object.defineProperty(req, "query", {
           value: sanitizedQuery,
@@ -65,16 +71,22 @@ const mongoSanitizeSafe = (req, res, next) => {
           configurable: true,
         });
       } catch (defineError) {
-        // Si Object.defineProperty échoue, on log l'erreur mais on continue
-        console.warn("⚠️  Could not redefine req.query:", defineError.message);
+        // Log only in development
+        if (process.env.NODE_ENV === "development") {
+          console.warn(
+            "⚠️  Could not redefine req.query:",
+            defineError.message
+          );
+        }
+        return next(defineError);
       }
     }
 
     next();
   } catch (error) {
     console.error("❌ Error in mongoSanitize middleware:", error);
-    // En cas d'erreur, on continue quand même pour ne pas bloquer l'application
-    next();
+    // In case of error, continue anyway to not block the application
+    return next(error);
   }
 };
 

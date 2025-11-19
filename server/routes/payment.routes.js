@@ -5,6 +5,7 @@ const {
   capturePaypalPayment,
   stripeSuccess,
 } = require("../controllers/payment.controllers");
+const { authenticateToken } = require("../middleware/auth");
 const router = express.Router();
 
 /**
@@ -23,10 +24,14 @@ const router = express.Router();
  */
 
 // POST /api/payment/paypal
-router.post("/paypal", getPaymentWithPaypal);
+router.post("/paypal", authenticateToken, getPaymentWithPaypal);
 router.get("/paypal/capture", capturePaypalPayment);
 
-router.post("/stripe/create-checkout-session", createCheckoutSession);
+router.post(
+  "/stripe/create-checkout-session",
+  authenticateToken,
+  createCheckoutSession
+);
 router.get("/stripe/success", stripeSuccess);
 
 module.exports = router;

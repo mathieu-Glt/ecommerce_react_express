@@ -1,19 +1,25 @@
+/**
+ * @file cloudinary.js
+ * @description
+ * Cloudinary Configuration and Utility Functions
+ *
+ * This module configures the Cloudinary SDK using environment variables
+ * and provides utility functions for uploading, deleting, and generating
+ * URLs for images.
+ *
+ * Environment Variables:
+ *  - CLOUDINARY_CLOUD_NAME: Your Cloudinary cloud name
+ *  - CLOUDINARY_API_KEY: Your Cloudinary API key
+ *  - CLOUDINARY_API_SECRET: Your Cloudinary API secret
+ *  doc utile :  - https://cloudinary.com/documentation/node_integration
+ *               - https://cloudinary.com/documentation/node_image_and_video_upload
+ *               - https://www.npmjs.com/package/cloudinary
+ *               - https://cloudinary.com/documentation/image_upload_api_reference
+ *               - https://github.com/cloudinary/cloudinary_npm?tab=readme-ov-file
+ */
 const cloudinary = require("cloudinary").v2;
 
 // Configuration
-console.log("🔧 Configuration Cloudinary:");
-console.log(
-  "  - CLOUDINARY_CLOUD_NAME:",
-  process.env.CLOUDINARY_CLOUD_NAME ? "Defined" : "Undefined"
-);
-console.log(
-  "  - CLOUDINARY_API_KEY:",
-  process.env.CLOUDINARY_API_KEY ? "Defined" : "Undefined"
-);
-console.log(
-  "  - CLOUDINARY_API_SECRET:",
-  process.env.CLOUDINARY_API_SECRET ? "Defined" : "Undefined"
-);
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -39,7 +45,6 @@ const uploadImage = async (filePath, options = {}) => {
       height: result.height,
     };
   } catch (error) {
-    console.error("Erreur upload Cloudinary:", error);
     return {
       success: false,
       error: error.message,
@@ -56,7 +61,6 @@ const deleteImage = async (public_id) => {
       message: `Image with public_id ${public_id} deleted successfully`,
     };
   } catch (error) {
-    console.error("Erreur suppression Cloudinary:", error);
     return {
       success: false,
       error: error.message,

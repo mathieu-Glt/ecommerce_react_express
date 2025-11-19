@@ -27,18 +27,8 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
     getAllCategories();
     getAllSubCategories();
   }, [getAllCategories, getAllSubCategories]);
-  console.log("Catégories disponibles :", categories);
-  console.log("Sous-catégories disponibles :", subCategories);
 
   const handleSearch = () => {
-    console.log("Filtres :", {
-      title,
-      minPrice,
-      maxPrice,
-      minRate,
-      maxRate,
-      categoryId,
-    });
     onSubmit({
       title,
       minPrice,
@@ -55,15 +45,15 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
     <div className="drawer-overlay" onClick={onClose}>
       <div
         className="drawer-panel"
-        onClick={(e) => e.stopPropagation()} // empêche la fermeture en cliquant à l'intérieur
+        onClick={(e) => e.stopPropagation()} // prevents closing when clicking inside
       >
         <button className="drawer-close" onClick={onClose}>
           ×
         </button>
-        <h2>🔍 Filtres produits</h2>
+        <h2>Product Filters</h2>
 
         <div className="form-group">
-          <label>Titre du produit</label>
+          <label>Product Title</label>
           <input
             type="text"
             placeholder="ex: nike-air-max"
@@ -95,7 +85,7 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
 
         <div className="form-group">
           <label>
-            Note : {minRate} – {maxRate}
+            Rating: {minRate} – {maxRate}
           </label>
           <input
             type="range"
@@ -116,12 +106,12 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
         </div>
 
         <div className="form-group">
-          <label>Catégorie</label>
+          <label>Category</label>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
           >
-            <option value="">Toutes les catégories</option>
+            <option value="">All Categories</option>
             {categories.map((cat) => (
               <option key={cat._id} value={cat._id}>
                 {cat.name}
@@ -130,12 +120,12 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
           </select>
         </div>
         <div className="form-group">
-          <label>Sous-catégorie</label>
+          <label>Subcategory</label>
           <select
             value={categoryId}
             onChange={(e) => setSubcategoryId(e.target.value)}
           >
-            <option value="">Toutes les sous catégories</option>
+            <option value="">All Subcategories</option>
             {subCategories.map((sub) => (
               <option key={sub._id} value={sub._id}>
                 {sub.name}
@@ -145,7 +135,7 @@ const SearchFilterDrawer: React.FC<SearchFilterDrawerProps> = ({
         </div>
 
         <button className="search-btn" onClick={handleSearch}>
-          Rechercher
+          Search
         </button>
       </div>
     </div>

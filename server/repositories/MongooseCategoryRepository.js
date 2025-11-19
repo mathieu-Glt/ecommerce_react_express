@@ -6,6 +6,8 @@ const ICategoryRepository = require("./ICategoryRepository");
  * This class handles all category-related database operations using
  * a Mongoose model. It extends the ICategoryRepository abstraction
  * to ensure the service layer does not depend on the database implementation.
+ * @extends {ICategoryRepository}
+ * @module repositories/MongooseCategoryRepository
  */
 class MongooseCategoryRepository extends ICategoryRepository {
   /**

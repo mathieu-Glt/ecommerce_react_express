@@ -6,15 +6,15 @@ import { Footer } from "../../components/footer/Footer";
 export const MainLayout = () => {
   return (
     <div className="main-layout">
-      {/* Header en haut */}
+      {/* Header at the top */}
       <Header />
 
       {/* Contenu dynamique (pages) */}
       <main className="main-content">
-        <Outlet /> {/* Toutes les pages de l'application s'affichent ici */}
+        <Outlet /> {/* All application pages are displayed here */}
       </main>
 
-      {/* Footer en bas */}
+      {/* Footer at the bottom */}
       <Footer />
     </div>
   );

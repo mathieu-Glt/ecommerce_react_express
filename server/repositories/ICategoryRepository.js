@@ -1,6 +1,9 @@
 /**
- * Interface/Abstraction pour le repository catégorie
- * Définit les méthodes que toutes les implémentations doivent avoir
+ * Interface/Abstraction for the category repository
+ * Set the methods that all implementations must have
+ * (e.g., Mongoose, MySQL) to manage categories.
+ *
+ * @interface ICategoryRepository
  */
 class ICategoryRepository {
   async findOrCreateCategory(categoryData) {

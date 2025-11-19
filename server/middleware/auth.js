@@ -28,6 +28,7 @@ const authService = new AuthService(userService.userRepository);
 const extractToken = (req) => {
   const authHeader = req.headers["authorization"];
   console.log("Authorization Header:", authHeader);
+  // Check for Bearer token format and extract token
   return authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 };
 
@@ -44,12 +45,9 @@ const extractToken = (req) => {
  * Call next() to continue to the next middleware/route.
  */
 const authenticateToken = async (req, res, next) => {
-  console.log("authenticateToken", req.headers);
-  console.log("Session data:", req.session);
   try {
     // Extract token from Authorization header
     const token = extractToken(req);
-    console.log("Extracted Token:", token);
 
     if (!token && !req.session?.user) {
       return res.status(401).json({ success: false, error: "Token required" });
@@ -59,7 +57,6 @@ const authenticateToken = async (req, res, next) => {
     if (token) {
       // Verify JWT token and decoded payload
       const tokenResult = authService.verifyToken(token);
-      console.log("Token verification result:", tokenResult);
       if (!tokenResult.success) {
         return res
           .status(403)
@@ -74,7 +71,6 @@ const authenticateToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error("Error authenticateToken:", error);
     res.status(500).json({ success: false, error: "Server error" });
   }
 };

@@ -14,8 +14,8 @@ import type { SubCategory } from "../../interfaces/subCategory.interface";
  * ===========================================================
  */
 export const fetchSubCategories = createAsyncThunk<
-  SubCategory[], // résultat attendu
-  void, // pas d’argument
+  SubCategory[],
+  void,
   { rejectValue: string }
 >("subCategories/fetchAll", async (_, thunkAPI) => {
   try {
@@ -23,8 +23,8 @@ export const fetchSubCategories = createAsyncThunk<
     if (!response.success) {
       return thunkAPI.rejectWithValue(response.message);
     }
-    // Certains endpoints renvoient un objet { results: [...] } ou { results: { subs: [...] } }
-    // Adapte si besoin selon la structure exacte
+    // Some endpoints return an object { results: [...] } or { results: { subs: [...] } }
+    // Adapt if needed according to the exact structure
     const results = Array.isArray(response.results)
       ? response.results
       : response.results?.subs || [];
@@ -74,7 +74,7 @@ export const fetchSubCategoryBySlug = createAsyncThunk<
     if (!response.success) {
       return thunkAPI.rejectWithValue(response.message);
     }
-    // La plupart du temps `results` contient directement le SubCategory
+    // Most of the time `results` directly contains the SubCategory
     return response.results as SubCategory;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(
@@ -135,7 +135,7 @@ export const updateExistingSubCategory = createAsyncThunk<
  * ===========================================================
  */
 export const deleteExistingSubCategory = createAsyncThunk<
-  string, // on renvoie le slug supprimé
+  string, // we return the deleted slug
   string, // argument = slug
   { rejectValue: string }
 >("subCategories/delete", async (slug, thunkAPI) => {

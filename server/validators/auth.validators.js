@@ -40,24 +40,25 @@ const { body, validationResult } = require("express-validator");
 // If no validation errors are found, it calls `next()` to proceed to the next middleware.
 
 const handleValidationErrors = (req, res, next) => {
-  console.log("=== VALIDATION CHECK ===");
-  console.log("req.body:", req.body);
-  console.log("req.body.email:", req.body.email);
+  // Retrieve validation errors from the request
+  // validationResult is a function from express-validator
   const errors = validationResult(req);
+
+  // Check if there are errors
   if (!errors.isEmpty()) {
-    console.log("❌ VALIDATION ERRORS:", errors.array());
+    // There are errors → Stop processing and return a response
     return res.status(400).json({
       success: false,
       errors: errors.array().map((error) => ({
-        field: error.path,
-        message: error.msg,
+        field: error.path, // The field with the error (e.g., "email")
+        message: error.msg, // The error message
       })),
     });
   }
-  console.log("✅ Validation passed");
+
+  // No errors → Continue to the next middleware
   next();
 };
-
 // Rules for validating user login requests.
 const loginValidation = [
   body("email").isEmail().withMessage("Email invalid").normalizeEmail(),

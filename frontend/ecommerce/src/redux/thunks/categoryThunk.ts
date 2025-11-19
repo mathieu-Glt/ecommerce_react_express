@@ -18,15 +18,14 @@ export const fetchCategories = createAsyncThunk<
   { rejectValue: string }
 >("categories/fetchAll", async (_, thunkAPI) => {
   try {
-    const response = await getCategories(); // ← tableau directement
-    console.log("Response in thunk:", response);
+    const response = await getCategories(); // ← array directly
 
-    // Si c’est bien un tableau, on le renvoie directement
+    // If it’s indeed an array, return it directly
     if (Array.isArray(response)) {
       return response;
     }
 
-    // Sinon on gère le cas d’erreur classique
+    // Otherwise handle the classic error case
     if (!response || !response.success) {
       return thunkAPI.rejectWithValue(
         response?.message || "Invalid response format"

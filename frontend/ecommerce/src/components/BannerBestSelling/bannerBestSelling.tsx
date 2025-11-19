@@ -24,7 +24,7 @@ export default function BannerBestSelling() {
           loop: true,
         }}
       />
-      {/* affichage meilleur vente produit */}
+      {/* best-selling product display */}
 
       <Carousel autoplay dots>
         {products.map((product) => (

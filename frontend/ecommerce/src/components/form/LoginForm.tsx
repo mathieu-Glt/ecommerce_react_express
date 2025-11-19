@@ -25,9 +25,7 @@ const LoginForm: React.FC<LoginProps> = ({
     rememberMe: false,
   };
 
-  console.log("Initial form values:", initialValues);
-
-  // Utilisation du hook useFormik au lieu du composant Formik
+  // Using the useFormik hook instead of the Formik component
   const formik = useFormik({
     initialValues,
     validationSchema: signInValidationSchema,
@@ -36,17 +34,8 @@ const LoginForm: React.FC<LoginProps> = ({
     validateOnBlur: true,
   });
 
-  console.log("Formik state:", {
-    values: formik.values,
-    errors: formik.errors,
-    touched: formik.touched,
-    isValid: formik.isValid,
-    dirty: formik.dirty,
-  });
-
   return (
     <div className="login-page-container">
-      {/* Formes d'arrière-plan animées */}
       <div className="login-background-shapes">
         <div className="shape shape-1"></div>
         <div className="shape shape-2"></div>
@@ -56,21 +45,21 @@ const LoginForm: React.FC<LoginProps> = ({
       {/* Card de login */}
       <div className="login-card-wrapper">
         <div className="login-card">
-          {/* Header avec logo */}
+          {/* Header with logo */}
           <div className="login-header">
             <div className="login-logo">
               <i className="bi bi-shield-lock-fill"></i>
             </div>
-            <h1 className="login-title">Bienvenue !</h1>
-            <p className="login-subtitle">Connectez-vous à votre compte</p>
+            <h1 className="login-title">Welcome!</h1>
+            <p className="login-subtitle">Log in to your account</p>
           </div>
 
-          {/* Formulaire de connexion */}
+          {/* Login form */}
           <div className="login-form-wrapper">
             {/* Global error from API */}
             {error && (
               <Alert variant="danger" dismissible className="mb-3">
-                <Alert.Heading>Erreur de connexion</Alert.Heading>
+                <Alert.Heading>Login Error</Alert.Heading>
                 <p>{error}</p>
               </Alert>
             )}

@@ -1,11 +1,30 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const { ObjectId } = mongoose.Schema.Types;
 
 /**
  * User Schema
  *
- * Gère l’authentification locale, Google et Azure.
+ * Manages local, Google, and Azure authentication.
+ * Stores user information including role and activation status .
+ *
+ * @typedef {Object} User
+ * @property {string} googleId - ID Google for OAuth2 authentication
+ * @property {string} azureId - ID Azure for OAuth2 authentication
+ * @property {string} accessToken - OAuth2 access token
+ * @property {string} refreshToken - OAuth2 refresh token
+ * @property {string} avatar - URL of the user's avatar
+ * @property {string} firstname - User's first name
+ * @property {string} lastname - User's last name (in uppercase)
+ * @property {string} picture - URL of the profile picture
+ * @property {string} email - User's unique email address (required)
+ * @property {Array} cart - User's cart contents
+ * @property {string} address - User's address
+ * @property {string} password - Hashed password (required if no AzureId or GoogleId)
+ * @property {string} role - User's role (admin or user)
+ * @property {boolean} isActive - User's activation status
+ * @property {Date} createdAt - Creation timestamp
+ * @property {Date} updatedAt - Last update timestamp
+ *
  */
 const userSchema = new mongoose.Schema(
   {

@@ -22,21 +22,18 @@ export default function AddCommentModal({
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  console.log("productId dans add comment :", productId);
-  console.log("params dans add comment :", params);
-  console.log("user dans add comment :", user?._id);
   const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!user?._id) {
-      message.warning("Vous devez être connecté pour laisser un commentaire.");
+      message.warning("You must be logged in to leave a comment.");
       return;
     }
 
     if (!rating || text.trim() === "") {
-      message.warning("Veuillez donner une note et écrire un commentaire.");
+      message.warning("Please provide a rating and write a comment.");
       return;
     }
 
@@ -52,12 +49,11 @@ export default function AddCommentModal({
       if (result.error) {
         throw new Error(result.error);
       }
-      result.success("✅ Commentaire ajouté avec succès !");
+      result.success("Comment added successfully!");
       setText("");
       setRating(0);
       onClose();
     } catch (err: any) {
-      console.error("❌ Erreur ajout commentaire :", err);
       message.error(err?.message || "Erreur lors de l’ajout du commentaire.");
     } finally {
       setLoading(false);
@@ -68,22 +64,22 @@ export default function AddCommentModal({
     <Modal
       open={open}
       onCancel={onClose}
-      title="📝 Laisser un avis"
+      title="Leave a review"
       footer={null}
       centered
       width={500}
       className="add-comment-modal"
     >
       <div className="add-comment-body">
-        <p className="text-gray-600 mb-2">Votre note :</p>
+        <p className="text-gray-600 mb-2">Your rating:</p>
         <Rate value={rating} onChange={setRating} />
 
-        <p className="text-gray-600 mt-4 mb-2">Votre commentaire :</p>
+        <p className="text-gray-600 mt-4 mb-2">Your comment:</p>
         <TextArea
           rows={4}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Partagez votre expérience..."
+          placeholder="Share your experience..."
         />
 
         <div className="flex justify-end gap-3 mt-5">

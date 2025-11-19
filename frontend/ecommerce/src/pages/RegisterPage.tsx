@@ -23,11 +23,10 @@ export const RegisterPage = () => {
   const { setUserStorage } = useLocalStorage<User | null>("user", null);
 
   const handleRegister = async (values: RegisterFormData): Promise<void> => {
-    console.log("Starting registration with values:", values);
     setValidated(true);
 
     try {
-      // Validation frontend des mots de passe
+      // Frontend validation of passwords
       if (values.password !== values.confirmPassword) {
         setErrors({ error: "Passwords do not match" });
         setValidated(false);
@@ -35,49 +34,40 @@ export const RegisterPage = () => {
       }
 
       const result = await register(values);
-      console.log("Registration result:", result);
-
-      // 🔍 DEBUG : Logger pour comprendre la structure
-      console.log("Result payload:", result.payload);
-      console.log("Result error:", result.error);
-      console.log("Full result:", JSON.stringify(result, null, 2));
 
       if (registerUser.fulfilled.match(result)) {
         const { user } = result.payload as ExtractRegisterResponse;
         setUserStorage(user);
         navigate("/login");
       } else {
-        // ✅ EXTRACTION ROBUSTE : Essayer plusieurs chemins possibles
+        // ✅ ROBUST EXTRACTION: Try multiple possible paths to get error message
         let errorMessage = "Registration failed";
 
-        // Chemin 1 : result.payload.error (format backend direct)
+        // Path 1: result.payload.error (direct backend format)
         if (result.payload?.error) {
           errorMessage = result.payload.error;
         }
-        // Chemin 2 : result.payload.message
+        // Path 2: result.payload.message
         else if (result.payload?.message) {
           errorMessage = result.payload.message;
         }
-        // Chemin 3 : result.payload est directement une string
+        // Path 3: result.payload is directly a string
         else if (typeof result.payload === "string") {
           errorMessage = result.payload;
         }
-        // Chemin 4 : result.error.message (Redux Toolkit)
+        // Path 4: result.error.message (Redux Toolkit)
         else if (result.error?.message) {
           errorMessage = result.error.message;
         }
-        // Chemin 5 : result.payload.data.error (réponse axios imbriquée)
+        // Path 5: result.payload.data.error (nested axios response)
         else if ((result.payload as any)?.data?.error) {
           errorMessage = (result.payload as any).data.error;
         }
-
-        console.log("Extracted error message:", errorMessage);
 
         setErrors({ error: errorMessage });
         setValidated(false);
       }
     } catch (err) {
-      console.error("Unexpected error during registration:", err);
       setErrors({
         error:
           err instanceof Error ? err.message : "An unexpected error occurred",
@@ -103,10 +93,8 @@ export const RegisterPage = () => {
               {/* Icône de création de compte - utilisez Bootstrap Icons */}
               <i className="bi bi-person-plus-fill"></i>
             </div>
-            <h1 className="register-title">Créez votre compte</h1>
-            <p className="register-subtitle">
-              Rejoignez-nous dès aujourd'hui !
-            </p>
+            <h1 className="register-title">Create your account</h1>
+            <p className="register-subtitle">Join us today!</p>
           </div>
 
           {/* Formulaire d'inscription */}

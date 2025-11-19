@@ -12,18 +12,15 @@ import { fetchCsrfToken } from "./hooks/useApi";
 
 function AppContent() {
   const { openBarFilter, toggleBarFilter, onSubmitSearchBar } = useFilter();
-
-  // ✅ CORRECTION : Déplacer dans useEffect avec []
-  useEffect(() => {
-    fetchCsrfToken()
-      .then(() => {
-        console.log("✅ CSRF token fetched on app load");
-        console.log("🍪 Cookies:", document.cookie);
-      })
-      .catch((error) => {
-        console.error("❌ Error fetching CSRF token on app load:", error);
-      });
-  }, []); // ✅ Tableau vide - n'exécuter qu'UNE SEULE FOIS
+  let fetchCount = 0;
+  // useEffect(() => {
+  //   fetchCount++;
+  //   fetchCsrfToken()
+  //     .then((token) => {
+  //     })
+  //     .catch((error) => {
+  //     });
+  // }, []);
 
   return (
     <>

@@ -27,7 +27,6 @@ class ResetPasswordServiceFactory {
       );
       return new ResetPasswordService(passwordResetRepository);
     } catch (error) {
-      console.error("Error creating Mongoose reset password service:", error);
       throw new Error("Failed to create Mongoose reset password service");
     }
   }
@@ -56,7 +55,6 @@ class ResetPasswordServiceFactory {
       );
       return new ResetPasswordService(passwordResetRepository);
     } catch (error) {
-      console.error("Error creating MySQL reset password service:", error);
       throw new Error("Failed to create MySQL reset password service");
     }
   }
@@ -70,19 +68,12 @@ class ResetPasswordServiceFactory {
    * @returns {ResetPasswordService} An instance of ResetPasswordService with the appropriate repository
    */
   static createResetPasswordService(databaseType = "mongoose") {
-    console.log(
-      `Creating reset password service with database type: ${databaseType}`
-    );
-
     switch (databaseType.toLowerCase()) {
       case "mongoose":
         return this.createMongooseResetPasswordService();
       case "mysql":
         return this.createMySQLResetPasswordService();
       default:
-        console.warn(
-          `Unsupported database type: ${databaseType}, falling back to mongoose`
-        );
         return this.createMongooseResetPasswordService();
     }
   }

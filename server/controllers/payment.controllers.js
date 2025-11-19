@@ -3,6 +3,22 @@
  *
  * Gère les paiements via Stripe et PayPal
  * et génère la facture PDF après succès.
+ * doc utile:  - https://docs.stripe.com/payments/checkout/how-checkout-works
+ *             - https://stripe.com/docs/api/checkout/sessions/create
+ *             -  https://docs.stripe.com/api/checkout/sessions/create?lang=node
+ *              - https://docs.stripe.com/api/checkout/sessions/retrieve?lang=node
+ *             -  https://docs.stripe.com/payments/quickstart-checkout-sessions
+ *             -       https://developer.paypal.com/docs/checkout/
+ *             -  https://developer.paypal.com/docs/api/orders/v2/
+ *              - https://developer.paypal.com/api/rest/integration/orders-api/
+ *              - https://developer.paypal.com/api/rest/integration/orders-api/api-use-cases/standard/
+ *              - https://github.com/paypal/PayPal-TypeScript-Server-SDK/blob/2.0.0/doc/controllers/orders.md
+ *              -  https://github.com/paypal/PayPal-TypeScript-Server-SDK/tree/2.0.0
+ *               https://www.npmjs.com/package/@hyperse/paypal-node-sdk
+ * https://docs.paypal.ai/reference/api/rest/orders/create-order
+ *
+ * @module controllers/payment.controller
+ *
  */
 
 const path = require("path");
@@ -15,15 +31,18 @@ require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const paypalClientId = process.env.CLIENT_ID_PAYPAL;
 const paypalSecret = process.env.CLIENT_SECRET_PAYPAL;
-const PAYPAL_BASE = "https://api-m.sandbox.paypal.com"; // sandbox pour tests
+const PAYPAL_BASE = "https://api-m.sandbox.paypal.com"; // sandbox for test
 
 /* ============================================================
-   ✅ STRIPE - Création de la session de paiement
+   STRIPE - Creation of the payment session
 ============================================================ */
 exports.createCheckoutSession = asyncHandler(async (req, res) => {
+  const userId = req.user?.userId;
   try {
     const { items } = req.body; // [{ name, price, quantity }]
-    console.log("Creating Stripe checkout session for items:", items);
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -44,13 +63,12 @@ exports.createCheckoutSession = asyncHandler(async (req, res) => {
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error("Stripe session error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
 /* ============================================================
-   ✅ STRIPE - Génération facture après succès
+   STRIPE - Invoice generation after success
 ============================================================ */
 exports.stripeSuccess = asyncHandler(async (req, res) => {
   const { session_id } = req.query;
@@ -79,7 +97,7 @@ exports.stripeSuccess = asyncHandler(async (req, res) => {
     const filePath = path.join(__dirname, "..", "invoices", fileName);
     generateInvoice(order, filePath);
 
-    // Attente que la facture soit bien écrite sur le disque
+    // Wait for the invoice to be fully written to disk
     await new Promise((resolve, reject) => {
       const check = setInterval(() => {
         if (fs.existsSync(filePath)) {
@@ -93,24 +111,21 @@ exports.stripeSuccess = asyncHandler(async (req, res) => {
       }, 5000);
     });
 
-    // ✅ Redirige vers le front avec l'URL de la facture en paramètre
+    // Redirect to the frontend with the invoice URL as a parameter
     const redirectUrl = `${
       process.env.FRONTEND_URL || "http://localhost:5173"
     }/merci?invoice=${fileName}`;
-    console.log("✅ Redirection vers :", redirectUrl);
     res.redirect(redirectUrl);
   } catch (err) {
-    console.error("Erreur génération facture Stripe:", err);
-    res.status(500).send("Erreur lors du traitement du paiement.");
+    res.status(500).send("Error processing payment.");
   }
 });
 
 /* ============================================================
-   🟢 PAYPAL - Création de la commande
+   PAYPAL - Creation of the order
 ============================================================ */
 exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
   const { amount } = req.body;
-  console.log("Initiating Paypal payment for amount:", amount);
 
   try {
     const auth = Buffer.from(`${paypalClientId}:${paypalSecret}`).toString(
@@ -127,7 +142,6 @@ exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
     });
 
     const tokenData = await tokenRes.json();
-    console.log("Paypal access token obtained:", tokenData);
 
     const orderRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
       method: "POST",
@@ -153,11 +167,9 @@ exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
     });
 
     const orderData = await orderRes.json();
-    console.log("Paypal order created:", orderData);
 
     res.json({ success: true, id: orderData.id });
   } catch (err) {
-    console.error("Paypal checkout error:", err);
     res.status(500).json({
       success: false,
       message: "Paypal checkout failed",
@@ -167,7 +179,7 @@ exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
 });
 
 /* ============================================================
-   🟢 PAYPAL - Capture du paiement et génération de facture
+   PAYPAL - Capture of the payment and invoice generation
 ============================================================ */
 // exports.capturePaypalPayment = asyncHandler(async (req, res) => {
 //   const { token } = req.query;
@@ -257,14 +269,13 @@ exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
 
 exports.capturePaypalPayment = async (req, res) => {
   const { token: orderId } = req.query;
-  console.log("📌 Capture PayPal pour l’ordre :", orderId);
 
   try {
     const auth = Buffer.from(`${paypalClientId}:${paypalSecret}`).toString(
       "base64"
     );
 
-    // 🔹 1. Obtenir un token d’accès PayPal
+    // Obtain a PayPal access token
     const tokenRes = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
       method: "POST",
       headers: {
@@ -275,7 +286,7 @@ exports.capturePaypalPayment = async (req, res) => {
     });
     const tokenData = await tokenRes.json();
 
-    // 🔹 2. Capturer le paiement
+    // Capture the payment
     const captureRes = await fetch(
       `${PAYPAL_BASE}/v2/checkout/orders/${orderId}/capture`,
       {
@@ -288,9 +299,8 @@ exports.capturePaypalPayment = async (req, res) => {
     );
 
     const captureData = await captureRes.json();
-    console.log("💰 Capture PayPal :", captureData);
 
-    // 🔹 3. Vérifier le statut
+    // Verify the status of the capture
     if (captureData.status === "COMPLETED") {
       const payer = captureData.payer || {};
       const name = payer.name
@@ -317,28 +327,24 @@ exports.capturePaypalPayment = async (req, res) => {
         total: parseFloat(capture.amount?.value || 0),
       };
 
-      // 🔹 4. Générer la facture
+      // Generate the invoice
       const fileName = `invoice-${Date.now()}.pdf`;
       const filePath = path.join(__dirname, "..", "invoices", fileName);
       await generateInvoice(order, filePath);
 
-      console.log("✅ Facture générée :", filePath);
-
-      // 🔹 5. Rediriger le client
+      // Redirect the client
       const redirectUrl = `${
         process.env.FRONTEND_URL || "http://localhost:5173"
       }/merci-paypal?invoice=${fileName}`;
 
-      console.log("🚀 Redirection vers :", redirectUrl);
       return res.redirect(redirectUrl);
     }
 
-    // Si le paiement n'est pas complété
+    // If the payment is not completed
     return res
       .status(400)
-      .json({ success: false, error: "Paiement non complété" });
+      .json({ success: false, error: "Payment not completed" });
   } catch (err) {
-    console.error("Paypal capture error:", err);
     if (!res.headersSent) {
       return res.status(500).json({
         success: false,

@@ -7,6 +7,10 @@ const mongoose = require("mongoose");
  * This class handles all product-related database operations using
  * a Mongoose model. It extends the IProductRepository abstraction
  * to ensure the service layer does not depend on the database implementation.
+ * @extends {IProductRepository}
+ * @module repositories/MongooseProductRepository
+ *
+ *
  */
 class MongooseProductRepository extends IProductRepository {
   /**
@@ -36,10 +40,10 @@ class MongooseProductRepository extends IProductRepository {
    */
   async getLatestProducts(limit) {
     return await this.Product.find()
-      .populate("category", "name slug") // Replace the category ID with an object containing only `name` and `slug` of Entity Category in related collection
-      .populate("sub", "name slug") // Same for the field `sub`
-      .sort({ createdAt: -1 })
-      .limit(limit)
+      .populate("category", "name slug") // JOINTURE Replace the category ID with an object containing only `name` and `slug` of Entity Category in related collection
+      .populate("sub", "name slug") // jointure Same for the field `sub`
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .limit(limit) // If limit equals 3, take the last 3 products
       .exec();
   }
 
@@ -49,9 +53,9 @@ class MongooseProductRepository extends IProductRepository {
    */
   async getTopRatedProductsRepo(limit) {
     return await this.Product.find()
-      .populate("category", "name slug")
-      .populate("sub", "name slug")
-      .sort({ "rating.average": -1 })
+      .populate("category", "name slug") // JOINTURE Replace the category ID with an object containing only `name` and `slug` of Entity Category in related collection
+      .populate("sub", "name slug") // jointure Same for the field `sub`
+      .sort({ "rating.average": -1 }) // Sort by average rating descending from highest to lowest
       .limit(limit)
       .exec();
   }
@@ -60,11 +64,11 @@ class MongooseProductRepository extends IProductRepository {
    * @param {number} limit - Number of products to retrieve
    * @returns {Promise<Array>} Array of matching product documents
    */
-  async getProductsByCategoryAccessories(limit) {
+  async getProductsByCategoryAccessories(limit, categoryId) {
     const accessoriesCategoryId = new mongoose.Types.ObjectId(
       "68af139bad37cf7ede6bd1ef"
-    ); // Remplacez par l'ID réel de la catégorie "accessories"
-    return await this.Product.find({ category: accessoriesCategoryId })
+    ); // Replace with the actual ID of the "accessories" category
+    return await this.Product.find({ category: categoryId })
       .populate("category", "name slug")
       .populate("sub", "name slug")
       .limit(limit)
@@ -76,11 +80,11 @@ class MongooseProductRepository extends IProductRepository {
    * @param {number} limit - Number of products to retrieve
    * @returns {Promise<Array>} Array of matching product documents
    */
-  async getProductsByCategoryOutillage(limit) {
+  async getProductsByCategoryOutillage(limit, categoryId) {
     const outillageCategoryId = new mongoose.Types.ObjectId(
       "68b1a8a7ee346bc5b9809b51"
-    ); // Remplacez par l'ID réel de la catégorie "outillage"
-    return await this.Product.find({ category: outillageCategoryId })
+    ); // Replace with the actual ID of the "outillage" category
+    return await this.Product.find({ category: categoryId })
       .populate("category", "name slug")
       .populate("sub", "name slug")
       .limit(limit)
@@ -95,20 +99,20 @@ class MongooseProductRepository extends IProductRepository {
   async findProductsByPriceRangeRepo(minPrice, maxPrice) {
     const query = {};
 
-    // Ne construire la clé price que si on a des valeurs
+    // Only build the price key if we have values
     if (minPrice !== undefined || maxPrice !== undefined) {
       const priceQuery = {};
-      if (minPrice !== undefined) priceQuery.$gte = Number(minPrice);
-      if (maxPrice !== undefined) priceQuery.$lte = Number(maxPrice);
-      query.price = priceQuery;
+      if (minPrice !== undefined) priceQuery.$gte = Number(minPrice); // Ensure it's a number and not a string $gte for "greater than or equal"
+      if (maxPrice !== undefined) priceQuery.$lte = Number(maxPrice); // $lte for "less than or equal"
+      query.price = priceQuery; // Add the price key to the main query so priceQuery contains $gte and/or $lte
+      // ex: { price: { $gte: 100, $lte: 500 } } so priceQuery = { $gte: 100, $lte: 500 }
     }
 
-    const results = await this.Product.find(query)
-      .populate("category", "name slug")
-      .populate("sub", "name slug")
+    const results = await this.Product.find(query) // this.Product.find({ price: { $gte: minPrice, $lte: maxPrice } })
+      .populate("category", "name slug") // Replace the category ID with an object containing only `name` and `slug` of Entity Category in related collection
+      .populate("sub", "name slug") // Same for the field `sub`
       .exec();
 
-    console.log("Products found in price range - mongoose repo:", results);
     return results;
   }
 
@@ -143,22 +147,23 @@ class MongooseProductRepository extends IProductRepository {
   }) {
     const matchStage = {};
 
-    if (minRate !== undefined) matchStage.avgRating = { $gte: minRate };
+    if (minRate !== undefined) matchStage.avgRating = { $gte: minRate }; // If minRate is defined
     if (maxRate !== undefined)
-      matchStage.avgRating = { ...(matchStage.avgRating || {}), $lte: maxRate };
-
-    const skip = (page - 1) * limit;
+      // If maxRate is defined
+      matchStage.avgRating = { ...(matchStage.avgRating || {}), $lte: maxRate }; // Copy the existing object if there is minRate and add $lte
+    // ex: { avgRating: { $gte: 3, $lte: 5 } } or just { avgRating: { $lte: 5 } } or { avgRating: { $gte: 3 } }
+    const skip = (page - 1) * limit; // Calculate the number of documents to skip for pagination page - 1 because page 1 should skip 0 documents
 
     const products = await this.Product.aggregate([
-      // Calculer la moyenne des notes
+      // Calculate the average rating
       {
         $addFields: {
-          avgRating: { $avg: "$rating.star" },
+          avgRating: { $avg: "$rating.star" }, // Add an avgRating field and calculate the average of stars in the rating array
         },
       },
-      // Filtrer par min/max
+      // Filter by min/max
       { $match: matchStage },
-      // Lookup category
+      // Lookup Join with another collection category
       {
         $lookup: {
           from: "categories",
@@ -167,7 +172,8 @@ class MongooseProductRepository extends IProductRepository {
           as: "categoryInfo",
         },
       },
-      { $unwind: "$categoryInfo" },
+      { $unwind: "$categoryInfo" }, // Unwind the resulting array: assuming there is only one category per product e.g., categoryInfo: [ { name: "Electronics", slug: "electronics" } ] becomes categoryInfo: { name: "Electronics", slug: "electronics" }
+      // So flattening an array means taking the first element of the array and putting it directly at the root of the document e.g., { categoryInfo: [ {...} ] } => { categoryInfo: {...} }
       // Lookup sub-category
       {
         $lookup: {
@@ -178,7 +184,7 @@ class MongooseProductRepository extends IProductRepository {
         },
       },
       { $unwind: "$subInfo" },
-      // Trier
+      // Sort by given field and order ascending or descending
       { $sort: { [sortField]: sortOrder } },
       // Pagination
       { $skip: skip },
@@ -195,10 +201,10 @@ class MongooseProductRepository extends IProductRepository {
    * @returns {Promise<Array>} Array of matching product documents
    */
   async findProductsByCategoryIdRepo(categoryId) {
-    // On récupère les produits liés à cette catégorie
+    // We retrieve the products related to this category
     const products = await this.Product.find({ category: categoryId })
-      .populate("category", "name slug") // optionnel : pour avoir le nom et slug de la catégorie
-      .populate("sub", "name slug"); // optionnel : pour les sous-catégories
+      .populate("category", "name slug") // optional: to get the name and slug of the category
+      .populate("sub", "name slug"); // optional: for subcategories
     return products;
   }
 
@@ -209,9 +215,9 @@ class MongooseProductRepository extends IProductRepository {
    * @returns {Promise<Array>} Array of matching product documents
    */
   async findProductsBySubCategoryIdRepo(subsCategoryId) {
-    // On récupère les produits liés à cette sous-catégorie
+    // We retrieve the products related to this subcategory
     const products = await this.Product.find({ sub: subsCategoryId })
-      .populate("category", "name slug") // optionnel : pour avoir le nom et slug de la catégorie
+      .populate("category", "name slug") // optional: to get the name and slug of the category
       .populate("sub", "name slug");
     return products;
   }
@@ -225,13 +231,12 @@ class MongooseProductRepository extends IProductRepository {
     const products = await this.Product.find()
       .populate("category", "name slug")
       .populate("sub", "name slug")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 }); // Sort by creation date descending, most recent first
 
     return products.map((product) => {
-      const prod = product.toJSON();
-      console.log("Processing product:", prod);
+      const prod = product.toJSON(); // Convert the Mongoose document to a plain JavaScript object, the opposite would be product.toObject() which also converts to a plain JS object
 
-      // Images : ajouter le préfixe si nécessaire
+      // Pictures: add prefix if necessary
       if (prod.images && prod.images.length > 0) {
         prod.images = prod.images.map((image) => {
           if (!image.startsWith("/uploads/") && !image.startsWith("http")) {
@@ -241,11 +246,11 @@ class MongooseProductRepository extends IProductRepository {
         });
       }
 
-      // ⚡ Assurer que averageRating et commentsCount sont toujours des nombres
+      // Ensure that averageRating and commentsCount are always numbers
       if (!prod.rating || prod.rating.length === 0) {
         prod.averageRating = 0;
       } else {
-        // Calculer la moyenne uniquement si item.star existe
+        // Calculate the average only if item.star exists
         const total = prod.rating.reduce(
           (acc, item) => acc + (item.star || 0),
           0
@@ -266,10 +271,8 @@ class MongooseProductRepository extends IProductRepository {
    * @returns {Promise<Object|null>} Product document or null if not found
    */
   async getProductBySlug(slug) {
-    console.log("Repository - getProductBySlug called with slug:", slug);
-
     const products = await this.Product.find({
-      slug: { $regex: slug, $options: "i" },
+      slug: { $regex: slug, $options: "i" }, // case-insensitive search "i"
     })
       .populate("category", "name slug")
       .populate("sub", "name slug");
@@ -278,7 +281,7 @@ class MongooseProductRepository extends IProductRepository {
       return null;
     }
 
-    // Formater les images pour chaque produit
+    // Format images for each product
     products.forEach((p) => {
       if (p?.images?.length > 0) {
         p.images = p.images.map((image) => {
@@ -290,7 +293,7 @@ class MongooseProductRepository extends IProductRepository {
       }
     });
 
-    return products; // tableau de produits correspondant à la recherche
+    return products; // array of products matching the search
   }
 
   /**
@@ -301,8 +304,6 @@ class MongooseProductRepository extends IProductRepository {
    */
 
   async getProductByTitle(title) {
-    console.log("Repository - getProductByTitle called with title:", title);
-
     const products = await this.Product.find({
       title: { $regex: title, $options: "i" },
     })
@@ -313,7 +314,7 @@ class MongooseProductRepository extends IProductRepository {
       return null;
     }
 
-    // Formater les images pour chaque produit
+    // Format images for each product
     products.forEach((p) => {
       if (p?.images?.length > 0) {
         p.images = p.images.map((image) => {
@@ -394,25 +395,26 @@ class MongooseProductRepository extends IProductRepository {
     if (!product) return null;
 
     const existingRating = product.rating.find(
-      (r) => r.postedBy.toString() === userId.toString()
+      (r) => r.postedBy.toString() === userId.toString() // To compare ObjectId as strings to check if the user has already rated the product
     );
 
     if (existingRating) {
-      existingRating.star = star; // Met à jour l'utilisateur seulement
+      existingRating.star = star; // Update the user's rating only
     } else {
-      // Si tu veux, tu peux aussi ajouter une nouvelle note si l'utilisateur n'a jamais noté
+      // If you want, you can also add a new rating if the user has never rated before
       product.rating.push({ star, postedBy: userId });
     }
 
     await product.save();
 
+    // Return an object with "clean" rating if you want to avoid _id in the front
     const sanitizedRatings = product.rating.map((r) => ({
       star: r.star,
       postedBy: r.postedBy,
     }));
 
     return {
-      ...product.toObject(), // toObject() convertit le document Mongoose en objet JavaScript "pur"
+      ...product.toObject(), // toObject() converts the Mongoose document to a "plain" JavaScript object
       rating: sanitizedRatings,
     };
   }
@@ -429,19 +431,19 @@ class MongooseProductRepository extends IProductRepository {
     const product = await this.Product.findById(productId);
     if (!product) return null;
 
-    // On pousse simplement la nouvelle note sans toucher aux anciennes
+    // We simply push the new rating without touching the old ones
     product.rating.push({ star, postedBy: userId });
 
     await product.save();
 
-    // Retourner un objet avec rating "propre" si tu veux éviter les _id dans le front
+    // Return an object with "clean" rating if you want to avoid _id in the front
     const sanitizedRatings = product.rating.map((r) => ({
       star: r.star,
       postedBy: r.postedBy,
     }));
 
     return {
-      ...product.toObject(), // toObject() convertit le document
+      ...product.toObject(), // toObject() converts the Mongoose document to a "plain" JavaScript object
       rating: sanitizedRatings,
     };
   }
@@ -453,30 +455,20 @@ class MongooseProductRepository extends IProductRepository {
    * @returns {Promise<Object|null>} Updated product document or null if not found
    */
   async takeRatingFromProductRepo(productId, userId) {
-    console.log(
-      "Repository - takeRatingFromProductRepo called: ",
-      productId,
-      userId
-    );
-
     const product = await this.Product.findById(productId);
-    console.log("Repository - Product fetched: ", product);
     if (!product || !product.rating) {
-      console.log("Repository - Product not found");
       return null;
     }
 
-    // Cherche la note de l'utilisateur
+    // Find the user's rating
     const userRating = product.rating.find(
       (r) => r.postedBy.toString() === userId
     );
 
     if (!userRating) {
-      console.log("Repository - User has not rated this product yet");
-      return null; // Important pour éviter l'erreur 500
+      return null; // Important to avoid 500 error
     }
 
-    console.log("Repository - User rating found: ", userRating);
     return userRating;
   }
 }

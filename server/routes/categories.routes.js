@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Middlewares
-const { requireRole } = require("../middleware/auth");
+const { requireRole, authenticateToken } = require("../middleware/auth");
 
 // Controllers
 const {
@@ -52,7 +52,12 @@ router.get("/categories/id/:id", getCategoryById);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.post("/categories", requireRole(["admin"]), createCategory);
+router.post(
+  "/categories",
+  authenticateToken,
+  requireRole(["admin"]),
+  createCategory
+);
 
 /**
  * @route PUT /category/:id
@@ -60,7 +65,12 @@ router.post("/categories", requireRole(["admin"]), createCategory);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.put("/categories/:id", requireRole(["admin"]), updateCategory);
+router.put(
+  "/categories/:id",
+  authenticateToken,
+  requireRole(["admin"]),
+  updateCategory
+);
 
 /**
  * @route DELETE /category/:id
@@ -68,6 +78,11 @@ router.put("/categories/:id", requireRole(["admin"]), updateCategory);
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
-router.delete("/categories/:id", requireRole(["admin"]), deleteCategory);
+router.delete(
+  "/categories/:id",
+  authenticateToken,
+  requireRole(["admin"]),
+  deleteCategory
+);
 
 module.exports = router;

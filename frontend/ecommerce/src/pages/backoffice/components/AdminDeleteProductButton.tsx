@@ -26,8 +26,7 @@ const AdminProductDeletePage = () => {
       setLoadingProduct(true);
       await getProduct(productId);
     } catch (err) {
-      console.error("❌ Error fetching product:", err);
-      setError("Erreur lors du chargement du produit");
+      setError("Error occurred while loading the product");
     } finally {
       setLoadingProduct(false);
     }
@@ -39,12 +38,12 @@ const AdminProductDeletePage = () => {
 
     // Double confirmation
     const confirmed = window.confirm(
-      `⚠️ Êtes-vous ABSOLUMENT SÛR de vouloir supprimer "${product?.title}" ?\n\n` +
-        "Cette action est IRRÉVERSIBLE et supprimera :\n" +
-        "- Le produit\n" +
-        "- Toutes ses images\n" +
-        "- Tous les avis associés\n\n" +
-        "Tapez OK pour confirmer."
+      `⚠️ Are you ABSOLUTELY SURE you want to delete "${product?.title}"?\n\n` +
+        "This action is IRREVERSIBLE and will delete:\n" +
+        "- The product\n" +
+        "- All its images\n" +
+        "- All associated reviews\n\n" +
+        "Type OK to confirm."
     );
 
     if (!confirmed) return;
@@ -53,20 +52,18 @@ const AdminProductDeletePage = () => {
     setError("");
 
     try {
-      console.log("🗑️ Deleting product with ID:", id);
       const success = await deleteProduct(id);
 
       if (success) {
         // Redirection immédiate vers la liste
         navigate("/admin/products", {
-          state: { message: "Produit supprimé avec succès" },
+          state: { message: "Product deleted successfully" },
         });
       } else {
-        setError("Échec de la suppression du produit");
+        setError("Failed to delete the product");
       }
     } catch (err: any) {
-      console.error("❌ Error deleting product:", err);
-      setError(err?.message || "Erreur lors de la suppression du produit");
+      setError(err?.message || "Error occurred while deleting the product");
     } finally {
       setLoading(false);
     }
@@ -82,8 +79,8 @@ const AdminProductDeletePage = () => {
     return (
       <div className="product-create-page">
         <div className="page-header">
-          <h1>⏳ Chargement...</h1>
-          <p>Chargement du produit en cours...</p>
+          <h1>⏳ Loading...</h1>
+          <p>Loading product...</p>
         </div>
       </div>
     );
@@ -94,14 +91,14 @@ const AdminProductDeletePage = () => {
     return (
       <div className="product-create-page">
         <div className="page-header">
-          <h1>❌ Produit non trouvé</h1>
-          <p>Le produit que vous cherchez n'existe pas.</p>
+          <h1>❌ Product not found</h1>
+          <p>The product you are looking for does not exist.</p>
         </div>
         <button
           className="btn btn-primary"
           onClick={() => navigate("/admin/products")}
         >
-          Retour à la liste
+          Back to list
         </button>
       </div>
     );
@@ -111,11 +108,11 @@ const AdminProductDeletePage = () => {
   return (
     <div className="product-create-page">
       <div className="page-header">
-        <h1>🗑️ Supprimer le produit</h1>
-        <p>Confirmez la suppression de ce produit</p>
+        <h1>🗑️ Delete Product</h1>
+        <p>Confirm the deletion of this product</p>
       </div>
 
-      {/* Message d'erreur */}
+      {/* Error Message */}
       {error && (
         <div className="alert alert-error">
           <span className="alert-icon">❌</span>
@@ -123,21 +120,20 @@ const AdminProductDeletePage = () => {
         </div>
       )}
 
-      {/* Avertissement */}
+      {/* Warning */}
       <div className="alert alert-error" style={{ marginBottom: "2rem" }}>
         <span className="alert-icon">⚠️</span>
         <div>
-          <strong>ATTENTION : Cette action est irréversible !</strong>
+          <strong>WARNING: This action is irreversible!</strong>
           <p style={{ marginTop: "0.5rem", marginBottom: 0 }}>
-            La suppression de ce produit entraînera également la suppression de
-            toutes ses images, avis et données associées.
+            Deleting this product will also delete all its images, reviews, and associated data.
           </p>
         </div>
       </div>
 
-      {/* Détails du produit à supprimer */}
+      {/* Product details to delete */}
       <div className="form-section">
-        <h2 className="section-title">📝 Informations du produit</h2>
+        <h2 className="section-title">📝 Product Information</h2>
 
         <div style={{ display: "grid", gap: "1rem" }}>
           <div>
@@ -146,32 +142,32 @@ const AdminProductDeletePage = () => {
           </div>
 
           <div>
-            <strong>Prix :</strong>
+            <strong>Price:</strong>
             <p>{product.price} €</p>
           </div>
 
           <div>
-            <strong>Description :</strong>
+            <strong>Description:</strong>
             <p>{product.description}</p>
           </div>
 
           <div>
-            <strong>Marque :</strong>
+            <strong>Brand:</strong>
             <p>{product.brand}</p>
           </div>
 
           <div>
-            <strong>Couleur :</strong>
+            <strong>Color:</strong>
             <p>{product.color}</p>
           </div>
 
           <div>
-            <strong>Quantité en stock :</strong>
+            <strong>Stock Quantity:</strong>
             <p>{product.quantity}</p>
           </div>
 
           <div>
-            <strong>Livraison :</strong>
+            <strong>Shipping:</strong>
             <p>
               {product.shipping === "Yes" ? "Disponible" : "Non disponible"}
             </p>
@@ -191,10 +187,10 @@ const AdminProductDeletePage = () => {
             </div>
           )}
 
-          {/* Note moyenne */}
+          {/* Average Rating */}
           {product.averageRating !== undefined && (
             <div>
-              <strong>Note moyenne :</strong>
+              <strong>Average Rating:</strong>
               <p>
                 {product.averageRating > 0
                   ? `⭐ ${product.averageRating.toFixed(1)} / 5`
@@ -203,11 +199,11 @@ const AdminProductDeletePage = () => {
             </div>
           )}
 
-          {/* Nombre d'avis */}
+          {/* Number of Reviews */}
           {product.rating && product.rating.length > 0 && (
             <div>
-              <strong>Nombre d'avis :</strong>
-              <p>{product.rating.length} avis</p>
+              <strong>Number of Reviews:</strong>
+              <p>{product.rating.length} reviews</p>
             </div>
           )}
         </div>
@@ -221,7 +217,7 @@ const AdminProductDeletePage = () => {
           onClick={handleCancel}
           disabled={loading}
         >
-          ← Annuler
+          ← Cancel
         </button>
         <button
           type="button"
@@ -236,18 +232,18 @@ const AdminProductDeletePage = () => {
           {loading ? (
             <>
               <span className="spinner"></span>
-              Suppression en cours...
+              Deletion in progress...
             </>
           ) : (
             <>
               <span>🗑️</span>
-              Supprimer définitivement
+              Delete permanently
             </>
           )}
         </button>
       </div>
 
-      {/* Informations supplémentaires */}
+      {/* Additional Information */}
       <div
         style={{
           marginTop: "2rem",
@@ -260,12 +256,11 @@ const AdminProductDeletePage = () => {
           ℹ️ Informations
         </h3>
         <ul style={{ marginBottom: 0, paddingLeft: "1.5rem" }}>
-          <li>Cette suppression est définitive et ne peut pas être annulée</li>
-          <li>Les images seront supprimées de Cloudinary</li>
-          <li>Les avis clients associés seront perdus</li>
+          <li>This deletion is permanent and cannot be undone</li>
+          <li>Images will be deleted from Cloudinary</li>
+          <li>Associated customer reviews will be lost</li>
           <li>
-            L'historique des commandes conservera une référence au produit
-            supprimé
+            The order history will retain a reference to the deleted product
           </li>
         </ul>
       </div>

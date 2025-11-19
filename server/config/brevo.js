@@ -1,7 +1,11 @@
 /**
  * @file brevoEmails.js
  * @description
+ * @module brevoEmails
  * Module for sending transactional emails (reset password + welcome) using Brevo API with EJS templates.
+ * doc utile : - https://github.com/getbrevo/brevo-node
+ *             - https://developers.brevo.com/reference/sendtransacemail
+ *
  */
 
 const Brevo = require("@getbrevo/brevo");
@@ -24,9 +28,6 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
  */
 const sendResetEmail = async (toEmail, name, resetLink) => {
   try {
-    console.log("📧 [Welcome Email] Starting...");
-    console.log("📧 [Welcome Email] To:", toEmail);
-    console.log("📧 [Welcome Email] Name:", name);
     // Render EJS template
     const htmlContent = await renderTemplate("resetPassword", {
       name,
@@ -35,7 +36,6 @@ const sendResetEmail = async (toEmail, name, resetLink) => {
       logoUrl: LOGO_URL,
     });
 
-    console.log("✅ [Welcome Email] Template rendered successfully");
 
     // Plain text fallback
     const textContent = `
@@ -63,10 +63,8 @@ ${APP_NAME} Support Team
     email.htmlContent = htmlContent;
 
     const response = await emailAPI.sendTransacEmail(email);
-    console.log("Reset email sent:", response);
     return { success: true };
   } catch (err) {
-    console.error("Error sending reset email:", err);
     return { success: false, error: err.message };
   }
 };
@@ -119,10 +117,8 @@ This email was sent to ${toEmail}
     email.htmlContent = htmlContent;
 
     const response = await emailAPI.sendTransacEmail(email);
-    console.log("Welcome email sent:", response);
     return { success: true };
   } catch (err) {
-    console.error("Error sending welcome email:", err);
     return { success: false, error: err.message };
   }
 };

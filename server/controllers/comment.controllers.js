@@ -134,8 +134,10 @@ exports.createComment = asyncHandler(async (req, res) => {
     text,
     rating,
   };
-  console.log("dataComment dans controller :", dataComment);
   try {
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
     const existingCommentofUserForThisProduct =
       await commentService.getCommentByUserAndProduct(userId, productId);
     if (existingCommentofUserForThisProduct) {
@@ -151,7 +153,6 @@ exports.createComment = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error creating comment:", error.message);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -205,9 +206,13 @@ exports.createComment = asyncHandler(async (req, res) => {
  * @returns {Object} 500 - Internal server error
  */
 exports.updateComment = asyncHandler(async (req, res) => {
+  const userId = req.user?.userId;
   const { commentId } = req.params;
   const updateData = req.body;
   try {
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
     const updatedComment = await commentService.updateComment(
       commentId,
       updateData
@@ -241,6 +246,10 @@ exports.updateComment = asyncHandler(async (req, res) => {
  * @returns {Object} 500 - Internal server error
  */
 exports.deleteComment = asyncHandler(async (req, res) => {
+  const userId = req.user?.userId;
+  if (!userId) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
   const { commentId } = req.params;
   try {
     const deletedComment = await commentService.deleteCommentService(commentId);
@@ -255,7 +264,6 @@ exports.deleteComment = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error deleting comment:", error.message);
     res.status(500).json({
       success: false,
       message: "Internal server error",

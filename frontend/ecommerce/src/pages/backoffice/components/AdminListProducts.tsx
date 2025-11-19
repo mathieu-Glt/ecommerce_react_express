@@ -11,7 +11,6 @@ import AdminProductCard from "./AdminProductCard";
 import DeleteConfirmModal from "./modals/DeleteConfirmModal";
 export const AdminListProduct = () => {
   const navigate = useNavigate();
-  console.log("navigate : ", navigate);
   const { products, loading, getAllProducts, getProductById, deleteProduct } =
     useProduct();
   const {
@@ -31,14 +30,10 @@ export const AdminListProduct = () => {
   const pageSize = 3;
   const [clicked, setClicked] = useState(false);
 
-  // ✅ State pour le modal de suppression
+  // State for the delete modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState<any>(null);
 
-  console.log("Products in ListProduct : ", getProducts);
-  console.log("listProducts state : ", listProducts);
-  console.log("products state : ", products);
-  console.log("searchProducts state : ", searchProducts);
   if (backList) {
     window.location.reload();
   }
@@ -95,30 +90,28 @@ export const AdminListProduct = () => {
     }, 200);
   };
 
-  // ✅ Ouvrir le modal de suppression
+  // Open the delete modal
   const handleOpenDeleteModal = (product: any) => {
-    console.log("Opening delete modal for:", product);
     setProductToDelete(product);
     setShowDeleteModal(true);
   };
 
-  // ✅ Fermer le modal
+  // Close the delete modal
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setProductToDelete(null);
   };
 
-  // ✅ Confirmer la suppression
+  // Confirm the deletion
   const handleConfirmDelete = async (productId: string) => {
     try {
       await deleteProduct(productId);
-      // Recharger la liste des produits
+      // Reload the product list
       await getAllProducts();
-      // Fermer le modal
+      // Close the modal
       handleCloseDeleteModal();
     } catch (error) {
-      console.error("Error deleting product:", error);
-      // L'erreur est déjà gérée dans le modal
+      // The error is already handled in the modal
       throw error;
     }
   };
@@ -130,7 +123,6 @@ export const AdminListProduct = () => {
   const paginatedProducts = (
     searchProducts && searchProducts.length > 0 ? searchProducts : products
   ).slice(startIndex, endIndex);
-  console.log("Current Products : ", paginatedProducts);
 
   return (
     <div className="product-list-container">
@@ -141,7 +133,7 @@ export const AdminListProduct = () => {
           onClick={() => setBackList(!backList)}
           className="toggle-list-button"
         >
-          Liste de produits
+          Product List
         </button>
       )}
 
@@ -176,7 +168,7 @@ export const AdminListProduct = () => {
           }}
         />
       </div>
-      {/* ✅ Modal de confirmation de suppression */}
+      {/* Delete confirmation modal */}
       {productToDelete && (
         <DeleteConfirmModal
           product={productToDelete}

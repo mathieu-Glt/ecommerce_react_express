@@ -45,7 +45,9 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    // Set the path of the destination folder _dirname is the current folder
     const uploadDir = path.join(__dirname, "../uploads/temp");
+    // Check if the folder exists, otherwise create it
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -53,6 +55,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    // Call the callback with the unique file path
     cb(
       null,
       file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
@@ -84,101 +87,110 @@ const upload = multer({
  *
  * @returns {void} Calls next() if successful, or sends 500 error response on failure
  */
+/**
+ * Middleware to upload files to Cloudinary or locally
+ * - If Cloudinary is configured: upload to the cloud
+ * - Otherwise: save locally in the /uploads folder
+ *
+ * @param {Object} req - Express request (must contain req.files via multer)
+ * @param {Object} res - Express response
+ * @param {Function} next - next() function to pass to the next middleware
+ */
 const uploadToCloudinary = async (req, res, next) => {
   try {
-    console.log("=== CLOUDINARY MIDDLEWARE START ===");
-    console.log("1. req.files:", req.files);
-    console.log("2. Number of files:", req.files?.length || 0);
-
+    // If no file was uploaded, initialize an empty array and continue
     if (!req.files || req.files.length === 0) {
-      console.log("⚠️ No files to upload");
       req.cloudinaryImages = [];
       return next();
     }
 
+    // Check that all Cloudinary environment variables are present
     const isCloudinaryConfigured =
       process.env.CLOUDINARY_CLOUD_NAME &&
       process.env.CLOUDINARY_API_KEY &&
       process.env.CLOUDINARY_API_SECRET;
 
-    console.log("3. Cloudinary configured:", isCloudinaryConfigured);
-    console.log(
-      "4. CLOUDINARY_CLOUD_NAME:",
-      process.env.CLOUDINARY_CLOUD_NAME ? "EXISTS" : "MISSING"
-    );
-    console.log(
-      "5. CLOUDINARY_API_KEY:",
-      process.env.CLOUDINARY_API_KEY ? "EXISTS" : "MISSING"
-    );
-    console.log(
-      "6. CLOUDINARY_API_SECRET:",
-      process.env.CLOUDINARY_API_SECRET ? "EXISTS" : "MISSING"
-    );
-
+    // Array to store uploaded images information
     const uploadedImages = [];
 
+    // ========== LOCAL MODE (without Cloudinary) ==========
     if (!isCloudinaryConfigured) {
-      console.log("📁 Using local storage (Cloudinary not configured)");
+      // Loop through all received files
       for (const file of req.files) {
+        // Define the local storage folder path
         const uploadDir = path.join(__dirname, "../uploads");
-        if (!fs.existsSync(uploadDir))
-          fs.mkdirSync(uploadDir, { recursive: true });
 
+        // Create the uploads folder if it doesn't exist yet
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        // Generate a unique filename (timestamp + original name)
         const fileName = `${Date.now()}-${file.originalname}`;
+
+        // Build the full destination file path
         const filePath = path.join(uploadDir, fileName);
 
+        // Copy the file from temporary folder to uploads folder
         fs.copyFileSync(file.path, filePath);
+
+        // Delete the temporary file created by multer
         fs.unlinkSync(file.path);
 
+        // Add file information to the array
         uploadedImages.push({
           originalName: file.originalname,
-          url: `/uploads/${fileName}`,
-          local: true,
+          url: `/uploads/${fileName}`, // Relative URL to serve the file
+          local: true, // Flag to differentiate local/cloud storage
         });
-        console.log("✅ Image saved locally:", filePath);
       }
-    } else {
-      console.log("☁️ Uploading to Cloudinary...");
+    }
+    // ========== CLOUDINARY MODE (with configuration) ==========
+    else {
+      // Loop through all received files
       for (const file of req.files) {
-        console.log("📤 Uploading:", file.originalname);
-        console.log("📍 File path:", file.path);
-
+        // Upload the file to Cloudinary
         const result = await uploadImage(file.path);
-        console.log("📥 Upload result:", result);
 
+        // If upload was successful
         if (result.success) {
+          // Add information returned by Cloudinary
           uploadedImages.push({
             originalName: file.originalname,
-            public_id: result.public_id,
-            url: result.url,
-            width: result.width,
+            public_id: result.public_id, // Unique Cloudinary ID to delete/modify
+            url: result.url, // Public URL of the image on Cloudinary
+            width: result.width, // Dimensions returned by Cloudinary
             height: result.height,
           });
-          console.log("✅ Image uploaded:", result.url);
         } else {
+          // In case of failure, throw an error that will be caught
           throw new Error(
             `Upload error for ${file.originalname}: ${result.error}`
           );
         }
 
+        // Delete the local temporary file after uploading to Cloudinary
         fs.unlinkSync(file.path);
       }
     }
 
+    // Attach the uploaded images array to the request for subsequent middlewares
     req.cloudinaryImages = uploadedImages;
-    console.log("7. req.cloudinaryImages created:", req.cloudinaryImages);
-    console.log("=== CLOUDINARY MIDDLEWARE END ===");
 
+    // Pass to the next middleware (e.g., controller that will create the product with these images)
     next();
   } catch (error) {
-    console.error("❌ Cloudinary middleware error:", error);
-
+    // ========== ERROR HANDLING ==========
+    // Clean up all temporary files in case of error
     if (req.files) {
       req.files.forEach((file) => {
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
       });
     }
 
+    // Return an error response to the client
     res.status(500).json({
       success: false,
       message: "Image upload failed",
@@ -197,13 +209,11 @@ const deleteFromCloudinary = async (publicIds) => {
   try {
     const results = [];
     for (const publicId of publicIds) {
-      console.log("Deleting from Cloudinary:", publicId);
       const result = await deleteImage(publicId);
       results.push({ publicId, ...result });
     }
     return results;
   } catch (error) {
-    console.error("Cloudinary deletion error:", error);
     throw error;
   }
 };

@@ -9,9 +9,7 @@ export const Footer: React.FC = () => {
       <div className="footer-section social-section">
         <div className="container">
           <div className="social-wrapper">
-            <span className="social-label">
-              Suivez-nous sur les réseaux sociaux :
-            </span>
+            <span className="social-label">Follow us on social media :</span>
             <div className="social-links">
               <a href="#" className="social-icon" aria-label="Facebook">
                 <i className="fab fa-facebook-f"></i>
@@ -39,16 +37,16 @@ export const Footer: React.FC = () => {
           <div className="footer-columns">
             {/* Colonne 1 */}
             <div className="footer-col">
-              <h3 className="col-title">À propos</h3>
+              <h3 className="col-title">About Us</h3>
               <ul className="col-list">
                 <li>
-                  <a href="#">Notre histoire</a>
+                  <a href="#">Our Story</a>
                 </li>
                 <li>
-                  <a href="#">Notre équipe</a>
+                  <a href="#">Our Team</a>
                 </li>
                 <li>
-                  <a href="#">Carrières</a>
+                  <a href="#">Careers</a>
                 </li>
                 <li>
                   <a href="#">Blog</a>
@@ -58,7 +56,7 @@ export const Footer: React.FC = () => {
 
             {/* Colonne 2 */}
             <div className="footer-col">
-              <h3 className="col-title">Produits</h3>
+              <h3 className="col-title">Products</h3>
               <ul className="col-list">
                 <li>
                   <a href="#">iPhone 16 Pro</a>
@@ -80,13 +78,13 @@ export const Footer: React.FC = () => {
               <h3 className="col-title">Support</h3>
               <ul className="col-list">
                 <li>
-                  <a href="#">Centre d'aide</a>
+                  <a href="#">Help Center</a>
                 </li>
                 <li>
-                  <a href="#">Garantie</a>
+                  <a href="#">Warranty</a>
                 </li>
                 <li>
-                  <a href="#">Retours</a>
+                  <a href="#">Returns</a>
                 </li>
                 <li>
                   <a href="#">Contact</a>
@@ -96,16 +94,16 @@ export const Footer: React.FC = () => {
 
             {/* Colonne 4 */}
             <div className="footer-col">
-              <h3 className="col-title">Légal</h3>
+              <h3 className="col-title">Legal</h3>
               <ul className="col-list">
                 <li>
-                  <a href="#">Mentions légales</a>
+                  <a href="#">Legal Notice</a>
                 </li>
                 <li>
                   <a href="#">CGV</a>
                 </li>
                 <li>
-                  <a href="#">Confidentialité</a>
+                  <a href="#">Privacy Policy</a>
                 </li>
                 <li>
                   <a href="#">Cookies</a>
@@ -121,9 +119,9 @@ export const Footer: React.FC = () => {
         <div className="container">
           <div className="newsletter-wrapper">
             <div className="newsletter-info">
-              <h3 className="newsletter-heading">📧 Restez informé</h3>
+              <h3 className="newsletter-heading">📧 Stay Informed</h3>
               <p className="newsletter-desc">
-                Inscrivez-vous pour nos offres exclusives
+                Sign up for our exclusive offers and latest product news!
               </p>
             </div>
             <form className="newsletter-form">
@@ -145,10 +143,10 @@ export const Footer: React.FC = () => {
         <div className="container">
           <div className="copyright-wrapper">
             <p className="copyright-text">
-              © 2025 EShop - 365. Tous droits réservés.
+              © 2025 EShop - 365. All rights reserved.
             </p>
             <div className="payment-methods">
-              <span className="payment-label">Paiement sécurisé</span>
+              <span className="payment-label">Secure Payment</span>
               <i className="fab fa-cc-visa"></i>
               <i className="fab fa-cc-mastercard"></i>
               <i className="fab fa-cc-paypal"></i>

@@ -46,9 +46,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordProps> = ({
             <div className="login-logo">
               <i className="bi bi-shield-lock-fill"></i>
             </div>
-            <h1 className="login-title">Mot de passe oublié</h1>
+            <h1 className="login-title">Forgot password</h1>
             <p className="login-subtitle">
-              Entrez votre email pour réinitialiser votre mot de passe
+              Enter your email to reset your password
             </p>
           </div>
 
@@ -63,7 +63,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordProps> = ({
 
             {success && (
               <Alert variant="success" className="mb-3">
-                <Alert.Heading>Succès</Alert.Heading>
+                <Alert.Heading>Success</Alert.Heading>
                 <p>{success}</p>
               </Alert>
             )}
@@ -75,7 +75,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordProps> = ({
                 <Form.Control
                   type="email"
                   name="email"
-                  placeholder="Entrez votre email"
+                  placeholder="Enter your email"
                   value={formik.values.email}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -89,7 +89,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordProps> = ({
                   </Form.Control.Feedback>
                 )}
                 <Form.Text className="text-muted">
-                  Nous ne partagerons jamais votre email.
+                  We will never share your email.
                 </Form.Text>
               </Form.Group>
 
@@ -110,10 +110,10 @@ const ForgotPasswordForm: React.FC<ForgotPasswordProps> = ({
                       aria-hidden="true"
                       className="me-2"
                     />
-                    Envoi...
+                    Sending...
                   </>
                 ) : (
-                  "Réinitialiser le mot de passe"
+                  "Reset Password"
                 )}
               </Button>
             </Form>

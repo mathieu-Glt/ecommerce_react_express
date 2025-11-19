@@ -35,7 +35,6 @@ export const useComment = () => {
       await dispatch(getAllComments()).unwrap();
       toast.showSuccess("Comments loaded successfully");
     } catch (err: any) {
-      console.error("❌ Failed to fetch comments:", err);
       toast.showError(err?.message || "Failed to fetch comments");
     }
   }, [dispatch, toast]);
@@ -49,7 +48,6 @@ export const useComment = () => {
         await dispatch(getCommentsByProduct(productId)).unwrap();
         toast.showSuccess("Comments for product loaded successfully");
       } catch (err: any) {
-        console.error("❌ Failed to fetch comments for product:", err);
         toast.showError(err?.message || "Failed to fetch comments for product");
       }
     },
@@ -64,7 +62,6 @@ export const useComment = () => {
         await dispatch(getCommentsByUser(userId)).unwrap();
         toast.showSuccess("Comments for user loaded successfully");
       } catch (err: any) {
-        console.error("❌ Failed to fetch comments for user:", err);
         toast.showError(err?.message || "Failed to fetch comments for user");
       }
     },
@@ -75,7 +72,6 @@ export const useComment = () => {
   // ============================================
   const createComment = useCallback(
     async (commentData: Partial<Comment>): Promise<void> => {
-      console.log("commentData dans useComment :", commentData);
       const { productId, userId, text, rating } = commentData;
       if (!productId || !userId || !text || rating === undefined) {
         toast.showError("Missing required fields to create comment");
@@ -92,7 +88,6 @@ export const useComment = () => {
         ).unwrap();
         toast.showSuccess("Comment created successfully");
       } catch (err: any) {
-        console.error("❌ Failed to create comment:", err);
         toast.showError(err?.message || "Failed to create comment");
       }
     },
@@ -104,18 +99,14 @@ export const useComment = () => {
   // ============================================
   const updateComment = useCallback(
     async (commentId: string, commentData: Partial<Comment>): Promise<void> => {
-      console.log("commentId dans useComment :", commentId);
-      console.log("commentData dans useComment :", commentData);
       try {
         const result = await dispatch(
           updateExistingComment({ commentId, ...commentData })
         ).unwrap();
-        console.log("Result of updateExistingComment :", result);
         if (result) {
           toast.showSuccess("Comment updated successfully");
         }
       } catch (err: any) {
-        console.error("❌ Failed to update comment:", err);
         toast.showError(err?.message || "Failed to update comment");
       }
     },
@@ -127,12 +118,10 @@ export const useComment = () => {
   // ============================================
   const deleteComment = useCallback(
     async (commentId: string): Promise<void> => {
-      console.log("commentId to delete in useComment :", commentId);
       try {
         await dispatch(deleteExistingComment(commentId)).unwrap();
         toast.showSuccess("Comment deleted successfully");
       } catch (err: any) {
-        console.error("❌ Failed to delete comment:", err);
         toast.showError(err?.message || "Failed to delete comment");
       }
     },

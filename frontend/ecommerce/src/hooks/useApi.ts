@@ -2,19 +2,15 @@ import axios from "axios";
 import type { AxiosInstance, AxiosResponse } from "axios";
 import { destroyTokenUser, refreshTokens } from "../services/api/auth";
 
-// Variable pour stocker le token CSRF
+// Variable to store the CSRF token
 let csrfToken: string | null = null;
-// Promesse en cours pour éviter les appels multiples
-let csrfTokenPromise: Promise<string> | null = null;
+// Promise in progress to avoid multiple calls
+let csrfTokenPromise: Promise<any> | null = null;
 
-// Fonction pour récupérer le token CSRF
-async function fetchCsrfToken(): Promise<string> {
+// Function to fetch the CSRF token
+async function fetchCsrfToken(): Promise<any> {
   if (csrfTokenPromise) {
     return csrfTokenPromise;
-  }
-
-  if (csrfToken) {
-    return csrfToken;
   }
 
   csrfTokenPromise = (async () => {
@@ -22,11 +18,11 @@ async function fetchCsrfToken(): Promise<string> {
       const response = await axios.get("http://localhost:8000/api/csrf-token", {
         withCredentials: true,
       });
+
       csrfToken = response.data.csrfToken;
-      console.log("✅ CSRF token fetched:", csrfToken);
+
       return csrfToken;
     } catch (error) {
-      console.error("❌ Failed to fetch CSRF token:", error);
       csrfToken = null;
       throw error;
     } finally {
@@ -36,9 +32,8 @@ async function fetchCsrfToken(): Promise<string> {
 
   return csrfTokenPromise;
 }
-
 // ============================================
-// ✅ CRÉER UNE SEULE INSTANCE GLOBALE
+// CREATE A SINGLE GLOBAL INSTANCE
 // ============================================
 const BASE_URL =
   import.meta.env?.VITE_API_BASE_URL || "http://localhost:8000/api/";
@@ -49,36 +44,30 @@ const api: AxiosInstance = axios.create({
 });
 
 // -----------------------------
-// Intercepteur de requêtes
+// Request Interceptor
 // -----------------------------
 api.interceptors.request.use(
   async (config) => {
-    console.log("🚀 Interceptor running for:", config.url);
     config.headers = config.headers || {};
 
     // JWT
     const token = localStorage.getItem("token");
-    console.log(
-      "🔐 Token from localStorage:",
-      token ? "EXISTS (" + token.substring(0, 20) + "...)" : "NULL"
-    );
-
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
-      console.log("✅ Authorization header set");
-    } else {
-      console.warn("⚠️ No token in localStorage!");
     }
 
     // CSRF Token
-    if (!config.url?.includes("csrf-token")) {
-      if (!csrfToken && !csrfTokenPromise) {
-        console.log("📡 Fetching CSRF token...");
+    const needsCsrf = ["POST", "PUT", "DELETE", "PATCH"].includes(
+      config.method?.toUpperCase() || ""
+    );
+
+    if (needsCsrf && !config.url?.includes("csrf-token")) {
+      if (!csrfToken) {
         await fetchCsrfToken();
       }
+
       if (csrfToken) {
         config.headers["X-CSRF-Token"] = csrfToken;
-        console.log("✅ CSRF token set");
       }
     }
 
@@ -87,18 +76,12 @@ api.interceptors.request.use(
       config.headers["Content-Type"] = "application/json";
     }
 
-    console.log("📤 Final headers:", {
-      Authorization: config.headers["Authorization"] ? "SET" : "NOT SET",
-      "X-CSRF-Token": config.headers["X-CSRF-Token"] ? "SET" : "NOT SET",
-    });
-
     return config;
   },
   (error) => Promise.reject(error)
 );
-
 // -----------------------------
-// Intercepteur de réponses
+// Response Interceptor
 // -----------------------------
 api.interceptors.response.use(
   (response) => response,
@@ -118,7 +101,7 @@ api.interceptors.response.use(
 
           originalRequest.headers["Authorization"] =
             "Bearer " + result.data.token;
-          return api(originalRequest); // ✅ Utiliser l'instance globale
+          return api(originalRequest); // Use the global instance
         } catch (err) {
           destroyTokenUser();
           window.location.href = "/";
@@ -143,9 +126,9 @@ api.interceptors.response.use(
           csrfTokenPromise = null;
           await fetchCsrfToken();
           originalRequest.headers["X-CSRF-Token"] = csrfToken;
-          return api(originalRequest); // ✅ Utiliser l'instance globale
+          return api(originalRequest); // Use the global instance
         } catch (err) {
-          console.error("❌ Failed to refresh CSRF token", err);
+          return Promise.reject(error);
         }
       }
     }
@@ -155,11 +138,11 @@ api.interceptors.response.use(
 );
 
 // ============================================
-// ✅ EXPORTER L'INSTANCE DIRECTEMENT
+// EXPORT THE INSTANCE DIRECTLY
 // ============================================
 export { api, fetchCsrfToken };
 
-// ✅ useApi retourne toujours la même instance
+// useApi always returns the same instance
 export function useApi(): AxiosInstance {
   return api;
 }

@@ -19,7 +19,7 @@ const initialState: CommentState = {
 };
 
 // ====================================================
-// 🧩 SLICE COMMENTAIRES
+// 🧩 COMMENT SLICE
 // ====================================================
 
 const commentSlice: Slice<CommentState> = createSlice({
@@ -27,11 +27,11 @@ const commentSlice: Slice<CommentState> = createSlice({
   initialState,
 
   // ----------------------------------------------------
-  // 🔹 Reducers synchrones
+  // 🔹 Synchronous reducers
   // ----------------------------------------------------
   reducers: {
     /**
-     * Vide complètement la liste des commentaires
+     * Completely clears the list of comments
      */
     clearComments: (state) => {
       state.comments = [];
@@ -40,14 +40,14 @@ const commentSlice: Slice<CommentState> = createSlice({
     },
 
     /**
-     * Définit une erreur manuellement
+     * Manually sets an error state
      */
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
 
     /**
-     * Définit l’état de chargement manuellement
+     * Manually sets the loading state
      */
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -55,7 +55,7 @@ const commentSlice: Slice<CommentState> = createSlice({
   },
 
   // ----------------------------------------------------
-  // 🔹 Extra reducers — Thunks async (API)
+  // 🔹 Extra reducers — Async thunks (API)
   // ----------------------------------------------------
   extraReducers: (builder) => {
     // ==========================================
@@ -67,21 +67,12 @@ const commentSlice: Slice<CommentState> = createSlice({
         state.error = null;
       })
       .addCase(fetchAllCommentsThunk.fulfilled, (state, action) => {
-        console.log(
-          "✅ [commentSlice] Tous les commentaires récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.comments = action.payload || [];
       })
       .addCase(fetchAllCommentsThunk.rejected, (state, action) => {
-        console.error(
-          "❌ [commentSlice] Erreur récupération commentaires:",
-          action.payload
-        );
         state.loading = false;
-        state.error =
-          (action.payload as string) || "Erreur récupération commentaires";
+        state.error = (action.payload as string) || "Error fetching comments";
       });
 
     // ==========================================
@@ -93,22 +84,13 @@ const commentSlice: Slice<CommentState> = createSlice({
         state.error = null;
       })
       .addCase(fetchCommentsByProductThunk.fulfilled, (state, action) => {
-        console.log(
-          "✅ [commentSlice] Commentaires du produit récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.comments = action.payload || [];
       })
       .addCase(fetchCommentsByProductThunk.rejected, (state, action) => {
-        console.error(
-          "❌ [commentSlice] Erreur récupération commentaires produit:",
-          action.payload
-        );
         state.loading = false;
         state.error =
-          (action.payload as string) ||
-          "Erreur récupération commentaires produit";
+          (action.payload as string) || "Error fetching comments for product";
       });
 
     // ==========================================
@@ -120,22 +102,13 @@ const commentSlice: Slice<CommentState> = createSlice({
         state.error = null;
       })
       .addCase(fetchCommentsByUserThunk.fulfilled, (state, action) => {
-        console.log(
-          "✅ [commentSlice] Commentaires utilisateur récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.comments = action.payload || [];
       })
       .addCase(fetchCommentsByUserThunk.rejected, (state, action) => {
-        console.error(
-          "❌ [commentSlice] Erreur récupération commentaires utilisateur:",
-          action.payload
-        );
         state.loading = false;
         state.error =
-          (action.payload as string) ||
-          "Erreur récupération commentaires utilisateur";
+          (action.payload as string) || "Error fetching comments for user";
       });
 
     // ==========================================
@@ -147,17 +120,12 @@ const commentSlice: Slice<CommentState> = createSlice({
         state.error = null;
       })
       .addCase(postCommentThunk.fulfilled, (state, action) => {
-        console.log("✅ [commentSlice] Commentaire ajouté:", action.payload);
         state.loading = false;
         if (action.payload) state.comments.push(action.payload);
       })
       .addCase(postCommentThunk.rejected, (state, action) => {
-        console.error(
-          "❌ [commentSlice] Erreur ajout commentaire:",
-          action.payload
-        );
         state.loading = false;
-        state.error = (action.payload as string) || "Erreur ajout commentaire";
+        state.error = (action.payload as string) || "Error adding comment";
       });
 
     // ==========================================
@@ -169,18 +137,12 @@ const commentSlice: Slice<CommentState> = createSlice({
         state.error = null;
       })
       .addCase(deleteCommentThunk.fulfilled, (state, action) => {
-        console.log("✅ [commentSlice] Commentaire supprimé:", action.payload);
         state.loading = false;
         state.comments = state.comments.filter((c) => c._id !== action.payload);
       })
       .addCase(deleteCommentThunk.rejected, (state, action) => {
-        console.error(
-          "❌ [commentSlice] Erreur suppression commentaire:",
-          action.payload
-        );
         state.loading = false;
-        state.error =
-          (action.payload as string) || "Erreur suppression commentaire";
+        state.error = (action.payload as string) || "Error deleting comment";
       });
   },
 });

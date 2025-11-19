@@ -74,7 +74,6 @@ const saveBase64Image = async (
       path: relativePath,
     };
   } catch (error) {
-    console.error("Error saving image:", error);
     return {
       success: false,
       error: "Failed to save image",
@@ -101,7 +100,6 @@ const deleteImage = async (imagePath) => {
 
     return { success: true };
   } catch (error) {
-    console.error("Error deleting image:", error);
     return {
       success: false,
       error: "Failed to delete image",

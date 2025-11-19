@@ -15,14 +15,12 @@ import type { ProductState } from "../../interfaces/product.interface";
 // import { loadProductStateFromLocalStorage } from "../middleware/localStorageMiddleware";
 
 // ====================================================
-// 🔄 HYDRATATION DEPUIS LOCAL STORAGE
+// 🔄 HYDRATION FROM LOCAL STORAGE
 // ====================================================
 
 // const persistedProducts = loadProductStateFromLocalStorage();
-// console.log("🌊 [productSlice] État persisté chargé:", persistedProducts);
-
 // ====================================================
-// 🧠 ÉTAT INITIAL
+// 🧠 INITIAL STATE
 // ====================================================
 
 // const initialState: ProductState = persistedProducts || {
@@ -34,7 +32,7 @@ const initialState: ProductState = {
 };
 
 // ====================================================
-// 🧩 SLICE PRODUITS
+// 🧩 PRODUCT SLICE
 // ====================================================
 
 const productSlice: Slice<ProductState> = createSlice({
@@ -42,12 +40,12 @@ const productSlice: Slice<ProductState> = createSlice({
   initialState,
 
   // ----------------------------------------------------
-  // 🔹 Reducers synchrones
+  // 🔹 Synchronous reducers
   // ----------------------------------------------------
   reducers: {
     /**
-     * Vide complètement la liste des produits
-     * (utile lors du logout ou d’un refresh complet)
+     * Completely clears the list of products
+     * (useful during logout or a full refresh)
      */
     clearProducts: (state) => {
       state.products = [];
@@ -57,21 +55,21 @@ const productSlice: Slice<ProductState> = createSlice({
     },
 
     /**
-     * Définit un produit sélectionné (ex: page détail)
+     * Sets a selected product (e.g., detail page)
      */
     setSelectedProduct: (state, action: PayloadAction<any>) => {
       state.selectedProduct = action.payload;
     },
 
     /**
-     * Définit manuellement une erreur
+     * Manually sets an error state
      */
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
 
     /**
-     * Définit l’état de chargement
+     * Manually sets the loading state
      */
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -79,7 +77,7 @@ const productSlice: Slice<ProductState> = createSlice({
   },
 
   // ----------------------------------------------------
-  // 🔹 Extra reducers — Thunks async (API)
+  // 🔹 Extra reducers — Async thunks (API)
   // ----------------------------------------------------
   extraReducers: (builder) => {
     builder
@@ -91,18 +89,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        console.log("✅ [productSlice] Produits récupérés:", action.payload);
-
         state.loading = false;
         state.products = action.payload || [];
         state.error = null;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur récupération produits:",
-          action.payload
-        );
-
         state.loading = false;
         state.error = (action.payload as string) || "Failed to fetch products";
       });
@@ -115,16 +106,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(searchProducts.fulfilled, (state, action) => {
-        console.log("✅ [productSlice] Produits recherchés:", action.payload);
         state.loading = false;
         state.products = action.payload.results || [];
         state.error = null;
       })
       .addCase(searchProducts.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur recherche produits:",
-          action.payload
-        );
         state.loading = false;
         state.error = (action.payload as string) || "Failed to search products";
       });
@@ -137,19 +123,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
-        console.log(
-          "✅ [productSlice] Produit par ID récupéré:",
-          action.payload
-        );
         state.loading = false;
         state.selectedProduct = action.payload || null;
         state.error = null;
       })
       .addCase(fetchProductById.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur récupération produit par ID:",
-          action.payload
-        );
         state.loading = false;
         state.error =
           (action.payload as string) || "Failed to fetch product by ID";
@@ -163,19 +141,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(fetchLatestProducts.fulfilled, (state, action) => {
-        console.log(
-          "✅ [productSlice] Derniers produits récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.products = action.payload || [];
         state.error = null;
       })
       .addCase(fetchLatestProducts.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur récupération derniers produits:",
-          action.payload
-        );
         state.loading = false;
         state.error =
           (action.payload as string) || "Failed to fetch latest products";
@@ -192,7 +162,7 @@ const productSlice: Slice<ProductState> = createSlice({
         state.loading = false;
         const updatedProduct = action.payload;
 
-        // Met à jour le produit sélectionné
+        // Updates the selected product if it matches
         if (
           state.selectedProduct &&
           state.selectedProduct._id === updatedProduct._id
@@ -200,15 +170,14 @@ const productSlice: Slice<ProductState> = createSlice({
           state.selectedProduct = updatedProduct;
         }
 
-        // Met à jour la liste de produits si présente
+        // Updates the product list if present
         state.products = state.products.map((p) =>
           p._id === updatedProduct._id ? updatedProduct : p
         );
       })
       .addCase(rateProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error =
-          (action.payload as string) || "Erreur lors de la notation du produit";
+        state.error = (action.payload as string) || "Error rating product";
       });
     //=========================================
     // FETCH PRODUCTS BY CATEGORY ID
@@ -219,19 +188,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(fetchProductsByCategoryId.fulfilled, (state, action) => {
-        console.log(
-          "✅ [productSlice] Produits par catégorie récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.products = action.payload || [];
         state.error = null;
       })
       .addCase(fetchProductsByCategoryId.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur récupération produits par catégorie:",
-          action.payload
-        );
         state.loading = false;
         state.error =
           (action.payload as string) || "Failed to fetch products by category";
@@ -245,19 +206,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(fetchProductsBySubsCategoryId.fulfilled, (state, action) => {
-        console.log(
-          "✅ [productSlice] Produits par sous-catégorie récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.products = action.payload || [];
         state.error = null;
       })
       .addCase(fetchProductsBySubsCategoryId.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur récupération produits par sous-catégorie:",
-          action.payload
-        );
         state.loading = false;
         state.error =
           (action.payload as string) ||
@@ -272,19 +225,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(fetchProductsByAverageRate.fulfilled, (state, action) => {
-        console.log(
-          "✅ [productSlice] Produits par moyenne de notation récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.products = action.payload || [];
         state.error = null;
       })
       .addCase(fetchProductsByAverageRate.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur récupération produits par moyenne de notation:",
-          action.payload
-        );
         state.loading = false;
         state.error =
           (action.payload as string) ||
@@ -299,19 +244,11 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error = null;
       })
       .addCase(fetchProductsByPriceRangeThunk.fulfilled, (state, action) => {
-        console.log(
-          "✅ [productSlice] Produits par fourchette de prix récupérés:",
-          action.payload
-        );
         state.loading = false;
         state.products = action.payload || [];
         state.error = null;
       })
       .addCase(fetchProductsByPriceRangeThunk.rejected, (state, action) => {
-        console.error(
-          "❌ [productSlice] Erreur récupération produits par fourchette de prix:",
-          action.payload
-        );
         state.loading = false;
         state.error =
           (action.payload as string) ||

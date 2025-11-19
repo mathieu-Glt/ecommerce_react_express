@@ -29,13 +29,12 @@ interface ExistingImage {
 
 const AdminProductEditPage = () => {
   const { id } = useParams<{ id: string }>();
-  console.log("Editing product with ID:", id);
   const navigate = useNavigate();
   const { getAllCategories, categories } = useCategory();
   const { getAllSubCategories, subCategories } = useSubCategory();
   const { getProductById, updateProduct, selectedProduct } = useProduct();
 
-  // State pour les sous-catégories filtrées
+  // State for filtered subcategories
   const [filteredSubs, setFilteredSubs] = useState<SubCategory[]>([]);
 
   // State UI
@@ -44,11 +43,11 @@ const AdminProductEditPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // State pour les images
+  // State for images
   const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
-  // Couleurs disponibles
+  // Available colors
   const colors = [
     "Black",
     "White",
@@ -63,7 +62,7 @@ const AdminProductEditPage = () => {
     "Gray",
   ];
 
-  // Marques disponibles
+  // Available brands
   const brands = [
     "Apple",
     "Samsung",
@@ -95,7 +94,6 @@ const AdminProductEditPage = () => {
       setLoadingProduct(true);
       await getProductById(productId);
     } catch (err) {
-      console.error("❌ Error fetching product:", err);
       setError("Erreur lors du chargement du produit");
     } finally {
       setLoadingProduct(false);
@@ -106,7 +104,6 @@ const AdminProductEditPage = () => {
     try {
       await getAllCategories();
     } catch (err) {
-      console.error("❌ Error fetching categories:", err);
       setError("Erreur lors du chargement des catégories");
     }
   };
@@ -115,7 +112,6 @@ const AdminProductEditPage = () => {
     try {
       await getAllSubCategories();
     } catch (err) {
-      console.error("❌ Error fetching subcategories:", err);
       setError("Erreur lors du chargement des sous-catégories");
     }
   };
@@ -150,7 +146,7 @@ const AdminProductEditPage = () => {
   const formik = useFormik({
     initialValues,
     validationSchema: productValidationSchema,
-    enableReinitialize: true, // ✅ Important pour mettre à jour avec les données du produit
+    enableReinitialize: true, // Important to update with product data
     onSubmit: async (values, { setErrors, setFieldError }) => {
       if (!id) return;
 
@@ -173,43 +169,37 @@ const AdminProductEditPage = () => {
         formDataToSend.append("color", values.color);
         formDataToSend.append("brand", values.brand);
 
-        // ✅ Ajouter les IDs des images existantes à conserver
+        // Add IDs of existing images to keep
         existingImages.forEach((img) => {
           formDataToSend.append("existingImages", img.public_id);
         });
 
-        // ✅ Ajouter les nouvelles images (File objects)
+        // Add new images (File objects)
         if (values.images && values.images.length > 0) {
           values.images.forEach((image) => {
             formDataToSend.append("images", image as File);
           });
         }
 
-        console.log("📦 FormData prepared for update");
-        console.log("Existing images to keep:", existingImages.length);
-        console.log("New images to upload:", values.images.length);
-
         await updateProduct(id, formDataToSend);
 
-        setSuccess("Produit mis à jour avec succès !");
+        setSuccess("Product updated successfully!");
 
-        // Faire défiler vers le haut pour voir le message de succès
+        // Scroll to top to see the success message
         window.scrollTo({ top: 0, behavior: "smooth" });
 
-        // Rediriger vers la liste des produits après 2 secondes
+        // Redirect to product list after 2 seconds
         // setTimeout(() => {
         //   navigate("/admin/products");
         // }, 2000);
       } catch (err: any) {
-        console.error("❌ Error updating product:", err);
-
-        // Gérer les erreurs du backend
+        // Handle backend errors
         if (err.response?.data?.errors) {
           setErrors(err.response.data.errors);
         } else if (err.response?.data?.message) {
           setError(err.response.data.message);
         } else {
-          setError("Erreur lors de la mise à jour du produit");
+          setError("Error updating product");
         }
       } finally {
         setLoading(false);
@@ -222,9 +212,7 @@ const AdminProductEditPage = () => {
   // ==================== POPULATE FORM WITH PRODUCT DATA ====================
   useEffect(() => {
     if (selectedProduct && selectedProduct._id === id) {
-      console.log("📝 Populating form with product data:", selectedProduct);
-
-      // Remplir le formulaire avec les données du produit
+      // Populate the form with product data
       formik.setValues({
         title: selectedProduct.title || "",
         slug: selectedProduct.slug || "",
@@ -236,10 +224,10 @@ const AdminProductEditPage = () => {
         shipping: selectedProduct.shipping || "No",
         color: selectedProduct.color || "",
         brand: selectedProduct.brand || "",
-        images: [], // Nouvelles images (vide au départ)
+        images: [], // New images (empty initially)
       });
 
-      // Définir les images existantes
+      // Set existing images
       if (selectedProduct.images && selectedProduct.images.length > 0) {
         setExistingImages(selectedProduct.images);
       }
@@ -261,11 +249,8 @@ const AdminProductEditPage = () => {
   // ==================== NEW IMAGE UPLOAD HANDLER ====================
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      console.log("=== 🖼️ handleImageChange START ===");
-
       const files = e.currentTarget.files;
       if (!files || files.length === 0) {
-        console.log("❌ No files, returning");
         return;
       }
 
@@ -274,36 +259,31 @@ const AdminProductEditPage = () => {
       const totalImages =
         existingImages.length + currentImages.length + fileArray.length;
 
-      // Vérifie le nombre total d'images (existantes + nouvelles)
+      // Check total number of images (existing + new)
       if (totalImages > 5) {
-        console.log("❌ Too many images");
         formik.setFieldError("images", "Maximum 5 images au total autorisées");
         return;
       }
 
-      // Vérifie la taille de chaque fichier
+      // Check size of each file
       const maxSize = 5 * 1024 * 1024;
       for (const file of fileArray) {
         if (file.size > maxSize) {
-          console.log(`❌ File ${file.name} too large`);
           formik.setFieldError("images", `L'image ${file.name} dépasse 5MB`);
           return;
         }
       }
 
-      // Créer le nouveau tableau d'images
+      // Create the new array of images
       const updatedImages = [...currentImages, ...fileArray];
       formik.setFieldValue("images", updatedImages);
       formik.setFieldTouched("images", true);
 
-      // Créer les aperçus
+      // Create previews
       const newPreviews = fileArray.map((file) => URL.createObjectURL(file));
       setNewImagePreviews((prev) => [...prev, ...newPreviews]);
-
-      console.log("✅ Images added successfully");
-      console.log("=== 🖼️ handleImageChange END ===");
     } catch (error) {
-      console.error("❌ ERROR in handleImageChange:", error);
+      formik.setFieldError("images", "Erreur lors du chargement des images");
     }
   };
 
@@ -323,7 +303,7 @@ const AdminProductEditPage = () => {
       );
       setFilteredSubs(filtered);
 
-      // Réinitialiser la sous-catégorie si elle n'est plus valide
+      // Reset the subcategory if it is no longer valid
       if (
         formik.values.sub &&
         !filtered.find((s) => s._id === formik.values.sub)
@@ -341,8 +321,8 @@ const AdminProductEditPage = () => {
     return (
       <div className="product-create-page">
         <div className="page-header">
-          <h1>⏳ Chargement...</h1>
-          <p>Chargement du produit en cours...</p>
+          <h1>⏳ Loading...</h1>
+          <p>Loading product...</p>
         </div>
       </div>
     );
@@ -352,14 +332,14 @@ const AdminProductEditPage = () => {
     return (
       <div className="product-edit-page">
         <div className="page-header">
-          <h1>❌ Produit non trouvé</h1>
-          <p>Le produit que vous cherchez n'existe pas.</p>
+          <h1>❌ Product not found</h1>
+          <p>The product you are looking for does not exist.</p>
         </div>
         <button
           className="btn btn-primary"
           onClick={() => navigate("/admin/products")}
         >
-          Retour à la liste
+          Back to list
         </button>
       </div>
     );
@@ -369,11 +349,11 @@ const AdminProductEditPage = () => {
   return (
     <div className="product-edit-page">
       <div className="page-header">
-        <h1>✏️ Modifier le produit</h1>
-        <p>Modifiez les informations de votre produit</p>
+        <h1>✏️ Edit Product</h1>
+        <p>Edit your product information</p>
       </div>
 
-      {/* Message d'erreur global */}
+      {/* Global error message */}
       {error && (
         <div className="alert alert-error">
           <span className="alert-icon">❌</span>
@@ -381,7 +361,7 @@ const AdminProductEditPage = () => {
         </div>
       )}
 
-      {/* Message de succès */}
+      {/* Success message */}
       {success && (
         <div className="alert alert-success">
           <span className="alert-icon">✅</span>
@@ -390,14 +370,14 @@ const AdminProductEditPage = () => {
       )}
 
       <form onSubmit={formik.handleSubmit} className="product-form-edit">
-        {/* INFORMATIONS GÉNÉRALES */}
+        {/* GENERAL INFORMATION */}
         <div className="form-section">
-          <h2 className="section-title">📝 Informations générales</h2>
+          <h2 className="section-title">📝 General Information</h2>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="title">
-                Titre du produit <span className="required">*</span>
+                Product Title <span className="required">*</span>
               </label>
               <input
                 type="text"
@@ -446,7 +426,7 @@ const AdminProductEditPage = () => {
                 <span className="error-message">{formik.errors.slug}</span>
               )}
               <small className="form-hint">
-                Généré automatiquement à partir du titre
+                Automatically generated from the title, but you can edit it.
               </small>
             </div>
           </div>
@@ -478,14 +458,14 @@ const AdminProductEditPage = () => {
           </div>
         </div>
 
-        {/* CATÉGORISATION */}
+        {/* CATEGORIZATION */}
         <div className="form-section">
-          <h2 className="section-title">🏷️ Catégorisation</h2>
+          <h2 className="section-title">🏷️ Categorization</h2>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="category">
-                Catégorie <span className="required">*</span>
+                Category <span className="required">*</span>
               </label>
               <select
                 id="category"
@@ -502,7 +482,7 @@ const AdminProductEditPage = () => {
                 }
                 disabled={loading}
               >
-                <option value="">Sélectionnez une catégorie</option>
+                <option value="">Select a category</option>
                 {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
                     {cat.name}
@@ -515,7 +495,7 @@ const AdminProductEditPage = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="sub">Sous-catégorie</label>
+              <label htmlFor="sub">Sub-category</label>
               <select
                 id="sub"
                 name="sub"
@@ -531,7 +511,7 @@ const AdminProductEditPage = () => {
                     : ""
                 }
               >
-                <option value="">Sélectionnez une sous-catégorie</option>
+                <option value="">Select a sub-category</option>
                 {subCategories.map((sub) => (
                   <option key={sub._id} value={sub._id}>
                     {sub.name}
@@ -547,7 +527,7 @@ const AdminProductEditPage = () => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="brand">
-                Marque <span className="required">*</span>
+                Brand <span className="required">*</span>
               </label>
               <select
                 id="brand"
@@ -564,7 +544,7 @@ const AdminProductEditPage = () => {
                 }
                 disabled={loading}
               >
-                <option value="">Sélectionnez une marque</option>
+                <option value="">Select a brand</option>
                 {brands.map((brand) => (
                   <option key={brand} value={brand}>
                     {brand}
@@ -595,7 +575,7 @@ const AdminProductEditPage = () => {
                 }
                 disabled={loading}
               >
-                <option value="">Sélectionnez une couleur</option>
+                <option value="">Select a color</option>
                 {colors.map((color) => (
                   <option key={color} value={color}>
                     {color}
@@ -609,14 +589,14 @@ const AdminProductEditPage = () => {
           </div>
         </div>
 
-        {/* PRIX ET STOCK */}
+        {/* PRICE AND STOCK */}
         <div className="form-section">
-          <h2 className="section-title">💰 Prix et stock</h2>
+          <h2 className="section-title">💰 Price and Stock</h2>
 
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="price">
-                Prix (€) <span className="required">*</span>
+                Price (€) <span className="required">*</span>
               </label>
               <input
                 type="number"
@@ -644,7 +624,7 @@ const AdminProductEditPage = () => {
 
             <div className="form-group">
               <label htmlFor="quantity">
-                Quantité en stock <span className="required">*</span>
+                Quantity in stock <span className="required">*</span>
               </label>
               <input
                 type="number"
@@ -670,7 +650,7 @@ const AdminProductEditPage = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="shipping">Livraison</label>
+              <label htmlFor="shipping">Shipping</label>
               <select
                 id="shipping"
                 name="shipping"
@@ -679,8 +659,8 @@ const AdminProductEditPage = () => {
                 onBlur={formik.handleBlur}
                 disabled={loading}
               >
-                <option value="No">Non disponible</option>
-                <option value="Yes">Disponible</option>
+                <option value="No">Not available</option>
+                <option value="Yes">Available</option>
               </select>
             </div>
           </div>
@@ -688,12 +668,12 @@ const AdminProductEditPage = () => {
 
         {/* IMAGES */}
         <div className="form-section">
-          <h2 className="section-title">📸 Images du produit</h2>
+          <h2 className="section-title">📸 Product Images</h2>
 
-          {/* Images existantes */}
+          {/* Existing Images */}
           {existingImages.length > 0 && (
             <div className="form-group">
-              <label>Images actuelles</label>
+              <label>Current Images</label>
               <div className="image-previews">
                 {existingImages.map((img, index) => (
                   <div key={img.public_id} className="image-preview-item">
@@ -711,20 +691,20 @@ const AdminProductEditPage = () => {
                 ))}
               </div>
               <small className="form-hint">
-                {existingImages.length} image(s) actuelle(s)
+                {existingImages.length} current image(s)
               </small>
             </div>
           )}
 
-          {/* Nouvelles images */}
+          {/* New Images */}
           <div className="form-group">
             <label htmlFor="images">
-              Ajouter de nouvelles images (Max: 5 images au total, 5MB chacune)
+              Add new images (Max: 5 images total, 5MB each)
             </label>
             <div className="image-upload-container">
               <label htmlFor="images" className="image-upload-label">
                 <div className="upload-icon">📁</div>
-                <span>Cliquez pour sélectionner des images</span>
+                <span>Click to select images</span>
                 <small>PNG, JPG, WEBP jusqu'à 5MB</small>
               </label>
               <input
@@ -765,8 +745,7 @@ const AdminProductEditPage = () => {
 
             {formik.values.images && formik.values.images.length > 0 && (
               <small className="form-hint text-success">
-                ✓ {formik.values.images.length} nouvelle(s) image(s)
-                sélectionnée(s)
+                ✓ {formik.values.images.length} new image(s) selected
               </small>
             )}
 
@@ -786,7 +765,7 @@ const AdminProductEditPage = () => {
             onClick={() => navigate("/admin/products")}
             disabled={loading}
           >
-            Annuler
+            Cancel
           </button>
           <button
             type="submit"
@@ -796,12 +775,12 @@ const AdminProductEditPage = () => {
             {loading ? (
               <>
                 <span className="spinner"></span>
-                Mise à jour en cours...
+                Updating...
               </>
             ) : (
               <>
                 <span>✅</span>
-                Mettre à jour le produit
+                Update Product
               </>
             )}
           </button>

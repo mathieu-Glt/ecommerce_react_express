@@ -7,11 +7,11 @@ import { AdminHeader } from "../../components/backoffice/AdminHeader/AdminHeader
 export const AdminLayout = () => {
   return (
     <div className="main-layout">
-      {/* Header en haut */}
+      {/* Header at the top */}
       <AdminHeader />
 
-      {/* Outlet affiche les routes enfants */}
-      {/* Contenu dynamique (pages) */}
+      {/* Outlet displays the child routes */}
+      {/* Dynamic content (pages) */}
       <main className="main-content">
         <Outlet />
       </main>

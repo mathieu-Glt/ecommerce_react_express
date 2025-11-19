@@ -6,6 +6,8 @@ const ISubRepository = require("./ISubRepository");
  * This class handles all subcategory-related database operations using
  * a Mongoose model. It extends the ISubRepository abstraction
  * to ensure the service layer does not depend on the database implementation.
+ * @extends {ISubRepository}
+ * @module repositories/MongooseSubRepository
  */
 class MongooseSubRepository extends ISubRepository {
   /**
@@ -22,13 +24,10 @@ class MongooseSubRepository extends ISubRepository {
    */
   async getSubs() {
     try {
-      console.log("🔍 MongooseSubRepository.getSubs() appelé");
       // Take relation parent categorie an object with name and slug only instead of full object
       const subs = await this.Sub.find().populate("parent", "name slug");
-      console.log("📊 Sous-catégories trouvées dans la DB:", subs?.length || 0);
       return subs;
     } catch (error) {
-      console.error("❌ Erreur dans MongooseSubRepository.getSubs():", error);
       throw error;
     }
   }
@@ -58,9 +57,9 @@ class MongooseSubRepository extends ISubRepository {
         const field = Object.keys(error.keyPattern)[0];
         const value = error.keyValue[field];
         throw new Error(
-          `Une sous-catégorie avec ce ${
-            field === "name" ? "nom" : "slug"
-          } "${value}" existe déjà`
+          `A subs-category with this ${
+            field === "name" ? "name" : "slug"
+          } "${value}" already exists`
         );
       }
       throw error;
@@ -100,9 +99,9 @@ class MongooseSubRepository extends ISubRepository {
         const field = Object.keys(error.keyPattern)[0];
         const value = error.keyValue[field];
         throw new Error(
-          `Une sous-catégorie avec ce ${
-            field === "name" ? "nom" : "slug"
-          } "${value}" existe déjà`
+          `A subs-category with this ${
+            field === "name" ? "name" : "slug"
+          } "${value}" already exists`
         );
       }
       throw error;

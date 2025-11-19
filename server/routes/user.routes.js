@@ -11,7 +11,7 @@ const {
   deleteUser,
 } = require("../controllers/user.controllers");
 
-const { requireRole } = require("../middleware/auth");
+const { requireRole, authenticateToken } = require("../middleware/auth");
 
 const {
   updateUserProfileValidation,
@@ -35,7 +35,7 @@ const {
  * @returns {Array<Object>} 200 - List of user objects
  * @returns {Error} 403 - Forbidden (if not admin)
  */
-router.get("/users", requireRole(["admin"]), getUsers);
+router.get("/users", authenticateToken, requireRole(["admin"]), getUsers);
 
 /**
  * GET /api/user/:email
@@ -48,7 +48,12 @@ router.get("/users", requireRole(["admin"]), getUsers);
  * @returns {Error} 404 - User not found
  * @returns {Error} 403 - Forbidden (if not admin)
  */
-router.get("/users/:email", requireRole(["admin"]), getUserByEmail);
+router.get(
+  "/users/:email",
+  authenticateToken,
+  requireRole(["admin"]),
+  getUserByEmail
+);
 
 /**
  * GET /api/users/:id
@@ -61,7 +66,12 @@ router.get("/users/:email", requireRole(["admin"]), getUserByEmail);
  * @returns {Error} 404 - User not found
  * @returns {Error} 403 - Forbidden (if not admin)
  */
-router.get("/users/:id", requireRole(["admin"]), getUserById);
+router.get(
+  "/users/:id",
+  authenticateToken,
+  requireRole(["admin"]),
+  getUserById
+);
 
 /**
  * PUT /api/user/:id
@@ -78,6 +88,7 @@ router.get("/users/:id", requireRole(["admin"]), getUserById);
  */
 router.put(
   "/users/:id",
+  authenticateToken,
   requireRole(["admin"]),
   updateUserProfileValidation,
   updateUser
@@ -94,6 +105,11 @@ router.put(
  * @returns {Error} 404 - User not found
  * @returns {Error} 403 - Forbidden (if not admin)
  */
-router.delete("/users/:id", requireRole(["admin"]), deleteUser);
+router.delete(
+  "/users/:id",
+  authenticateToken,
+  requireRole(["admin"]),
+  deleteUser
+);
 
 module.exports = router;

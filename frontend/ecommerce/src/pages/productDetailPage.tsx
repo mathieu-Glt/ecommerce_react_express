@@ -7,9 +7,7 @@ import type { ProductDetailInterface } from "../interfaces/product.interface";
 
 export const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
-  console.log("Product ID from params:", productId);
   const { selectedProduct, loading, getProductById } = useProduct();
-  console.log("Selected product in ProductDetail:", selectedProduct);
 
   useEffect(() => {
     if (!productId) return;

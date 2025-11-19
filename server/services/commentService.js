@@ -42,13 +42,13 @@ class CommentService {
    *
    */
   async addComment(commentData) {
-    console.log("commentData dans service :", commentData);
     return await this.commentRepository.addComment(commentData);
   }
   /**
    * Find a comment by user ID and product ID.
    * @param {String} userId - ID of the user.
    * @param {String} productId - ID of the product.
+   * @returns {Promise<Object|null>} Comment object or null if not found.
    */
   async getCommentByUserAndProduct(userId, productId) {
     return await this.commentRepository.getCommentByUserAndProduct(
@@ -69,6 +69,7 @@ class CommentService {
   /**
    * Get all comments.
    * @returns {Promise<Array>} List of comments.
+   *
    *
    */
   async getAllComments() {

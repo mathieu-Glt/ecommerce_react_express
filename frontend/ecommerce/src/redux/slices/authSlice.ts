@@ -11,24 +11,22 @@ import { loginUser, registerUser, fetchCurrentUser } from "../thunks/authThunk";
 import { loadAuthStateFromLocalStorage } from "../middleware/localStorageMiddleware";
 
 // ============================================
-// HYDRATATION - Chargement depuis localStorage
+// HYDRATION - Loading from localStorage
 // ============================================
 
 /**
- * Charge l'état d'authentification depuis localStorage au démarrage
- * S'exécute une seule fois lors de l'import du fichier
+ * Loads the authentication state from localStorage on startup
+ * Executes only once when the file is imported
  */
 const persistedAuth = loadAuthStateFromLocalStorage();
 
-console.log("🌊 [authSlice] État persisté chargé:", persistedAuth);
-
 // ============================================
-// ÉTAT INITIAL
+// INITIAL STATE
 // ============================================
 
 /**
- * État initial de l'authentification
- * Hydraté avec les données de localStorage si disponibles
+ * Initial authentication state
+ * Hydrated with localStorage data if available
  */
 const initialState: AuthState = persistedAuth || {
   isAuthenticated: false,
@@ -44,17 +42,17 @@ const initialState: AuthState = persistedAuth || {
 // ============================================
 
 /**
- * Slice Redux pour la gestion de l'authentification et de l'utilisateur connecté
+ * Redux slice for managing authentication and the connected user
  *
- * Gère :
- * - Connexion/Déconnexion
- * - Inscription
- * - Récupération de l'utilisateur actuel
- * - Tokens d'authentification
- * - Profil utilisateur connecté
+ * Manages:
+ * - Login/Logout
+ * - Registration
+ * - Fetching the current user
+ * - Authentication tokens
+ * - Connected user profile
  *
- * Note : Le middleware localStorage synchronise automatiquement
- * toutes les modifications avec le localStorage
+ * Note: The localStorage middleware automatically synchronizes
+ * all changes with localStorage
  */
 const authSlice: Slice<AuthState> = createSlice({
   name: "auth",
@@ -65,10 +63,10 @@ const authSlice: Slice<AuthState> = createSlice({
   // ============================================
   reducers: {
     /**
-     * Réinitialise complètement l'état d'authentification
-     * Utilisé lors de la déconnexion ou pour réinitialiser l'app
+     * Completely resets the authentication state
+     * Used during logout or to reset the app
      *
-     * Note : Le middleware nettoiera automatiquement localStorage
+     * Note: The middleware will automatically clear localStorage
      */
     clearAuthState: (state) => {
       state.user = null;
@@ -80,11 +78,11 @@ const authSlice: Slice<AuthState> = createSlice({
     },
 
     /**
-     * Définit les tokens d'authentification
+     * Sets the authentication tokens
      *
-     * @param action - Payload contenant token et optionnellement refreshToken
+     * @param action - Payload containing token and optionally refreshToken
      *
-     * Note : Le middleware sauvegardera automatiquement dans localStorage
+     * Note: The middleware will automatically save to localStorage
      */
     setTokens: (
       state,
@@ -97,15 +95,15 @@ const authSlice: Slice<AuthState> = createSlice({
     },
 
     /**
-     * Définit l'utilisateur connecté
+     * Sets the connected user
      *
-     * @param action - Payload contenant les données utilisateur
+     * @param action - Payload containing user data
      *
-     * Utilisé pour :
-     * - Mettre à jour le profil utilisateur
-     * - Définir l'utilisateur après une action manuelle
+     * Used for:
+     * - Updating the user profile
+     * - Setting the user after a manual action
      *
-     * Note : Le middleware sauvegardera automatiquement dans localStorage
+     * Note: The middleware will automatically save to localStorage
      */
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
@@ -113,10 +111,10 @@ const authSlice: Slice<AuthState> = createSlice({
     },
 
     /**
-     * Déconnecte l'utilisateur
-     * Alias de clearAuthState pour une API plus explicite
+     * Logs out the user
+     * Alias of clearAuthState for a more explicit API
      *
-     * Note : Le middleware nettoiera automatiquement localStorage
+     * Note: The middleware will automatically clear localStorage
      */
     logout: (state) => {
       state.user = null;
@@ -128,18 +126,18 @@ const authSlice: Slice<AuthState> = createSlice({
     },
 
     /**
-     * Définit l'état de chargement
+     * Sets the loading state
      *
-     * @param action - Boolean indiquant si un chargement est en cours
+     * @param action - Boolean indicating if a loading is in progress
      */
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
 
     /**
-     * Définit une erreur
+     * Sets an error
      *
-     * @param action - Message d'erreur ou null pour effacer
+     * @param action - Error message or null to clear
      */
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
@@ -159,8 +157,6 @@ const authSlice: Slice<AuthState> = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("✅ [authSlice] Login réussi:", action.payload);
-
         state.loading = false;
         state.user = (action.payload.results as payloadDataUser).user ?? null;
         state.token =
@@ -171,16 +167,14 @@ const authSlice: Slice<AuthState> = createSlice({
         state.isAuthenticated = true;
         state.error = null;
 
-        // ✅ Le middleware sauvegardera automatiquement dans localStorage
+        // The middleware will automatically save to localStorage
       })
       .addCase(loginUser.rejected, (state, action) => {
-        console.error("❌ [authSlice] Login échoué:", action.payload);
-
         state.loading = false;
         state.error = action.payload || "Login failed";
         state.isAuthenticated = false;
 
-        // ✅ Le middleware nettoiera automatiquement localStorage
+        // The middleware will automatically clear localStorage
       })
 
       // ==========================================
@@ -191,57 +185,46 @@ const authSlice: Slice<AuthState> = createSlice({
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        console.log("✅ [authSlice] Inscription réussie:", action.payload);
-
         state.loading = false;
         state.user = (action.payload as payloadDataUser).user ?? null;
-        state.token = null; // Pas de token après inscription (doit se connecter)
+        state.token = null; // No token after registration (must log in)
         state.isAuthenticated = true;
         state.error = null;
 
-        // ✅ Le middleware sauvegardera automatiquement dans localStorage
+        // The middleware will automatically save to localStorage
       })
       .addCase(registerUser.rejected, (state, action) => {
-        console.error("❌ [authSlice] Inscription échouée:", action.payload);
-
         state.loading = false;
         state.error = action.payload || "Registration failed";
       })
 
       // ==========================================
       // FETCH CURRENT USER
-      // Récupère l'utilisateur connecté actuel
+      // Fetch the currently authenticated user
       // ==========================================
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        console.log("✅ [authSlice] Utilisateur récupéré:", action.payload);
-
         state.loading = false;
 
-        // Mettre à jour l'utilisateur si présent
+        // Update user if present
         if (action.payload.user) {
           state.user = action.payload.user;
           state.isAuthenticated = true;
         }
 
-        // Mettre à jour le token si présent
+        // Update token if present
         if (action.payload.token) {
           state.token = action.payload.token;
         }
 
         state.error = null;
 
-        // ✅ Le middleware sauvegardera automatiquement dans localStorage
+        // The middleware will automatically save to localStorage
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
-        console.error(
-          "❌ [authSlice] Échec récupération utilisateur:",
-          action.payload
-        );
-
         state.loading = false;
         state.error = action.payload || "Failed to fetch current user";
         state.isAuthenticated = false;
@@ -249,7 +232,7 @@ const authSlice: Slice<AuthState> = createSlice({
         state.token = null;
         state.refreshToken = null;
 
-        // ✅ Le middleware nettoiera automatiquement localStorage
+        // The middleware will automatically clear localStorage
       });
   },
 });
@@ -259,12 +242,12 @@ const authSlice: Slice<AuthState> = createSlice({
 // ============================================
 
 /**
- * Actions exportées pour utilisation dans les composants
+ * Actions exported for use in components
  *
- * Utilisations courantes :
- * - dispatch(setUser(newUser)) - Mettre à jour le profil
- * - dispatch(logout()) - Déconnecter l'utilisateur
- * - dispatch(setTokens({ token, refreshToken })) - Définir les tokens
+ * Common uses:
+ * - dispatch(setUser(newUser)) - Update profile
+ * - dispatch(logout()) - Log out user
+ * - dispatch(setTokens({ token, refreshToken })) - Set tokens
  */
 export const {
   clearAuthState,
@@ -276,16 +259,16 @@ export const {
 } = authSlice.actions;
 
 /**
- * Reducer par défaut pour le store Redux
+ * Default reducer for the Redux store
  */
 export default authSlice.reducer;
 
 // ============================================
-// EXEMPLES D'UTILISATION
+// USAGE EXAMPLES
 // ============================================
 
 /**
- * EXEMPLE 1 : Afficher l'utilisateur connecté
+ * EXAMPLE 1: Display the logged-in user
  *
  * ```typescript
  * import { useAppSelector } from '../store/store';
@@ -309,7 +292,7 @@ export default authSlice.reducer;
  */
 
 /**
- * EXEMPLE 2 : Déconnexion
+ * EXAMPLE 2: Log out
  *
  * ```typescript
  * import { useAppDispatch } from '../store/store';
@@ -330,7 +313,7 @@ export default authSlice.reducer;
  */
 
 /**
- * EXEMPLE 3 : Mettre à jour le profil
+ * EXAMPLE 3: Update profile
  *
  * ```typescript
  * import { setUser } from '../store/slices/authSlice';
@@ -353,7 +336,7 @@ export default authSlice.reducer;
  */
 
 /**
- * EXEMPLE 4 : Récupérer l'utilisateur au démarrage
+ * EXAMPLE 4: Fetch current user on startup
  *
  * ```typescript
  * import { fetchCurrentUser } from '../store/thunks/authThunk';

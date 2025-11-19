@@ -5,14 +5,15 @@ import "./cart-counter.css";
 function CartCount() {
   const { cart } = useLocalStorage();
   const [totalItems, setTotalItems] = useState(0);
-  console.log("Cart in CartCount:", cart);
   useEffect(() => {
     if (cart && Array.isArray(cart)) {
+      {
+        /* Calculate total quantity of items in the cart */
+      }
       const total = cart.reduce(
         (sum: number, item: any) => sum + (item.quantity || 0),
         0
       );
-      console.log("Total items in cart:", total);
       setTotalItems(total);
     }
   }, [cart]);
