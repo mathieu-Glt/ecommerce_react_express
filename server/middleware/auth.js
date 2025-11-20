@@ -14,7 +14,7 @@
 // Create instances of services
 const AuthService = require("../services/authService");
 const UserServiceFactory = require("../factories/userServiceFactory");
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 
 const userService = UserServiceFactory.createUserService(
   process.env.DATABASE_TYPE || "mongoose"
@@ -129,32 +129,32 @@ const requireRole = (roles) => (req, res, next) => {
  * Attach the user data to req.user and call next().
  * If verification fails → return 401 with "Invalid or Expired Token".
  */
-const checkAuthFirebase = async (req, res, next) => {
-  try {
-    const token = extractToken(req);
-    if (!token)
-      return res.status(401).json({ status: "error", message: "Unauthorized" });
+// const checkAuthFirebase = async (req, res, next) => {
+//   try {
+//     const token = extractToken(req);
+//     if (!token)
+//       return res.status(401).json({ status: "error", message: "Unauthorized" });
 
-    const firebaseUser = await admin.auth().verifyIdToken(token);
-    const userDoc = await admin
-      .firestore()
-      .collection("users")
-      .doc(firebaseUser.uid)
-      .get();
+//     const firebaseUser = await admin.auth().verifyIdToken(token);
+//     const userDoc = await admin
+//       .firestore()
+//       .collection("users")
+//       .doc(firebaseUser.uid)
+//       .get();
 
-    req.user = userDoc.data();
-    next();
-  } catch (error) {
-    console.error("Error checkAuthFirebase:", error);
-    res
-      .status(401)
-      .json({ status: "error", message: "Invalid or Expired Token" });
-  }
-};
+//     req.user = userDoc.data();
+//     next();
+//   } catch (error) {
+//     console.error("Error checkAuthFirebase:", error);
+//     res
+//       .status(401)
+//       .json({ status: "error", message: "Invalid or Expired Token" });
+//   }
+// };
 
 module.exports = {
   authenticateToken,
   // optionalAuth,
   requireRole,
-  checkAuthFirebase,
+  // checkAuthFirebase,
 };

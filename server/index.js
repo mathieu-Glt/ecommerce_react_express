@@ -58,17 +58,32 @@ const httpServer = require("http").createServer(app);
 app.use(cookieParser());
 
 // =============================================
-// 2. CORS - FIRST (before other middlewares)
+// 2. CORS - CONFIGURATION DYNAMIQUE POUR PRODUCTION
 // =============================================
 /**
- * OPTIONS is a special HTTP method used by browsers to check CORS permissions before sending the actual request.
- * This is called a "preflight request".
- * What is a Preflight Request? It's an automatic verification request sent by the browser before the actual request to check if the server allows the operation.
+ * Configure CORS based on environment
+ * Development: Allow localhost
+ * Production: Allow only the frontend URL from environment variable
  */
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? [process.env.FRONTEND_URL] // Production: only Vercel URL
+    : ["http://localhost:5173", "http://localhost:3000"]; // Development: localhost
+
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️  CORS blocked origin: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"], // OPTIONS ajouté pour preflight requests
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: [
     "Content-Type",
     "Authorization",
@@ -146,38 +161,43 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // =============================================
-// 6. SESSION
+// 6. SESSION - CONFIGURATION DYNAMIQUE
 // =============================================
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || "your-secret-key",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // true in production HTTPS
+    secure: process.env.NODE_ENV === "production", // true en production (HTTPS)
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24,
-    sameSite: "lax", // Critical for CSRF with cookies
+    maxAge: 1000 * 60 * 60 * 24, // 24 hours
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // 'none' pour cross-domain en prod
   },
 };
+
+if (process.env.NODE_ENV !== "production") {
+  console.warn(
+    "⚠️  WARNING: Using MemoryStore for sessions (not suitable for production)"
+  );
+}
+
 const sessionMiddleware = session(sessionConfig);
 app.use(sessionMiddleware);
-
 // =============================================
 // 7. SOCKET.IO
 // =============================================
 initSocket(httpServer, sessionMiddleware);
 
 // =============================================
-// 8. CSRF PROTECTION
+// 8. CSRF PROTECTION - CONFIGURATION DYNAMIQUE
 // =============================================
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
   },
 });
-
 // Simple route to get the CSRF token
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
   const token = req.csrfToken();
@@ -282,17 +302,60 @@ app.use(errorHandler);
 // =============================================
 // 15. START SERVER
 // =============================================
+console.log("═══════════════════════════════════════");
+console.log("🚀 INITIALIZING SERVER...");
+console.log("═══════════════════════════════════════");
+console.log(`📍 Node version: ${process.version}`);
+console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
+console.log(`📍 Port: ${process.env.PORT || 8000}`);
+console.log(
+  `📍 Frontend URL: ${process.env.FRONTEND_URL || "http://localhost:5173"}`
+);
+console.log("═══════════════════════════════════════\n");
+
 const initializeApp = async () => {
   try {
+    console.log("🔄 Validating database configuration...");
     validateDatabaseConfig();
+
+    console.log("🔄 Connecting to MongoDB...");
     await connectDB();
+    console.log("✅ MongoDB connected successfully\n");
 
     const PORT = process.env.PORT || 8000;
-    httpServer.listen(PORT, () => {});
+
+    // ✅ IMPORTANT: Listen on 0.0.0.0 for Render.com
+    httpServer.listen(PORT, "0.0.0.0", () => {
+      console.log("═══════════════════════════════════════");
+      console.log("✅ SERVER STARTED SUCCESSFULLY!");
+      console.log("═══════════════════════════════════════");
+      console.log(`🌐 Server running on port ${PORT}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(
+        `📡 Frontend URL: ${
+          process.env.FRONTEND_URL || "http://localhost:5173"
+        }`
+      );
+      console.log(`🗄️  Database: ${process.env.DATABASE_TYPE || "mongoose"}`);
+      console.log("═══════════════════════════════════════");
+
+      if (process.env.NODE_ENV !== "production") {
+        console.log(`\n🔗 Local API: http://localhost:${PORT}/api`);
+        console.log(`🔗 Health Check: http://localhost:${PORT}/api/health`);
+        console.log(`🔗 CSRF Token: http://localhost:${PORT}/api/csrf-token\n`);
+      }
+    });
   } catch (error) {
+    console.error("═══════════════════════════════════════");
+    console.error("❌ SERVER FAILED TO START!");
+    console.error("═══════════════════════════════════════");
+    console.error("❌ Error:", error.message);
+    console.error("❌ Stack:", error.stack);
+    console.error("═══════════════════════════════════════\n");
     process.exit(1);
   }
 };
 
 initializeApp();
+
 module.exports = { app, httpServer };
