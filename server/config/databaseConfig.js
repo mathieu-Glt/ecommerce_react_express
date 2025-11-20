@@ -81,7 +81,7 @@ function checkDatabaseConfig() {
   const databaseType = process.env.DATABASE_TYPE || "mongoose";
 
   if (databaseType === "mongoose") {
-    if (process.env.MONGO_URI_PRODUCTION) {
+    if (process.env.MONGODB_URI) {
     } else {
     }
   } else if (databaseType === "mysql") {

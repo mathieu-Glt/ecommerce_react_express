@@ -4,23 +4,29 @@ const mongoose = require("mongoose");
  * Configuration de la base de données avec support pour différents types
  */
 const connectDB = async () => {
-  const databaseType = process.env.DATABASE_TYPE || "mongoose";
-
   try {
-    if (databaseType === "mongoose") {
-      const conn = await mongoose.connect(process.env.MONGO_URI_PRODUCTION);
-      return conn;
-    } else if (databaseType === "mysql") {
-      // Pour MySQL, la connexion sera gérée par le repository
-      return null;
-    } else {
-      throw new Error(`Unsupported database type: ${databaseType}`);
-    }
+    console.log("🔄 Connecting to MongoDB...");
+    console.log(
+      "📍 MongoDB URI:",
+      process.env.MONGODB_URI ? "SET ✅" : "MISSING ❌"
+    );
+    console.log("📍 Database:", process.env.MONGODB_URI?.split("/").pop());
+
+    await mongoose.connect(process.env.MONGODB_URI);
+
+    console.log("✅ MongoDB connected successfully");
   } catch (error) {
-    process.exit(1);
+    console.error("═══════════════════════════════════════");
+    console.error("❌ MONGODB CONNECTION ERROR:");
+    console.error("═══════════════════════════════════════");
+    console.error("Error name:", error.name);
+    console.error("Error message:", error.message);
+    console.error("Error code:", error.code);
+    console.error("Full error:", error);
+    console.error("═══════════════════════════════════════");
+    throw error;
   }
 };
-
 /**
  * Vérifier la configuration de la base de données
  */
