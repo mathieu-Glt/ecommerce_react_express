@@ -29,8 +29,16 @@
  * database connection, route loading, and error handling.
  */
 
-require("dotenv").config({ path: __dirname + "/.env" });
-
+/**
+ * Load environment variables from .env file in development only
+ * In production (Render), environment variables are injected directly
+ */
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config({ path: __dirname + "/.env" });
+  console.log("✅ Loaded .env file for development");
+} else {
+  console.log("✅ Using environment variables from platform (production)");
+}
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
