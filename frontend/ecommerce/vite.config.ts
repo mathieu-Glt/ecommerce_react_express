@@ -14,20 +14,20 @@ export default defineConfig(({ mode }) => {
         env.VITE_API_BASE_URL || "http://localhost:8000"
       ),
     },
-    build: {
-      // Ignorer les erreurs TypeScript pendant le build
-      rollupOptions: {
-        onwarn(warning, warn) {
-          // Ignorer les warnings
-          if (warning.code === "UNUSED_EXTERNAL_IMPORT") return;
-          warn(warning);
-        },
-      },
-    },
-    // Désactiver la vérification TypeScript
-    esbuild: {
-      logOverride: { "this-is-undefined-in-esm": "silent" },
-    },
+    // build: {
+    //   // Ignorer les erreurs TypeScript pendant le build
+    //   rollupOptions: {
+    //     onwarn(warning, warn) {
+    //       // Ignorer les warnings
+    //       if (warning.code === "UNUSED_EXTERNAL_IMPORT") return;
+    //       warn(warning);
+    //     },
+    //   },
+    // },
+    // // Désactiver la vérification TypeScript
+    // esbuild: {
+    //   logOverride: { "this-is-undefined-in-esm": "silent" },
+    // },
 
     plugins: [react()],
 
