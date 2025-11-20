@@ -295,3 +295,4 @@ const initializeApp = async () => {
 };
 
 initializeApp();
+module.exports = { app, httpServer };

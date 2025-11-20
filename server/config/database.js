@@ -8,7 +8,7 @@ const connectDB = async () => {
 
   try {
     if (databaseType === "mongoose") {
-      const conn = await mongoose.connect(process.env.MONGODB_URI);
+      const conn = await mongoose.connect(process.env.MONGO_URI_PRODUCTION);
       return conn;
     } else if (databaseType === "mysql") {
       // Pour MySQL, la connexion sera gérée par le repository
@@ -43,7 +43,6 @@ const validateDatabaseConfig = () => {
       );
     }
   }
-
 };
 
 module.exports = { connectDB, validateDatabaseConfig };
