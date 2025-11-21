@@ -111,11 +111,17 @@ exports.stripeSuccess = asyncHandler(async (req, res) => {
       }, 5000);
     });
 
+    // ✅ Retourner l'URL du backend, pas du frontend !
+    const frontendUrl =
+      process.env.FRONTEND_URL ||
+      "https://frontend-typescript-react-gules.vercel.app";
+    const backendUrl =
+      process.env.BACKEND_URL || "https://cellphone365-api.onrender.com";
+
     // Redirect to the frontend with the invoice URL as a parameter
-    const redirectUrl = `${
-      process.env.FRONTEND_URL || "http://localhost:5173"
-    }/merci?invoice=${fileName}`;
-    res.redirect(redirectUrl);
+    res.redirect(
+      `${frontendUrl}/merci?invoice=${fileName}&downloadUrl=${backendUrl}/api/invoices/${fileName}`
+    );
   } catch (err) {
     res.status(500).send("Error processing payment.");
   }
