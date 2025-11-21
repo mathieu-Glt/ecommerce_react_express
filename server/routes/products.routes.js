@@ -41,50 +41,90 @@ const {
  * @module routes/productRoutes
  */
 
+// ========================================
+// PUBLIC ROUTES - SPECIFIC PATHS FIRST
+// ========================================
+
 /**
- * @route GET /products/
+ * @route GET /
  * @desc Get a list of all products
  * @access Public
  */
 router.get("/", getProducts);
 
 /**
- * @route GET /product/slug/:slug
- * @desc Get product details by slug
- * @access Public
- */
-router.get("/:slug", getProductBySlug);
-
-/**
- * @route GET /product/search
- * @desc Search products by query or slug
- * @access Public
- */
-router.get("/search", searchProducts);
-
-/**
- * @route GET /product/search/price
- * @desc Search products by price range
- * @access Public
- */
-router.get("/products/search/price", searchProductByPriceRange);
-
-/**
- * @route GET /id/:id
- * @desc Get product details by ID
- * @access Public
- */
-router.get("/:id", getProductById);
-
-/**
- * @route GET /product/lastest
+ * @route GET /latest
  * @desc Get latest products
  * @access Public
  */
 router.get("/latest", getLatestProducts);
 
 /**
- * @route POST /product
+ * @route GET /sold-best
+ * @desc Get top sold products
+ * @access Public
+ */
+router.get("/sold-best", getBestSoldProducts);
+
+/**
+ * @route GET /search
+ * @desc Search products by query or slug
+ * @access Public
+ */
+router.get("/search", searchProducts);
+
+/**
+ * @route GET /products/search/price
+ * @desc Search products by price range
+ * @access Public
+ */
+router.get("/products/search/price", searchProductByPriceRange);
+
+/**
+ * @route GET /average-rate
+ * @desc Find products by average rate range
+ * @access Public
+ */
+router.get("/average-rate", findProductsByAverageRateRange);
+
+/**
+ * @route GET /price-range
+ * @desc Search products by price range
+ * @access Public
+ */
+router.get("/price-range", findProductsByPriceRange);
+
+/**
+ * @route GET /category/accessories
+ * @desc Get top accessories products
+ * @access Public
+ */
+router.get("/category/accessories", getProductsByCategoryAcesories);
+
+/**
+ * @route GET /category/outillage
+ * @desc Get top outillage products
+ * @access Public
+ */
+router.get("/category/outillage", getProductsByCategoryOutillage);
+
+// ========================================
+// PUBLIC ROUTES - DYNAMIC PARAMETERS (MUST BE LAST)
+// ========================================
+
+/**
+ * @route GET /:id
+ * @desc Get product details by ID
+ * @access Public
+ */
+router.get("/:id", getProductById);
+
+// ========================================
+// PROTECTED ROUTES - CREATE, UPDATE, DELETE
+// ========================================
+
+/**
+ * @route POST /
  * @desc Create a new product
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"]), upload.array("images", 5), uploadToCloudinary
@@ -99,7 +139,7 @@ router.post(
 );
 
 /**
- * @route PUT /product/:id
+ * @route PUT /:id
  * @desc Update an existing product by ID
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"]), upload.array("images", 5), uploadToCloudinary
@@ -114,15 +154,19 @@ router.put(
 );
 
 /**
- * @route DELETE /product/:id
+ * @route DELETE /:id
  * @desc Delete a product by ID
  * @access Protected (Admin only)
  * @middleware requireRole(["admin"])
  */
 router.delete("/:id", authenticateToken, requireRole(["admin"]), deleteProduct);
 
+// ========================================
+// PROTECTED ROUTES - RATINGS
+// ========================================
+
 /**
- * @route POST /product/:id/rate
+ * @route POST /:id/rate
  * @desc Rate a product
  * @access Protected (Authenticated users)
  * @middleware requireRole(["user", "admin"])
@@ -135,7 +179,7 @@ router.post(
 );
 
 /**
- * @route PUT /product/:id/rate
+ * @route PUT /:id/rate
  * @desc Update a product rating
  * @access Protected (Authenticated users)
  * @middleware requireRole(["user", "admin"])
@@ -148,60 +192,29 @@ router.put(
 );
 
 /**
- * @route GET /product/:id/rate/check
+ * @route GET /:id/rate/check
  * @desc Check if user has rated the product
  * @access Protected (Authenticated users)
  * @middleware requireRole(["user", "admin"])
  */
 router.get("/:id/rate/check", authenticateToken, takeProductRating);
 
+// ========================================
+// PUBLIC ROUTES - SUB-ROUTES WITH :id PARAMETER
+// ========================================
+
 /**
- * @route GET /product/:id/category
+ * @route GET /:id/category
  * @desc Category on a product
  * @access Public
  */
 router.get("/:id/category", findProductsByCategoryId);
 
 /**
- * @route GET /product/:id/subs-category
+ * @route GET /:id/subs-category
  * @desc SubsCategory on a product
  * @access Public
  */
 router.get("/:id/subs-category", findProductsBySubsCategoryId);
-
-/**
- * @route GET /products/average-rate?minRate=3&maxRate=5&page=1&limit=10
- * @desc Find products by average rate range
- * @access Public
- */
-router.get("/average-rate", findProductsByAverageRateRange);
-
-/**
- * @route POST /produccts/price-range?minPrice=100&maxPrice=500
- * @desc Search products by price range
- * @access Public
- */
-router.get("/price-range", findProductsByPriceRange);
-
-/**
- * @route POST /product/sold/best
- * @desc Get top sold products
- * @access Public
- */
-router.get("/sold-best", getBestSoldProducts);
-
-/**
- * @route POST /product/category/acesories
- * @desc Get top accessories products
- * @access Public
- */
-router.get("/category/accessories", getProductsByCategoryAcesories);
-
-/**
- * @route POST /product/category/outillage
- * @desc Get top outillage products
- * @access Public
- */
-router.get("/category/outillage", getProductsByCategoryOutillage);
 
 module.exports = router;
