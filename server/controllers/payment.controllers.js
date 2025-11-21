@@ -57,7 +57,7 @@ exports.createCheckoutSession = asyncHandler(async (req, res) => {
         },
         quantity: item.quantity,
       })),
-      success_url: `http://localhost:8000/api/payment/stripe/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `https://cellphone365-api.onrender.com/api/payment/stripe/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/paypal/failure`,
     });
 
@@ -160,7 +160,7 @@ exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
           },
         ],
         application_context: {
-          return_url: `http://localhost:8000/api/payment/paypal/capture`,
+          return_url: `https://cellphone365-api.onrender.com/api/payment/paypal/capture`,
           cancel_url: `${req.headers.origin}/cancel`,
         },
       }),
