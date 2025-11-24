@@ -18,8 +18,11 @@ const { saveBase64Image, validateBase64Image } = require("../utils/imageUtils");
 const jwt = require("jsonwebtoken");
 const { getIO, emitToSession } = require("../config/socket");
 const { sendWelcomeEmail } = require("../config/brevo");
+const User = require("../models/User");
 require("dotenv").config();
-
+const path = require("path");
+const mongoose = require("mongoose");
+const { app, httpServer } = require("../index");
 // Create auth service based on database type (mongoose or mysql)
 const authService = AuthServiceFactory.createAuthService(
   process.env.DATABASE_TYPE || "mongoose"
@@ -319,6 +322,7 @@ exports.register = asyncHandler(async (req, res) => {
     throw error; // Let asyncHandler handle the error
   }
 });
+
 /**
  * Verify JWT token validity
  * @access Protected
