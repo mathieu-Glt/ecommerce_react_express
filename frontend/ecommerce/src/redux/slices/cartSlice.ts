@@ -21,9 +21,8 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // ===========================================
-    // ➕ Add a product to cart
-    // ===========================================
+
+    // Add a product to cart
     addToCart: (
       state,
       action: PayloadAction<{
@@ -49,9 +48,7 @@ const cartSlice = createSlice({
       localStorage.setItem("cart", JSON.stringify(state.items));
     },
 
-    // ===========================================
-    // 🔁 Update the quantity of a product
-    // ===========================================
+    // Update the quantity of a product
     updateToCart: (
       state,
       action: PayloadAction<{ productId: string; quantity: number }>
@@ -65,17 +62,14 @@ const cartSlice = createSlice({
       }
     },
 
-    // ===========================================
-    // ❌ Remove a product from cart
-    // ===========================================
+    // Remove a product from cart
+
     removeFromCart: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter((i) => i.product._id !== action.payload);
       localStorage.setItem("cart", JSON.stringify(state.items));
     },
 
-    // ===========================================
-    // 🧹 Clear the cart
-    // ===========================================
+    // Clear the cart
     clearCart: (state) => {
       state.items = [];
       localStorage.removeItem("cart");
@@ -83,9 +77,7 @@ const cartSlice = createSlice({
       state.orderedBy = null;
     },
 
-    // ===========================================
-    // 👤 Set the user associated with the cart
-    // ===========================================
+    // Set the user associated with the cart
     setOrderedBy: (state, action: PayloadAction<string | null>) => {
       state.orderedBy = action.payload;
       if (action.payload) {

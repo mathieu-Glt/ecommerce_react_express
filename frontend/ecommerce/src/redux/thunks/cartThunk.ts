@@ -1,4 +1,3 @@
-// src/redux/thunks/cartThunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { RootState } from "../store"; // adapte le chemin selon ton store
 import type { Product } from "../../interfaces/product.interface";

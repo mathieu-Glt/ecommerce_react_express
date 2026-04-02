@@ -1,4 +1,3 @@
-// src/components/modals/DeleteConfirmModal.tsx
 import React, { useState } from "react";
 import "./DeleteConfirmModal.css";
 

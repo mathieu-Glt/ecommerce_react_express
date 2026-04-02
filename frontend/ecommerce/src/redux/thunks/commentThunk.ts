@@ -10,9 +10,7 @@ import {
 import type { Comment } from "../../interfaces/comment.interface";
 
 /**
- * =====================================================
- * 🔹 FETCH ALL COMMENTS
- * =====================================================
+ * FETCH ALL COMMENTS
  */
 export const getAllComments = createAsyncThunk<
   Comment[],
@@ -35,9 +33,7 @@ export const getAllComments = createAsyncThunk<
 });
 
 /**
- * =====================================================
- * 🔹 FETCH COMMENTS BY PRODUCT ID
- * =====================================================
+ *  FETCH COMMENTS BY PRODUCT ID
  */
 export const getCommentsByProduct = createAsyncThunk<
   Comment[],
@@ -60,9 +56,7 @@ export const getCommentsByProduct = createAsyncThunk<
 });
 
 /**
- * =====================================================
- * 🔹 FETCH COMMENTS BY USER ID
- * =====================================================
+ *  FETCH COMMENTS BY USER ID
  */
 export const getCommentsByUser = createAsyncThunk<
   Comment[],
@@ -85,9 +79,7 @@ export const getCommentsByUser = createAsyncThunk<
 });
 
 /**
- * =====================================================
- * 🔹 CREATE (POST) COMMENT
- * =====================================================
+ *  CREATE (POST) COMMENT
  */
 export const createNewComment = createAsyncThunk<
   Comment,
@@ -108,9 +100,7 @@ export const createNewComment = createAsyncThunk<
 });
 
 /**
- * =====================================================
- * 🔹 UPDATE COMMENT
- * =====================================================
+ *  UPDATE COMMENT
  */
 export const updateExistingComment = createAsyncThunk<
   Comment,
@@ -134,9 +124,7 @@ export const updateExistingComment = createAsyncThunk<
 });
 
 /**
- * =====================================================
- * 🔹 DELETE COMMENT
- * =====================================================
+ *  DELETE COMMENT
  */
 export const deleteExistingComment = createAsyncThunk<
   string,

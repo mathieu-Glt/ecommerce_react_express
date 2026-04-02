@@ -1,4 +1,3 @@
-// src/hooks/useProduct.ts
 import { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "./useReduxHooks";
 import useToast from "./usetoast";
@@ -40,9 +39,7 @@ export const useProduct = () => {
     (state) => state.products
   );
 
-  // ============================================
   // FETCH ALL PRODUCTS
-  // ============================================
   const getAllProducts = useCallback(async (): Promise<void> => {
     try {
       await dispatch(fetchProducts()).unwrap();
@@ -52,9 +49,7 @@ export const useProduct = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // FETCH LATEST PRODUCTS
-  // ============================================
 
   const getLatestProducts = useCallback(
     async (limit: number): Promise<void> => {
@@ -68,9 +63,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // FETCH BY ID
-  // ============================================
   const getProductById = useCallback(
     async (id: string): Promise<Product | null> => {
       try {
@@ -84,9 +77,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // FETCH BY SLUG
-  // ============================================
   const getProductBySlug = useCallback(
     async (slug: string): Promise<Product | null> => {
       try {
@@ -100,9 +91,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // CREATE PRODUCT
-  // ============================================
   const createProduct = useCallback(
     async (data: Record<string, any> | FormData): Promise<Product | null> => {
       try {
@@ -117,9 +106,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // UPDATE PRODUCT
-  // ============================================
   const updateProduct = useCallback(
     async (
       id: string,
@@ -137,9 +124,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // DELETE PRODUCT
-  // ============================================
   const deleteProduct = useCallback(
     async (id: string): Promise<boolean> => {
       try {
@@ -154,9 +139,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // RATE PRODUCT
-  // ============================================
   const rateProductHook = useCallback(
     async (
       id: string,
@@ -175,9 +158,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // CHECK RATE PRODUCT BY USER AUTHENTICATED
-  // ============================================
   const checkRateProductByUser = useCallback(
     async (productId: string): Promise<{} | null> => {
       try {
@@ -191,9 +172,7 @@ export const useProduct = () => {
     [toast]
   );
 
-  // ============================================
   // SEARCH PRODUCTS (by title or slug)
-  // ============================================
   const searchProductsHook = useCallback(
     async (params: { title?: string; slug?: string }): Promise<Product[]> => {
       try {
@@ -211,9 +190,7 @@ export const useProduct = () => {
     },
     [dispatch, toast]
   );
-  // ============================================
   // SEARCH PRODUCTS by CATEGORY ID
-  // ============================================
   const searchProductsByCategoryIdHook = useCallback(
     async (categoryId: string): Promise<Product[]> => {
       try {
@@ -235,9 +212,7 @@ export const useProduct = () => {
     },
     [dispatch, toast]
   );
-  // ============================================
   // SEARCH PRODUCTS by SUBS CATEGORY ID
-  // ============================================
   const searchProductsBySubsCategoryIdHook = useCallback(
     async (subsCategoryId: string): Promise<Product[]> => {
       try {
@@ -262,9 +237,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // SEARCH PRODUCTS by rate average rate max and min
-  // ============================================
   const searchProductsByAverageRateHook = useCallback(
     async (minRate: number, maxRate: number): Promise<Product[]> => {
       try {
@@ -288,9 +261,7 @@ export const useProduct = () => {
     },
     [dispatch, toast]
   );
-  // ============================================
   // SEARCH PRODUCTS by PRICE RANGE
-  // ============================================
   const searchProductsByPriceRangeHook = useCallback(
     async (minPrice: number, maxPrice: number): Promise<Product[]> => {
       try {
@@ -314,9 +285,7 @@ export const useProduct = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // GET PRODUCTS TOP RATED
-  // ============================================
   const fetchTopRatedProductsHook = useCallback(async (): Promise<
     Product[]
   > => {
@@ -330,9 +299,7 @@ export const useProduct = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // GET PRODUCTS BY CATEGORY ACESORIES
-  // ============================================
   const fetchProductsByCategoryAcesoriesHook = useCallback(async (): Promise<
     Product[]
   > => {
@@ -348,9 +315,7 @@ export const useProduct = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // GET PRODUCTS BY CATEGORY OUTILLAGE
-  // ============================================
   const fetchProductsByCategoryOutillageHook = useCallback(async (): Promise<
     Product[]
   > => {
@@ -366,9 +331,7 @@ export const useProduct = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // MEMOIZED RETURN VALUE
-  // ============================================
   const productContextValue = useMemo(
     () => ({
       products,

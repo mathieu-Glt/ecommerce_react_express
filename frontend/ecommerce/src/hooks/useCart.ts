@@ -1,4 +1,3 @@
-// src/hooks/useCart.ts
 import { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "./useReduxHooks";
 import useToast from "./usetoast";
@@ -27,9 +26,7 @@ export const useCart = () => {
   // useCart.ts
   const { items: cart, orderedBy } = useAppSelector((state) => state.cart);
 
-  // ============================================
   // FETCH USER CART
-  // ============================================
   const getUserCart = useCallback(async (): Promise<void> => {
     try {
       await dispatch(fetchUserCartThunk()).unwrap();
@@ -39,9 +36,7 @@ export const useCart = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // ADD ITEM TO CART
-  // ============================================
   const addToCart = useCallback(
     // async (productId: string, quantity = 1): Promise<void> => {
     async (datasCart: AddToCartPayload): Promise<void> => {
@@ -55,9 +50,7 @@ export const useCart = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // REMOVE ITEM FROM CART
-  // ============================================
   const removeFromCart = useCallback(
     async (productId: string): Promise<void> => {
       try {
@@ -70,9 +63,7 @@ export const useCart = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // UPDATE ITEM QUANTITY
-  // ============================================
   const updateCartItem = useCallback(
     async (productId: string, quantity: number): Promise<void> => {
       try {
@@ -85,9 +76,7 @@ export const useCart = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // CLEAR CART
-  // ============================================
   const clearCart = useCallback(async (): Promise<void> => {
     try {
       await dispatch(clearCartThunk()).unwrap();
@@ -97,9 +86,7 @@ export const useCart = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // MEMOIZED RETURN VALUE
-  // ============================================
   const cartContextValue = useMemo(
     () => ({
       cart,

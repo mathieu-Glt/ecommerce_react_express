@@ -1,7 +1,5 @@
-// tests/setup.ts
-// Ce fichier est exécuté AVANT tous les tests
 
-// ✅ Mock de import.meta pour tous les tests
+// Mock de import.meta pour tous les tests
 Object.defineProperty(globalThis, "import", {
   value: {
     meta: {
@@ -15,7 +13,7 @@ Object.defineProperty(globalThis, "import", {
   configurable: true,
 });
 
-// ✅ Mock de localStorage (souvent nécessaire pour les tests)
+// Mock de localStorage (souvent nécessaire pour les tests)
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
 
@@ -38,14 +36,7 @@ Object.defineProperty(global, "localStorage", {
   writable: true,
 });
 
-// ✅ Reset localStorage avant chaque test
+// Reset localStorage avant chaque test
 beforeEach(() => {
   localStorage.clear();
 });
-
-// ✅ Console logs pour confirmer que le setup fonctionne
-console.log("✅ Test setup completed");
-console.log(
-  "📝 import.meta.env.VITE_API_BASE_URL:",
-  (globalThis as any).import?.meta?.env?.VITE_API_BASE_URL
-);

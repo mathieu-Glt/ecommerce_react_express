@@ -52,7 +52,7 @@ export default function ProductCard({ product }: ProductProps) {
         onRateChange={onRateChange} // passing our handler
       />
 
-      {/* 🖼️ Product image */}
+      {/* Product image */}
       {product.images?.[0] && (
         <img
           src={product.images[0]}

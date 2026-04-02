@@ -1,4 +1,3 @@
-// src/context/CartContext.tsx
 import { createContext, useContext, useState } from "react";
 import { useCart as useCartHook } from "../hooks/useCart";
 import type { Cart } from "../interfaces/cart.interface";
@@ -29,7 +28,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     updateCartItem,
   } = useCartHook();
 
-  // ✅ Optional: if you want to maintain a small local state (e.g., open/close cart drawer)
   const [isCartOpen, setIsCartOpen] = useState(false);
   const toggleCart = () => setIsCartOpen((prev) => !prev);
 

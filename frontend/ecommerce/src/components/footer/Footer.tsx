@@ -1,4 +1,3 @@
-// src/components/footer/Footer.tsx
 import React from "react";
 import "./Footer.css";
 

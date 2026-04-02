@@ -9,9 +9,7 @@ import {
 import type { SubCategory } from "../../interfaces/subCategory.interface";
 
 /**
- * ===========================================================
- * 🔹 FETCH ALL SUB-CATEGORIES
- * ===========================================================
+ *  FETCH ALL SUB-CATEGORIES
  */
 export const fetchSubCategories = createAsyncThunk<
   SubCategory[],
@@ -37,9 +35,7 @@ export const fetchSubCategories = createAsyncThunk<
 });
 
 /**
- * ===========================================================
- * 🔹 FETCH SUB-CATEGORY BY ID
- * ===========================================================
+ *  FETCH SUB-CATEGORY BY ID
  */
 export const fetchSubCategoryById = createAsyncThunk<
   SubCategory,
@@ -60,9 +56,7 @@ export const fetchSubCategoryById = createAsyncThunk<
 });
 
 /**
- * ===========================================================
- * 🔹 FETCH SUB-CATEGORY BY SLUG
- * ===========================================================
+ *  FETCH SUB-CATEGORY BY SLUG
  */
 export const fetchSubCategoryBySlug = createAsyncThunk<
   SubCategory,
@@ -84,9 +78,7 @@ export const fetchSubCategoryBySlug = createAsyncThunk<
 });
 
 /**
- * ===========================================================
- * 🔹 CREATE NEW SUB-CATEGORY
- * ===========================================================
+ *  CREATE NEW SUB-CATEGORY
  */
 export const createNewSubCategory = createAsyncThunk<
   SubCategory,
@@ -107,9 +99,7 @@ export const createNewSubCategory = createAsyncThunk<
 });
 
 /**
- * ===========================================================
- * 🔹 UPDATE EXISTING SUB-CATEGORY
- * ===========================================================
+ *  UPDATE EXISTING SUB-CATEGORY
  */
 export const updateExistingSubCategory = createAsyncThunk<
   SubCategory,
@@ -130,8 +120,7 @@ export const updateExistingSubCategory = createAsyncThunk<
 });
 
 /**
- * ===========================================================
- * 🔹 DELETE SUB-CATEGORY
+ *  DELETE SUB-CATEGORY
  * ===========================================================
  */
 export const deleteExistingSubCategory = createAsyncThunk<

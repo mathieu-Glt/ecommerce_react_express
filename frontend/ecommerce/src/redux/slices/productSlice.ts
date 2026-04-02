@@ -14,14 +14,10 @@ import {
 import type { ProductState } from "../../interfaces/product.interface";
 // import { loadProductStateFromLocalStorage } from "../middleware/localStorageMiddleware";
 
-// ====================================================
-// 🔄 HYDRATION FROM LOCAL STORAGE
-// ====================================================
+// HYDRATION FROM LOCAL STORAGE
 
 // const persistedProducts = loadProductStateFromLocalStorage();
-// ====================================================
-// 🧠 INITIAL STATE
-// ====================================================
+// INITIAL STATE
 
 // const initialState: ProductState = persistedProducts || {
 const initialState: ProductState = {
@@ -31,17 +27,13 @@ const initialState: ProductState = {
   error: null,
 };
 
-// ====================================================
-// 🧩 PRODUCT SLICE
-// ====================================================
+//  PRODUCT SLICE
 
 const productSlice: Slice<ProductState> = createSlice({
   name: "products",
   initialState,
 
-  // ----------------------------------------------------
-  // 🔹 Synchronous reducers
-  // ----------------------------------------------------
+  // Synchronous reducers
   reducers: {
     /**
      * Completely clears the list of products
@@ -76,14 +68,11 @@ const productSlice: Slice<ProductState> = createSlice({
     },
   },
 
-  // ----------------------------------------------------
-  // 🔹 Extra reducers — Async thunks (API)
-  // ----------------------------------------------------
+  // Extra reducers — Async thunks (API)
   extraReducers: (builder) => {
     builder
-      // ==========================================
       // FETCH PRODUCTS
-      // ==========================================
+
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -97,9 +86,8 @@ const productSlice: Slice<ProductState> = createSlice({
         state.loading = false;
         state.error = (action.payload as string) || "Failed to fetch products";
       });
-    // ==========================================
     // SEARCH PRODUCTS
-    // ==========================================
+
     builder
       .addCase(searchProducts.pending, (state) => {
         state.loading = true;
@@ -114,9 +102,8 @@ const productSlice: Slice<ProductState> = createSlice({
         state.loading = false;
         state.error = (action.payload as string) || "Failed to search products";
       });
-    // ==========================================
     // GET PRODUCT BY ID
-    // ==========================================
+
     builder
       .addCase(fetchProductById.pending, (state) => {
         state.loading = true;
@@ -132,9 +119,8 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error =
           (action.payload as string) || "Failed to fetch product by ID";
       });
-    // ==========================================
     // FECTH LATEST PRODUCTS
-    // ==========================================
+
     builder
       .addCase(fetchLatestProducts.pending, (state) => {
         state.loading = true;
@@ -150,9 +136,8 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error =
           (action.payload as string) || "Failed to fetch latest products";
       });
-    // ==========================================
-    // ⭐ RATE PRODUCT
-    // ==========================================
+    // RATE PRODUCT
+
     builder
       .addCase(rateProduct.pending, (state) => {
         state.loading = true;
@@ -179,9 +164,8 @@ const productSlice: Slice<ProductState> = createSlice({
         state.loading = false;
         state.error = (action.payload as string) || "Error rating product";
       });
-    //=========================================
+
     // FETCH PRODUCTS BY CATEGORY ID
-    // ==========================================
     builder
       .addCase(fetchProductsByCategoryId.pending, (state) => {
         state.loading = true;
@@ -197,9 +181,9 @@ const productSlice: Slice<ProductState> = createSlice({
         state.error =
           (action.payload as string) || "Failed to fetch products by category";
       });
-    //=========================================
+
+
     // FETCH PRODUCTS BY SUBS CATEGORY ID
-    // ==========================================
     builder
       .addCase(fetchProductsBySubsCategoryId.pending, (state) => {
         state.loading = true;
@@ -216,9 +200,9 @@ const productSlice: Slice<ProductState> = createSlice({
           (action.payload as string) ||
           "Failed to fetch products by subs category";
       });
-    //=========================================
+
+
     // FETCH PRODUCTS BY AVERAGE RATE RATE MIN AND MAX
-    // ==========================================
     builder
       .addCase(fetchProductsByAverageRate.pending, (state) => {
         state.loading = true;
@@ -235,9 +219,9 @@ const productSlice: Slice<ProductState> = createSlice({
           (action.payload as string) ||
           "Failed to fetch products by average rate";
       });
-    //=========================================
+
+
     // FETCH PRODUCTS BY PRICE MIN AND MAX
-    // ==========================================
     builder
       .addCase(fetchProductsByPriceRangeThunk.pending, (state) => {
         state.loading = true;
@@ -257,9 +241,7 @@ const productSlice: Slice<ProductState> = createSlice({
   },
 });
 
-// ====================================================
-// 🧭 EXPORTS
-// ====================================================
+// EXPORTS
 
 export const { clearProducts, setSelectedProduct, setError, setLoading } =
   productSlice.actions;

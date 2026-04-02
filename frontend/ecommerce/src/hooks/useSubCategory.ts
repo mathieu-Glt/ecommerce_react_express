@@ -23,9 +23,7 @@ export const useSubCategory = () => {
     (state) => state.sub
   );
 
-  // ============================================
   // FETCH ALL SUB-CATEGORIES
-  // ============================================
   const getAllSubCategories = useCallback(async (): Promise<void> => {
     try {
       await dispatch(fetchSubCategories()).unwrap();
@@ -35,9 +33,7 @@ export const useSubCategory = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // FETCH SUB-CATEGORY BY SLUG
-  // ============================================
   const getSubCategoryBySlug = useCallback(
     async (slug: string): Promise<SubCategory | null> => {
       try {
@@ -51,9 +47,7 @@ export const useSubCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // CREATE SUB-CATEGORY
-  // ============================================
   const createSubCategory = useCallback(
     async (
       data: Record<string, any> | FormData
@@ -70,9 +64,7 @@ export const useSubCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // UPDATE SUB-CATEGORY
-  // ============================================
   const updateSubCategory = useCallback(
     async (
       slug: string,
@@ -90,9 +82,7 @@ export const useSubCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // DELETE SUB-CATEGORY
-  // ============================================
   const deleteSubCategory = useCallback(
     async (slug: string): Promise<boolean> => {
       try {
@@ -107,9 +97,7 @@ export const useSubCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // MEMOIZED RETURN VALUE
-  // ============================================
   const subCategoryContextValue = useMemo(
     () => ({
       subCategories,

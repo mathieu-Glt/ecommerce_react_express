@@ -1,4 +1,3 @@
-// src/layouts/AdminLayout.tsx
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { RequireAdminRoleAccess } from "../../guards/RequireAdminRoleAccess";

@@ -1,4 +1,3 @@
-// src/validators/validationCreateProduct.ts
 import * as Yup from "yup";
 
 /**

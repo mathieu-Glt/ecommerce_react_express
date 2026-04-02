@@ -21,9 +21,7 @@ import {
 import type { RegisterFormData } from "../../interfaces/regsiterProps.interface";
 import { logout } from "../slices/authSlice";
 
-// ==============================
-// 🔐 LOGIN
-// ==============================
+// LOGIN
 export const loginUser = createAsyncThunk<
   ApiResponse,
   LoginCredentials,
@@ -41,9 +39,7 @@ export const loginUser = createAsyncThunk<
   }
 });
 
-// ==============================
-// 📝 REGISTER
-// ==============================
+// REGISTER
 export const registerUser = createAsyncThunk<
   ApiResponse,
   RegisterFormData,
@@ -76,9 +72,7 @@ export const registerUser = createAsyncThunk<
   }
 });
 
-// ==============================
-// 🚪 LOGOUT
-// ==============================
+// LOGOUT
 export const logoutThunk = createAsyncThunk<
   LogoutSuccessResponse,
   void,
@@ -102,9 +96,7 @@ export const logoutThunk = createAsyncThunk<
   }
 });
 
-// ==============================
-// 👤 FETCH CURRENT USER
-// ==============================
+// FETCH CURRENT USER
 export const fetchCurrentUser = createAsyncThunk<
   FetchCurrentUserResponse,
   void,

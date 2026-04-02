@@ -1,4 +1,3 @@
-// src/pages/backoffice/AdminProductEditPage.tsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";

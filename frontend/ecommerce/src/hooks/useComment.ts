@@ -27,9 +27,7 @@ export const useComment = () => {
   const { comments, loading, error } = useAppSelector(
     (state) => state.comments
   );
-  // ============================================
   // FETCH ALL COMMENTS
-  // ============================================
   const fetchAllComments = useCallback(async (): Promise<void> => {
     try {
       await dispatch(getAllComments()).unwrap();
@@ -39,9 +37,7 @@ export const useComment = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // FETCH COMMENTS BY PRODUCT ID
-  // ============================================
   const fetchCommentsByProductId = useCallback(
     async (productId: string): Promise<void> => {
       try {
@@ -53,9 +49,7 @@ export const useComment = () => {
     },
     [dispatch, toast]
   );
-  // ============================================
   // FETCH COMMENTS BY USER ID
-  // ============================================
   const fetchCommentsByUserId = useCallback(
     async (userId: string): Promise<void> => {
       try {
@@ -67,9 +61,7 @@ export const useComment = () => {
     },
     [dispatch, toast]
   );
-  // ============================================
   // CREATE NEW COMMENT
-  // ============================================
   const createComment = useCallback(
     async (commentData: Partial<Comment>): Promise<void> => {
       const { productId, userId, text, rating } = commentData;
@@ -94,9 +86,7 @@ export const useComment = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // UPDATE COMMENT
-  // ============================================
   const updateComment = useCallback(
     async (commentId: string, commentData: Partial<Comment>): Promise<void> => {
       try {
@@ -113,9 +103,7 @@ export const useComment = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // DELETE COMMENT
-  // ============================================
   const deleteComment = useCallback(
     async (commentId: string): Promise<void> => {
       try {

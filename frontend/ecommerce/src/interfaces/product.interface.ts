@@ -1,4 +1,3 @@
-// interfaces/product.interface.ts
 
 import type { Category } from "./category.interface";
 import type { SubCategory } from "./subCategory.interface";

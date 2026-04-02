@@ -3,21 +3,21 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
 
-  // ✅ SOLUTION : Configurer ts-jest pour accepter import.meta
+  // Configurer ts-jest pour accepter import.meta
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",
       {
         tsconfig: {
-          module: "esnext", // ✅ Permet import.meta
+          module: "esnext",
           target: "es2020",
           moduleResolution: "node",
           esModuleInterop: true,
           allowSyntheticDefaultImports: true,
           jsx: "react",
-          skipLibCheck: true, // ✅ Ignore les erreurs dans node_modules
+          skipLibCheck: true, 
         },
-        isolatedModules: true, // ✅ Plus rapide
+        isolatedModules: true, 
       },
     ],
   },
@@ -41,10 +41,10 @@ module.exports = {
     "!src/vite-env.d.ts",
   ],
 
-  // ✅ Ignorer certains modules problématiques
+  // Ignorer certains modules problématiques
   transformIgnorePatterns: ["node_modules/(?!(axios)/)"],
 
-  // ✅ Mock import.meta globalement
+  // Mock import.meta globalement
   globals: {
     "import.meta": {
       env: {

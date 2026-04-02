@@ -58,13 +58,13 @@ export const ProductDetail = ({
         const success = await rateProduct(
           selectedProduct._id,
           newRating,
-          isUpdate
+          isUpdate,
         );
       } catch (error) {
         console.warn("❌ Error while rating the product:", error);
       }
     },
-    [selectedProduct, rateProduct]
+    [selectedProduct, rateProduct],
   );
 
   if (!selectedProduct) return <PageLoader />;
@@ -95,7 +95,7 @@ export const ProductDetail = ({
           editable={true}
           starColor="#FFD700"
           emptyStarColor="#DDDDDD"
-          onRateChange={onRateChange} // ✅ Passing the handler here
+          onRateChange={onRateChange}
         />
         <h1 className="product-detail-title">{selectedProduct.title}</h1>
         <p className="product-detail-description">

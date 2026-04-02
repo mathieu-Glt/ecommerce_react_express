@@ -37,7 +37,7 @@ select.addEventListener("change", async () => {
         <p>Category: ${p.categoryInfo.name}</p>
         <p>Sub-category: ${p.subInfo.name}</p>
       </div>
-    `
+    `,
       )
       .join("");
   } catch (err) {

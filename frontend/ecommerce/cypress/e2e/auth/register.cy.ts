@@ -172,33 +172,7 @@ describe("Test de la Page de Registration", () => {
   });
 
   /**
-   * TEST 9 : Tester différents formats d'emails invalides
-   * (test commenté dans ton code d’origine)
-   */
-  // it("Devrait rejeter plusieurs formats d'emails invalides", () => {
-  //   const invalidEmails = [
-  //     "plaintext",              // pas de @
-  //     "@example.com",           // pas de partie locale
-  //     "user@",                  // pas de domaine
-  //     "user @example.com",      // espace interdit
-  //     "user@.com",              // point directement après @
-  //     "user..name@example.com", // double point dans la partie locale
-  //   ];
-
-  //   // Pour chaque email invalide, on vérifie que le champ devient invalide
-  //   invalidEmails.forEach((email) => {
-  //     cy.get('input[name="email"]').clear().type(email).blur();
-
-  //     // Le champ doit être en erreur
-  //     cy.get('input[name="email"]').should("have.class", "is-invalid");
-
-  //     // Petit log pour identifier l’email testé
-  //     cy.log(`❌ Email invalide rejeté: ${email}`);
-  //   });
-  // });
-
-  /**
-   * TEST 10 : Tester différents formats d'emails valides
+   * TEST 9 : Tester différents formats d'emails valides
    */
   it("Devrait accepter plusieurs formats d'emails valides", () => {
     // Tableau de plusieurs formats valides acceptés par ton regex
@@ -223,18 +197,18 @@ describe("Test de la Page de Registration", () => {
   });
 
   /**
-   * TEST 11 : Test de la séquence de validation (ordre des erreurs)
+   * TEST 10 : Test de la séquence de validation (ordre des erreurs)
    */
   it("Devrait valider dans l'ordre : required → email → matches", () => {
-    // 1️⃣ Étape 1 — Champ vide → déclenche l’erreur "required"
+    // 1️Étape 1 — Champ vide → déclenche l’erreur "required"
     cy.get('input[name="email"]').focus().blur();
     cy.contains("Email is required").should("be.visible");
 
-    // 2️⃣ Étape 2 — Email invalide → déclenche l’erreur de format basique
+    // Étape 2 — Email invalide → déclenche l’erreur de format basique
     cy.get('input[name="email"]').type("invalide").blur();
     cy.contains("Please enter a valid email address").should("be.visible");
 
-    // 3️⃣ Étape 3 — Email valide → plus aucune erreur
+    // Étape 3 — Email valide → plus aucune erreur
     cy.get('input[name="email"]').clear().type("test@example.com").blur();
     cy.get('input[name="email"]').should("have.class", "is-valid");
   });

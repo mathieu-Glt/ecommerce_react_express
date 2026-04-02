@@ -10,24 +10,21 @@ import { fetchCategories, fetchCategoryById } from "../thunks/categoryThunk";
 //   deleteCategory,
 // } from "../thunks/categoryThunk";
 
-// ====================================================
-// 🧠 INITIAL STATE
-// ====================================================
+// INITIAL STATE
+
 const initialState: CategoryState = {
   categories: [],
   selectedCategory: null,
   loading: false,
   error: null,
 };
-// ====================================================
-// 🧩 CATEGORY SLICE
-// ====================================================
+// CATEGORY SLICE
+
 const categorySlice: Slice<CategoryState> = createSlice({
   name: "categories",
   initialState,
-  // ----------------------------------------------------
-  // 🔹 Synchronous reducers
-  // ----------------------------------------------------
+  // Synchronous reducers
+
   reducers: {
     /**
      * Completely clears the list of categories
@@ -46,14 +43,11 @@ const categorySlice: Slice<CategoryState> = createSlice({
       state.selectedCategory = action.payload;
     },
   },
-  // ----------------------------------------------------
-  // 🔸 Extra asynchronous reducers (thunks)
-  // ----------------------------------------------------
+  // Extra asynchronous reducers (thunks)
+
   extraReducers: (builder) => {
     builder
-      // ==========================================
       // FETCH CATEGORIES
-      // ==========================================
       .addCase(fetchCategories.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -66,9 +60,8 @@ const categorySlice: Slice<CategoryState> = createSlice({
         state.loading = false;
         state.error = action.error.message || "Failed to fetch categories";
       });
-    // ==========================================
     // GET CATEGORY BY ID
-    // ==========================================
+    
     builder
       .addCase(fetchCategoryById.pending, (state) => {
         state.loading = true;

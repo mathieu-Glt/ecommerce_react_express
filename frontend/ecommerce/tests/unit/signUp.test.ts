@@ -1,8 +1,6 @@
-// tests/unit/signUp.test.ts
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // SECTION 1 : CRÉATION DES MOCKS
-// ═══════════════════════════════════════════════════════════════════════════════
+
 // Les mocks sont des fonctions simulées qui remplacent les vraies fonctions HTTP
 // d'Axios. Cela permet de tester notre code sans faire de vraies requêtes réseau.
 
@@ -22,10 +20,9 @@ const mockGet = jest.fn(); // Mock pour les requêtes GET (lire des ressources)
 const mockPut = jest.fn(); // Mock pour les requêtes PUT (mettre à jour des ressources)
 const mockDelete = jest.fn(); // Mock pour les requêtes DELETE (supprimer des ressources)
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // SECTION 2 : MOCK DU HOOK useApi
-// ═══════════════════════════════════════════════════════════════════════════════
-// ⚠️ TRÈS IMPORTANT : Ce mock DOIT être défini AVANT l'import de auth.ts
+
+// TRÈS IMPORTANT : Ce mock DOIT être défini AVANT l'import de auth.ts
 //
 // Pourquoi cet ordre est crucial ?
 // 1. Jest exécute les mocks en premier
@@ -63,10 +60,9 @@ jest.mock("../../src/hooks/useApi", () => ({
   })),
 }));
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // SECTION 3 : IMPORTS
-// ═══════════════════════════════════════════════════════════════════════════════
-// ⚠️ Ces imports doivent venir APRÈS les mocks (voir section 2)
+
+// Ces imports doivent venir APRÈS les mocks (voir section 2)
 
 // Import des types Axios nécessaires pour créer nos fixtures (données de test)
 import { AxiosError, AxiosResponse } from "axios";
@@ -80,9 +76,7 @@ import { API_ROUTES } from "../../src/services/constants/api-routes";
 // Import des types TypeScript pour le typage fort
 import type { ApiResponse } from "../../src/interfaces/response.interface";
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // SECTION 4 : SUITE DE TESTS
-// ═══════════════════════════════════════════════════════════════════════════════
 
 /**
  * Tests unitaires pour la fonction signUp
@@ -98,9 +92,7 @@ import type { ApiResponse } from "../../src/interfaces/response.interface";
  * se comporte comme prévu dans toutes les situations.
  */
 describe("signUp", () => {
-  // ─────────────────────────────────────────────────────────────────────────────
   // AVANT CHAQUE TEST : Nettoyage
-  // ─────────────────────────────────────────────────────────────────────────────
 
   /**
    * beforeEach() s'exécute AVANT chaque test individuel
@@ -119,9 +111,7 @@ describe("signUp", () => {
     localStorage.clear(); // Vider le localStorage pour partir d'un état propre
   });
 
-  // ─────────────────────────────────────────────────────────────────────────────
   // DONNÉES DE TEST COMMUNES (FIXTURES)
-  // ─────────────────────────────────────────────────────────────────────────────
 
   /**
    * Données d'inscription valides utilisées comme base pour tous les tests
@@ -166,9 +156,7 @@ describe("signUp", () => {
     },
   };
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 1 : INSCRIPTION RÉUSSIE
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 1 : Inscription réussie
@@ -189,9 +177,7 @@ describe("signUp", () => {
    * - Les champs importants (success, email, message) sont corrects
    */
   it("should return the user data if registration is successful", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Préparer les données de test
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Créer une FIXTURE qui simule la réponse HTTP d'Axios pour un succès
     // Note : status 201 (Created) est utilisé pour la création de ressources
@@ -207,22 +193,18 @@ describe("signUp", () => {
     // mockResolvedValueOnce = Simule UNE promesse résolue (succès)
     mockPost.mockResolvedValueOnce(axiosResponse);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT : Exécuter la fonction à tester
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Appeler signUp() avec les données d'inscription
     // Le mock intercepte l'appel api.post() et retourne axiosResponse
     const result = await signUp(registerData);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ASSERT : Vérifier les résultats
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Vérifier que l'API a été appelée avec les bons paramètres
     expect(mockPost).toHaveBeenCalledWith(
       API_ROUTES.AUTH.REGISTER, // L'URL de l'endpoint d'inscription
-      registerData // Les données envoyées
+      registerData, // Les données envoyées
     );
 
     // Vérifier qu'il n'y a eu qu'un seul appel API (pas de retry, pas de duplication)
@@ -241,9 +223,7 @@ describe("signUp", () => {
     expect(result.message).toBe("Utilisateur créé avec succès");
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 2 : EMAIL MANQUANT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 2 : Email manquant
@@ -263,9 +243,7 @@ describe("signUp", () => {
    * - Le message d'erreur est précis et exploitable
    */
   it("should throw an error if the email is missing", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Créer une erreur Axios simulée
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Créer une vraie AxiosError pour simuler fidèlement le comportement d'Axios
     // Contrairement à un objet simple, AxiosError est une vraie classe d'erreur
@@ -284,21 +262,19 @@ describe("signUp", () => {
         statusText: "Bad Request", // Texte du statut
         headers: {}, // En-têtes
         config: {} as any, // Configuration
-      }
+      },
     );
 
     // Configurer le mock pour rejeter (échec) avec cette erreur
     // mockRejectedValueOnce = Simule UNE promesse rejetée (erreur)
     mockPost.mockRejectedValueOnce(axiosError);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT & ASSERT : Appeler et vérifier que l'erreur est lancée
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Appeler signUp() avec un email vide
     // expect().rejects.toThrow() vérifie qu'une exception est lancée
     await expect(signUp({ ...registerData, email: "" })).rejects.toThrow(
-      "Email, password, firstname et lastname are required"
+      "Email, password, firstname et lastname are required",
     );
 
     // Vérifier que l'API a bien été appelée (même si elle a échoué)
@@ -308,9 +284,7 @@ describe("signUp", () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 3 : MOT DE PASSE MANQUANT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 3 : Mot de passe manquant
@@ -338,7 +312,7 @@ describe("signUp", () => {
         statusText: "Bad Request",
         headers: {},
         config: {} as any,
-      }
+      },
     );
 
     // Configurer le mock pour rejeter avec l'erreur
@@ -347,13 +321,11 @@ describe("signUp", () => {
     // Vérifier que l'exception est lancée avec le bon message
     // Note : Le message est en français ici (cohérent avec le backend)
     await expect(signUp({ ...registerData, password: "" })).rejects.toThrow(
-      "Email, password, firstname et lastname are required"
+      "Email, password, firstname et lastname are required",
     );
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 4 : PRÉNOM MANQUANT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 4 : Prénom manquant
@@ -376,19 +348,17 @@ describe("signUp", () => {
         statusText: "Bad Request",
         headers: {},
         config: {} as any,
-      }
+      },
     );
 
     mockPost.mockRejectedValueOnce(axiosError);
 
     await expect(signUp({ ...registerData, firstname: "" })).rejects.toThrow(
-      "Email, password, firstname et lastname are required"
+      "Email, password, firstname et lastname are required",
     );
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 5 : NOM MANQUANT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 5 : Nom manquant
@@ -411,19 +381,17 @@ describe("signUp", () => {
         statusText: "Bad Request",
         headers: {},
         config: {} as any,
-      }
+      },
     );
 
     mockPost.mockRejectedValueOnce(axiosError);
 
     await expect(signUp({ ...registerData, lastname: "" })).rejects.toThrow(
-      "Email, password, firstname et lastname are required"
+      "Email, password, firstname et lastname are required",
     );
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 6 : EMAIL DÉJÀ EXISTANT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 6 : Email déjà existant
@@ -458,7 +426,7 @@ describe("signUp", () => {
         statusText: "Bad Request",
         headers: {},
         config: {} as any,
-      }
+      },
     );
 
     mockPost.mockRejectedValueOnce(axiosError);
@@ -469,13 +437,11 @@ describe("signUp", () => {
     // Vérifier que l'API a été appelée normalement
     expect(mockPost).toHaveBeenCalledWith(
       API_ROUTES.AUTH.REGISTER,
-      registerData
+      registerData,
     );
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 7 : MOT DE PASSE TROP COURT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 7 : Mot de passe trop court
@@ -510,20 +476,18 @@ describe("signUp", () => {
         statusText: "Bad Request",
         headers: {},
         config: {} as any,
-      }
+      },
     );
 
     mockPost.mockRejectedValueOnce(axiosError);
 
     // Tester avec un mot de passe de seulement 6 caractères
     await expect(
-      signUp({ ...registerData, password: "Pass1!" })
+      signUp({ ...registerData, password: "Pass1!" }),
     ).rejects.toThrow("The password must be at least 8 characters long");
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 8 : STRUCTURE DE LA RÉPONSE
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 8 : Vérifier la structure complète de la réponse
@@ -542,9 +506,7 @@ describe("signUp", () => {
    * - La présence de TOUS les champs, même optionnels
    */
   it("should return a response with the correct structure", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Créer la fixture de réponse
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Objet de test qui simule la structure de la réponse API
     const axiosResponse: AxiosResponse<ApiResponse> = {
@@ -558,15 +520,11 @@ describe("signUp", () => {
     // Configurer le MOCK avec la FIXTURE
     mockPost.mockResolvedValueOnce(axiosResponse);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT : Appeler la fonction testée
-    // ─────────────────────────────────────────────────────────────────────────
 
     const result = await signUp(registerData);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ASSERT : Vérifier chaque propriété individuellement
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Vérifier les propriétés de la réponse de premier niveau
     expect(result).toHaveProperty("success"); // Flag de succès/échec
@@ -587,9 +545,7 @@ describe("signUp", () => {
     // Elle ne vérifie pas le type ou la valeur (c'est toEqual() qui le fait)
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 9 : ERREUR SERVEUR 500
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 9 : Erreur serveur 500
@@ -614,9 +570,7 @@ describe("signUp", () => {
    * - L'utilisateur doit voir un message clair
    */
   it("should handle server 500 errors", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Simuler une erreur serveur 500
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Objet de test qui simule la structure d'une erreur serveur
     const serverError = new AxiosError(
@@ -633,15 +587,13 @@ describe("signUp", () => {
         statusText: "Internal Server Error",
         headers: {},
         config: {} as any,
-      }
+      },
     );
 
     // Configurer le mock pour rejeter avec cette erreur serveur
     mockPost.mockRejectedValueOnce(serverError);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT & ASSERT : Vérifier que l'erreur est correctement propagée
-    // ─────────────────────────────────────────────────────────────────────────
 
     await expect(signUp(registerData)).rejects.toThrow("Internal server error");
 
@@ -652,9 +604,7 @@ describe("signUp", () => {
     // - Contacter le support si l'erreur persiste
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 10 : UPLOAD DE FICHIER (FORMDATA)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 10 : Inscription avec FormData (upload de fichier)
@@ -680,9 +630,7 @@ describe("signUp", () => {
    * - La réponse contient l'URL de la photo uploadée
    */
   it("should handle FormData for file upload", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Créer un FormData avec un fichier
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Créer un nouvel objet FormData (API Web native)
     const formData = new FormData();
@@ -700,7 +648,7 @@ describe("signUp", () => {
     const file = new File(
       ["dummy content"], // Contenu du fichier (simulé)
       "avatar.jpg", // Nom du fichier
-      { type: "image/jpeg" } // Type MIME
+      { type: "image/jpeg" }, // Type MIME
     );
 
     // Ajouter le fichier au FormData
@@ -726,15 +674,11 @@ describe("signUp", () => {
     // Configurer le mock pour retourner la réponse avec l'URL de la photo
     mockPost.mockResolvedValueOnce(axiosResponse);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT : Appeler signUp avec le FormData
-    // ─────────────────────────────────────────────────────────────────────────
 
     const result = await signUp(formData);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ASSERT : Vérifier le bon traitement du FormData et du fichier
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Vérifier que l'API a été appelée avec le FormData (pas un objet JSON)
     expect(mockPost).toHaveBeenCalledWith(API_ROUTES.AUTH.REGISTER, formData);
@@ -754,36 +698,3 @@ describe("signUp", () => {
   });
 });
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FIN DES TESTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * RÉSUMÉ DE LA COUVERTURE DE TESTS
- *
- * ✅ TEST 1  : Inscription réussie (happy path)
- * ✅ TEST 2  : Email manquant (validation)
- * ✅ TEST 3  : Mot de passe manquant (validation)
- * ✅ TEST 4  : Prénom manquant (validation)
- * ✅ TEST 5  : Nom manquant (validation)
- * ✅ TEST 6  : Email déjà existant (contrainte unique)
- * ✅ TEST 7  : Mot de passe trop court (règle métier)
- * ✅ TEST 8  : Structure de la réponse (contrat API)
- * ✅ TEST 9  : Erreur serveur 500 (robustesse)
- * ✅ TEST 10 : Upload de fichier (FormData)
- *
- * Total : 10 tests couvrant tous les scénarios critiques
- *
- * PATTERN UTILISÉ : AAA (Arrange-Act-Assert)
- * - ARRANGE : Préparer les données et mocks
- * - ACT     : Exécuter la fonction testée
- * - ASSERT  : Vérifier les résultats
- *
- * BONNES PRATIQUES APPLIQUÉES :
- * - Tests isolés (beforeEach nettoyage)
- * - Mocks configurés correctement
- * - Fixtures réutilisables
- * - Assertions explicites et complètes
- * - Commentaires détaillés
- * - Nommage clair des tests (should...)
- */

@@ -40,7 +40,7 @@ export const RegisterPage = () => {
         setUserStorage(user);
         navigate("/login");
       } else {
-        // ✅ ROBUST EXTRACTION: Try multiple possible paths to get error message
+        // ROBUST EXTRACTION: Try multiple possible paths to get error message
         let errorMessage = "Registration failed";
 
         // Path 1: result.payload.error (direct backend format)

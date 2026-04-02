@@ -10,9 +10,7 @@ import type { User } from "../../interfaces/user.interface";
 import { loginUser, registerUser, fetchCurrentUser } from "../thunks/authThunk";
 import { loadAuthStateFromLocalStorage } from "../middleware/localStorageMiddleware";
 
-// ============================================
 // HYDRATION - Loading from localStorage
-// ============================================
 
 /**
  * Loads the authentication state from localStorage on startup
@@ -20,9 +18,7 @@ import { loadAuthStateFromLocalStorage } from "../middleware/localStorageMiddlew
  */
 const persistedAuth = loadAuthStateFromLocalStorage();
 
-// ============================================
 // INITIAL STATE
-// ============================================
 
 /**
  * Initial authentication state
@@ -37,9 +33,7 @@ const initialState: AuthState = persistedAuth || {
   loading: false,
 };
 
-// ============================================
 // SLICE REDUX
-// ============================================
 
 /**
  * Redux slice for managing authentication and the connected user
@@ -58,9 +52,8 @@ const authSlice: Slice<AuthState> = createSlice({
   name: "auth",
   initialState,
 
-  // ============================================
   // REDUCERS SYNCHRONES
-  // ============================================
+
   reducers: {
     /**
      * Completely resets the authentication state
@@ -86,7 +79,7 @@ const authSlice: Slice<AuthState> = createSlice({
      */
     setTokens: (
       state,
-      action: PayloadAction<{ token: string; refreshToken?: string }>
+      action: PayloadAction<{ token: string; refreshToken?: string }>,
     ) => {
       state.token = action.payload.token;
       if (action.payload.refreshToken) {
@@ -144,26 +137,22 @@ const authSlice: Slice<AuthState> = createSlice({
     },
   },
 
-  // ============================================
   // EXTRA REDUCERS - Thunks asynchrones
-  // ============================================
+
   extraReducers: (builder) => {
     builder
-      // ==========================================
       // LOGIN USER
-      // ==========================================
+
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = (action.payload.results as payloadDataUser).user ?? null;
-        state.token =
-          (action.payload.results as payloadDataToken).token ?? null;
+        state.user = (action.payload as payloadDataUser).user ?? null;
+        state.token = (action.payload as payloadDataToken).token ?? null;
         state.refreshToken =
-          (action.payload.results as payloadDataRefreshToken).refreshToken ??
-          null;
+          (action.payload as payloadDataRefreshToken).refreshToken ?? null;
         state.isAuthenticated = true;
         state.error = null;
 
@@ -177,9 +166,8 @@ const authSlice: Slice<AuthState> = createSlice({
         // The middleware will automatically clear localStorage
       })
 
-      // ==========================================
       // REGISTER USER
-      // ==========================================
+
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -198,10 +186,9 @@ const authSlice: Slice<AuthState> = createSlice({
         state.error = action.payload || "Registration failed";
       })
 
-      // ==========================================
       // FETCH CURRENT USER
       // Fetch the currently authenticated user
-      // ==========================================
+
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -216,7 +203,7 @@ const authSlice: Slice<AuthState> = createSlice({
         }
 
         // Update token if present
-        if (action.payload.token) {
+        if (action.payload?.token) {
           state.token = action.payload.token;
         }
 
@@ -237,9 +224,7 @@ const authSlice: Slice<AuthState> = createSlice({
   },
 });
 
-// ============================================
 // EXPORTS
-// ============================================
 
 /**
  * Actions exported for use in components
@@ -262,94 +247,3 @@ export const {
  * Default reducer for the Redux store
  */
 export default authSlice.reducer;
-
-// ============================================
-// USAGE EXAMPLES
-// ============================================
-
-/**
- * EXAMPLE 1: Display the logged-in user
- *
- * ```typescript
- * import { useAppSelector } from '../store/store';
- *
- * function UserProfile() {
- *   const { user, isAuthenticated, loading } = useAppSelector(
- *     state => state.auth
- *   );
- *
- *   if (loading) return <Spinner />;
- *   if (!isAuthenticated) return <Login />;
- *
- *   return (
- *     <div>
- *       <h1>{user?.name}</h1>
- *       <p>{user?.email}</p>
- *     </div>
- *   );
- * }
- * ```
- */
-
-/**
- * EXAMPLE 2: Log out
- *
- * ```typescript
- * import { useAppDispatch } from '../store/store';
- * import { logout } from '../store/slices/authSlice';
- *
- * function LogoutButton() {
- *   const dispatch = useAppDispatch();
- *
- *   const handleLogout = () => {
- *     dispatch(logout());
- *     // Le middleware nettoie automatiquement localStorage
- *     navigate('/login');
- *   };
- *
- *   return <button onClick={handleLogout}>Déconnexion</button>;
- * }
- * ```
- */
-
-/**
- * EXAMPLE 3: Update profile
- *
- * ```typescript
- * import { setUser } from '../store/slices/authSlice';
- *
- * function EditProfile() {
- *   const dispatch = useAppDispatch();
- *
- *   const handleUpdate = async (newData) => {
- *     // 1. Appeler l'API
- *     const updatedUser = await updateUserAPI(newData);
- *
- *     // 2. Mettre à jour Redux
- *     dispatch(setUser(updatedUser));
- *     // Le middleware sauvegarde automatiquement dans localStorage
- *   };
- *
- *   return <form onSubmit={handleUpdate}>...</form>;
- * }
- * ```
- */
-
-/**
- * EXAMPLE 4: Fetch current user on startup
- *
- * ```typescript
- * import { fetchCurrentUser } from '../store/thunks/authThunk';
- *
- * function App() {
- *   const dispatch = useAppDispatch();
- *
- *   useEffect(() => {
- *     // Vérifie localStorage puis fait une requête API si nécessaire
- *     dispatch(fetchCurrentUser());
- *   }, [dispatch]);
- *
- *   return <Routes>...</Routes>;
- * }
- * ```
- */

@@ -1,5 +1,4 @@
 import Typewriter from "typewriter-effect";
-// import "./banner-last-products.css";
 import { useProduct } from "../../hooks/useProduct";
 import { useEffect } from "react";
 import PageLoader from "../LoaderPage/PageLoader";

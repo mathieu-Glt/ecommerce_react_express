@@ -42,9 +42,7 @@ export const useAuth = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  // ============================================
   // REDUX STATE - Single source of truth
-  // ============================================
 
   /**
    * Get the authentication state from Redux
@@ -53,9 +51,7 @@ export const useAuth = () => {
   const { user, loading, error, isAuthenticated, token, refreshToken } =
     useAppSelector((state) => state.auth);
 
-  // ============================================
   // LOGIN
-  // ============================================
 
   /**
    * Connect a user
@@ -95,9 +91,7 @@ export const useAuth = () => {
     [dispatch, navigate, toast]
   );
 
-  // ============================================
   // REGISTER
-  // ============================================
 
   /**
    * Register a new user
@@ -126,9 +120,7 @@ export const useAuth = () => {
     [dispatch, navigate, toast]
   );
 
-  // ============================================
   // LOGOUT
-  // ============================================
 
   /**
    * Disconnect the user
@@ -153,9 +145,7 @@ export const useAuth = () => {
     }
   }, [dispatch, navigate, toast]);
 
-  // ============================================
   // FORGOT PASSWORD
-  // ============================================
 
   /**
    * Sends a password reset email
@@ -180,9 +170,7 @@ export const useAuth = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // RESET PASSWORD
-  // ============================================
 
   /**
    * Resets the password using a token
@@ -217,9 +205,7 @@ export const useAuth = () => {
     [dispatch, navigate, toast]
   );
 
-  // ============================================
   // REFRESH USER
-  // ============================================
 
   /**
    * Refreshes user data from the server
@@ -237,9 +223,7 @@ export const useAuth = () => {
     }
   }, [dispatch]);
 
-  // ============================================
   // UPDATE USER PROFILE
-  // ============================================
 
   /**
    * Updates the user profile locally
@@ -261,9 +245,7 @@ export const useAuth = () => {
     [user, toast]
   );
 
-  // ============================================
   // CHECK AUTH
-  // ============================================
 
   /**
    * Checks if the user is authenticated
@@ -274,9 +256,7 @@ export const useAuth = () => {
     return isAuthenticated && !!user && !!token;
   }, [isAuthenticated, user, token]);
 
-  // ============================================
   // REFRESH AUTH (Token refresh)
-  // ============================================
 
   /**
    * Refreshes the authentication token
@@ -302,9 +282,7 @@ export const useAuth = () => {
     }
   }, [refreshToken, logout]);
 
-  // ============================================
   // MEMOIZED RETURN VALUE
-  // ============================================
 
   /**
    * Memoized return value
@@ -353,47 +331,3 @@ export const useAuth = () => {
   return authContextValue;
 };
 
-/**
- * ============================================
- * USAGE NOTES
- * ============================================
- *
- * ADVANTAGES of this new version:
- *
- * 1. SIMPLICITY
- *    - No more need for useLocalStorage for auth
- *    - No more manual synchronization
- *    - Redux is the single source of truth
- *
- * 2. AUTOMATION
- *    - Middleware automatically manages localStorage
- *    - Saves on login/register
- *    - Cleans up on logout
- *
- * 3. PERFORMANCE
- *    - Fewer unnecessary re-renders
- *    - No state duplication
- *    - Optimized memoization
- *
- * 4. MAINTAINABILITY
- *    - Shorter and clearer code
- *    - Fewer potential bugs
- *    - Easier to test and extend
- *
- * ============================================
- * CHANGES vs old version:
- * ============================================
- *
- * ❌ REMOVED:
- *    - useLocalStorage for user/token/refreshToken
- *    - clearLocalStorage (middleware handles it)
- *    - Manual synchronization Redux ↔ localStorage
- *    - logoutUser API call (to be implemented if necessary)
- *
- * ✅ ADDED:
- *    - refreshUser() to refresh data
- *    - Better error handling
- *    - Simpler and more direct code
- *
- * ============================================
- */

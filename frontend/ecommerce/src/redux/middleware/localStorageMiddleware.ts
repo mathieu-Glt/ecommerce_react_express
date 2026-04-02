@@ -42,90 +42,79 @@ const CLEAR_ACTIONS = [
  * 3. Gère les erreurs localStorage (quota, parsing, etc.)
  * 4. Centralise toute la logique localStorage en un seul endroit
  *
+ * Note:
+ * - L'action est typée comme `unknown` pour respecter TypeScript strict
+ * - On vérifie sa forme avant d'accéder à `action.type`
+ *
  * @example
- * // Dans store.ts
  * middleware: (getDefaultMiddleware) =>
  *   getDefaultMiddleware().concat(localStorageMiddleware)
  */
 export const localStorageMiddleware: Middleware<{}, RootState> =
-  (storeAPI) => (next) => (action) => {
-    // Exécuter l'action Redux normalement d'abord
+  (storeAPI) => (next) => (action: unknown) => {
+    // On exécute l'action Redux normalement d'abord
     const result = next(action);
 
-    // Vérifier si on est dans un environnement navigateur (pas SSR)
-    if (typeof window === "undefined") {
-      return result;
-    }
+    // On s'assure d'être dans un environnement navigateur
+    if (typeof window === "undefined") return result;
 
     try {
       const state = storeAPI.getState();
       const { user, token, refreshToken, isAuthenticated } = state.auth;
 
-      // ============================================
-      // 1. SYNCHRONISATION : Sauvegarder dans localStorage
-      // ============================================
+      // Vérifier que l'action est un objet avec un type
+      const actionType =
+        typeof action === "object" &&
+        action !== null &&
+        "type" in action &&
+        typeof (action as { type: string }).type === "string"
+          ? (action as { type: string }).type
+          : "";
 
+      // SYNCHRONISATION : Sauvegarder dans localStorage
       const shouldSync = SYNC_ACTIONS.some((type) =>
-        action.type.startsWith(type)
+        actionType.startsWith(type),
       );
-
       if (shouldSync && isAuthenticated) {
-        // Sauvegarder l'utilisateur
-        if (user) {
-          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-        }
-
-        // Sauvegarder le token
-        if (token) {
-          localStorage.setItem(STORAGE_KEYS.TOKEN, token);
-        }
-
-        // Sauvegarder le refresh token
-        if (refreshToken) {
+        if (user) localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+        if (token) localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        if (refreshToken)
           localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-        }
       }
 
-      // ============================================
-      // 2. NETTOYAGE : Supprimer du localStorage
-      // ============================================
-
+      // NETTOYAGE : Supprimer du localStorage
       const shouldClear =
-        CLEAR_ACTIONS.some((type) => action.type === type) || !isAuthenticated;
-
-      if (shouldClear && action.type !== "auth/fetchCurrentUser/pending") {
+        CLEAR_ACTIONS.some((type) => actionType === type) || !isAuthenticated;
+      if (shouldClear && actionType !== "auth/fetchCurrentUser/pending") {
         localStorage.removeItem(STORAGE_KEYS.USER);
         localStorage.removeItem(STORAGE_KEYS.TOKEN);
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       }
     } catch (error) {
-      // ============================================
-      // GESTION D'ERREURS
-      // ============================================
-
+      // Gestion d'erreurs localStorage
+      
       if (error instanceof DOMException) {
         if (error.name === "QuotaExceededError") {
-          // Stratégie : nettoyer tout localStorage
           try {
             localStorage.clear();
-          } catch (clearError) {
+          } catch {
             throw new Error(
-              "❌ [localStorage] Quota exceeded and failed to clear storage"
+              "❌ [localStorage] Quota exceeded and failed to clear storage",
             );
           }
         } else if (error.name === "SecurityError") {
           throw new Error(
-            "❌ [localStorage] Security error accessing localStorage"
+            "❌ [localStorage] Security error accessing localStorage",
           );
         }
       }
 
-      // En cas d'erreur critique, nettoyer pour éviter états corrompus
+      // Nettoyage préventif en cas d'erreur critique
       try {
         localStorage.removeItem(STORAGE_KEYS.USER);
         localStorage.removeItem(STORAGE_KEYS.TOKEN);
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-      } catch (cleanupError) {
+      } catch {
         throw new Error("❌ [localStorage] Error during cleanup after failure");
       }
     }
@@ -134,39 +123,22 @@ export const localStorageMiddleware: Middleware<{}, RootState> =
   };
 
 /**
- * Fonction utilitaire pour charger l'état initial depuis localStorage
- * À utiliser lors de la création du store pour hydrater l'état initial
- *
- * @returns État d'authentification ou null si pas de données
- *
- * @example
- * const persistedAuth = loadAuthStateFromLocalStorage();
- * const initialState = persistedAuth || defaultInitialState;
+ * Charger l'état initial depuis localStorage
+ * à utiliser pour hydrater l'état Redux au démarrage
  */
 export const loadAuthStateFromLocalStorage = () => {
-  // Check SSR (Server-Side Rendering)
-  if (typeof window === "undefined") {
-    return null;
-  }
+  if (typeof window === "undefined") return null;
 
   try {
     const userString = localStorage.getItem(STORAGE_KEYS.USER);
     const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
     const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
 
-    // Vérifier que les données minimales sont présentes
-    if (!userString || !token) {
-      return null;
-    }
+    if (!userString || !token) return null;
 
-    // Parser l'utilisateur
     const user = JSON.parse(userString);
-
-    // Validation basique
-    if (!user || typeof user !== "object" || !user._id) {
-      localStorage.removeItem(STORAGE_KEYS.USER);
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    if (!user || typeof user !== "object" || !("_id" in user)) {
+      clearAuthFromLocalStorage();
       return null;
     }
 
@@ -178,65 +150,39 @@ export const loadAuthStateFromLocalStorage = () => {
       loading: false,
       error: null,
     };
-  } catch (error) {
-    // Nettoyer les données corrompues
-    try {
-      localStorage.removeItem(STORAGE_KEYS.USER);
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    } catch (cleanupError) {
-      throw new Error(
-        "❌ [localStorage] Error during cleanup after load failure"
-      );
-    }
-
+  } catch {
+    clearAuthFromLocalStorage();
     return null;
   }
 };
 
 /**
- * Fonction utilitaire pour nettoyer manuellement le localStorage
- * Utile pour les tests ou le débogage
- *
- * @example
- * clearAuthFromLocalStorage(); // Nettoie user, token, refreshToken
+ * Nettoyer manuellement le localStorage
  */
 export const clearAuthFromLocalStorage = (): void => {
-  if (typeof window === "undefined") {
-    return;
-  }
+  if (typeof window === "undefined") return;
 
   try {
     localStorage.removeItem(STORAGE_KEYS.USER);
     localStorage.removeItem(STORAGE_KEYS.TOKEN);
     localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-  } catch (error) {
+  } catch {
     throw new Error("❌ [localStorage] Error clearing auth data");
   }
 };
 
 /**
- * Fonction utilitaire pour vérifier si l'utilisateur est authentifié
- * en se basant uniquement sur localStorage (sans Redux)
- *
- * @returns true si token et user présents, false sinon
- *
- * @example
- * if (isAuthenticatedInLocalStorage()) {
- *   // Utilisateur authentifié
- * }
+ * Vérifier si l'utilisateur est authentifié en localStorage
  */
 export const isAuthenticatedInLocalStorage = (): boolean => {
-  if (typeof window === "undefined") {
-    return false;
-  }
+  if (typeof window === "undefined") return false;
 
   try {
     const user = localStorage.getItem(STORAGE_KEYS.USER);
     const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
     return !!(user && token);
-  } catch (error) {
-    throw new Error("❌ [localStorage] Error checking authentication status");
+  } catch {
+    return false;
   }
 };
 

@@ -1,8 +1,4 @@
-// cypress/e2e/auth/login.cy.ts
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // TESTS E2E (END-TO-END) AVEC CYPRESS
-// ═══════════════════════════════════════════════════════════════════════════════
 //
 // DIFFÉRENCE ENTRE TESTS UNITAIRES (JEST) ET TESTS E2E (CYPRESS) :
 //
@@ -21,7 +17,6 @@
 // - Plus lents (secondes) mais plus représentatifs
 // - Simulent les interactions utilisateur (click, type, etc.)
 //
-// ═══════════════════════════════════════════════════════════════════════════════
 
 /**
  * Suite de tests E2E pour la page de login
@@ -42,9 +37,7 @@
  * - Tester le comportement comme un vrai utilisateur
  */
 describe("Login Page Test", () => {
-  // ─────────────────────────────────────────────────────────────────────────────
   // AVANT CHAQUE TEST : Visite de la page de login
-  // ─────────────────────────────────────────────────────────────────────────────
 
   /**
    * beforeEach() s'exécute AVANT chaque test individuel
@@ -65,9 +58,7 @@ describe("Login Page Test", () => {
     cy.visit("http://localhost:5173/login");
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 1 : VÉRIFICATION DE L'AFFICHAGE DE LA PAGE
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 1 : Vérifier que tous les éléments de la page sont affichés
@@ -91,27 +82,21 @@ describe("Login Page Test", () => {
    * - S'assure que le CSS charge correctement
    */
   it("Should display all elements of the login page", () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // VÉRIFIER LES TEXTES DE LA PAGE
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.contains() : Cherche un élément contenant le texte spécifié
     // .should("be.visible") : Vérifie que l'élément est visible à l'écran
     cy.contains("Bienvenue !").should("be.visible");
     cy.contains("Connectez-vous à votre compte").should("be.visible");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // VÉRIFIER LA PRÉSENCE DU LOGO
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.get() : Sélectionne un élément par sélecteur CSS
     // .should("exist") : Vérifie que l'élément existe dans le DOM
     // Note : "exist" vs "be.visible" - exist = dans le DOM, visible = affiché
     cy.get(".login-logo").should("exist");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // VÉRIFIER LES CHAMPS DU FORMULAIRE
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Champ email : Vérifier qu'il est visible ET qu'il a le bon placeholder
     // 'input[name="email"]' : Sélecteur d'attribut CSS
@@ -125,9 +110,7 @@ describe("Login Page Test", () => {
       .should("be.visible")
       .and("have.attr", "placeholder", "Password");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // VÉRIFIER LA CHECKBOX "REMEMBER ME"
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Vérifier que la checkbox existe
     cy.get('input[name="rememberMe"]').should("exist");
@@ -135,31 +118,23 @@ describe("Login Page Test", () => {
     // Vérifier que le label est visible
     cy.contains("Remember me").should("be.visible");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // VÉRIFIER LE BOUTON DE CONNEXION
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.contains("button", "Login") : Cherche un bouton contenant "Login"
     cy.contains("button", "Login").should("be.visible");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // VÉRIFIER LES LIENS UTILES
-    // ─────────────────────────────────────────────────────────────────────────
 
     cy.contains("Forgot password?").should("be.visible");
     cy.contains("Sign up here").should("be.visible");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // VÉRIFIER LES BOUTONS OAUTH
-    // ─────────────────────────────────────────────────────────────────────────
 
     cy.contains("Continue with Google").should("be.visible");
     cy.contains("Continue with Azure").should("be.visible");
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 2 : CAPTURE DE LA VRAIE REQUÊTE POST
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 2 : Capturer la vraie requête POST vers /login
@@ -174,26 +149,21 @@ describe("Login Page Test", () => {
    * - Vérifie que les données envoyées sont correctes
    * - Vérifie la redirection et le stockage des données
    *
-   * ⚠️ ATTENTION : Ce test nécessite que le backend soit lancé !
    *
    * cy.intercept() sans mock : Écoute les requêtes sans les modifier
    * cy.wait() : Attend qu'une requête soit capturée
    */
   it("Should capture the real POST request to /login", () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 1 : INTERCEPTER (ÉCOUTER) LA REQUÊTE POST
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.intercept() sans body de réponse = écoute SANS modifier
     // La requête ira vraiment au serveur backend
     // .as("loginRequest") : Donne un alias pour référencer cette interception
     cy.intercept("POST", "http://localhost:8000/api/auth/login").as(
-      "loginRequest"
+      "loginRequest",
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 2 : REMPLIR LE FORMULAIRE AVEC DES VRAIES CREDENTIALS
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.get() : Sélectionne un élément
     // .type() : Simule la saisie au clavier (comme un vrai utilisateur)
@@ -203,28 +173,22 @@ describe("Login Page Test", () => {
     // .check() : Coche la checkbox (simule un click sur la checkbox)
     cy.get('input[name="rememberMe"]').check();
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 3 : SOUMETTRE LE FORMULAIRE
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.contains("button", "Login") : Trouve le bouton Login
     // .click({ force: true }) : Simule un click utilisateur
     // force: true = click même si le bouton est partiellement masqué
     cy.contains("button", "Login").click({ force: true });
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 4 : ATTENDRE ET CAPTURER LA REQUÊTE POST
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.wait("@loginRequest") : Attend que la requête interceptée soit complète
     // .then() : Permet d'accéder à l'objet interception
     cy.wait("@loginRequest").then((interception) => {
-      // ───────────────────────────────────────────────────────────────────────
       // ÉTAPE 5 : VÉRIFIER LE CONTENU DE LA REQUÊTE ENVOYÉE
-      // ───────────────────────────────────────────────────────────────────────
 
       // console.log() : Affiche dans la console Cypress (utile pour debug)
-      console.log("Requête POST capturée :", interception.request.body);
+      // console.log("Requête POST capturée :", interception.request.body);
 
       // Vérifier que le body de la requête contient les bonnes données
       // .to.deep.include() : Vérifie que l'objet contient au moins ces champs
@@ -234,18 +198,14 @@ describe("Login Page Test", () => {
       });
     });
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 6 : VÉRIFIER LA REDIRECTION VERS LA PAGE D'ACCUEIL
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.url() : Obtient l'URL actuelle
     // { timeout: 10000 } : Attend jusqu'à 10 secondes pour la redirection
     // .should("eq", ...) : Vérifie que l'URL est exactement celle attendue
     cy.url({ timeout: 10000 }).should("eq", "http://localhost:5173/");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 7 : VÉRIFIER LE STOCKAGE DU TOKEN DANS LOCALSTORAGE
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.window() : Accède à l'objet window du navigateur
     // .then() : Permet d'exécuter du code JavaScript sur window
@@ -257,9 +217,7 @@ describe("Login Page Test", () => {
       expect(token).to.exist;
     });
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 8 : VÉRIFIER LE CONTENU COMPLET DU LOCALSTORAGE
-    // ─────────────────────────────────────────────────────────────────────────
 
     cy.window().then((win) => {
       // Récupérer token et user du localStorage
@@ -281,9 +239,7 @@ describe("Login Page Test", () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 3 : CONNEXION AVEC LA VRAIE API
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 3 : Se connecter avec la vraie API (backend doit être disponible)
@@ -298,7 +254,6 @@ describe("Login Page Test", () => {
    *
    * Cas d'usage : Test d'intégration réel
    *
-   * ⚠️ Dépend du backend : Si le backend est down, ce test échoue
    */
   it("Should connect with the real API (if backend is available)", () => {
     // Remplir le formulaire
@@ -319,9 +274,7 @@ describe("Login Page Test", () => {
     cy.url().should("eq", "http://localhost:5173/", { timeout: 10000 });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 4 : RÉPONSE COMPLÈTE ET VALIDE DU BACKEND (AVEC MOCK)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 4 : Recevoir une réponse complète et valide du backend
@@ -342,9 +295,7 @@ describe("Login Page Test", () => {
    * - Jest teste juste la fonction signIn() isolée
    */
   it("Should receive a complete and valid response from the backend after a successful login", () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 1 : PRÉPARER LES DONNÉES MOCKÉES
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Créer un faux utilisateur avec tous les champs attendus
     const mockUser = {
@@ -367,9 +318,7 @@ describe("Login Page Test", () => {
     const mockRefreshToken =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.4Adcj0vVzr8C8qY7Nj5qLpGZmH7qVx9kN8_8k8Y8X8Y";
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 2 : INTERCEPTER ET MOCKER LA REQUÊTE LOGIN
-    // ─────────────────────────────────────────────────────────────────────────
 
     // cy.intercept() avec un objet de réponse = REMPLACE la vraie réponse
     // La requête n'ira PAS au serveur, Cypress retournera ce mock
@@ -384,41 +333,31 @@ describe("Login Page Test", () => {
       },
     }).as("loginRequest");
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 3 : REMPLIR ET SOUMETTRE LE FORMULAIRE
-    // ─────────────────────────────────────────────────────────────────────────
 
     cy.get('input[name="email"]').type("jean.dupont@example.com");
     cy.get('input[name="password"]').type("Password123!");
     cy.contains("button", "Login").click({ force: true });
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ÉTAPE 4 : ATTENDRE L'INTERCEPTION ET VALIDER LA RÉPONSE COMPLÈTE
-    // ─────────────────────────────────────────────────────────────────────────
 
     cy.wait("@loginRequest").then((interception) => {
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LE STATUS CODE
-      // ───────────────────────────────────────────────────────────────────────
 
       expect(interception.response.statusCode).to.equal(200);
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LA STRUCTURE DE PREMIER NIVEAU
-      // ───────────────────────────────────────────────────────────────────────
 
       expect(interception.response.body).to.have.property("success", true);
       expect(interception.response.body).to.have.property(
         "message",
-        "Connection successful"
+        "Connection successful",
       );
       expect(interception.response.body).to.have.property("user");
       expect(interception.response.body).to.have.property("token");
       expect(interception.response.body).to.have.property("refreshToken");
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LES TOKENS (TYPE ET CONTENU)
-      // ───────────────────────────────────────────────────────────────────────
 
       const { token, refreshToken } = interception.response.body;
 
@@ -428,9 +367,7 @@ describe("Login Page Test", () => {
       expect(refreshToken).to.be.a("string");
       expect(refreshToken).to.not.be.empty;
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER L'OBJET USER EN DÉTAIL
-      // ───────────────────────────────────────────────────────────────────────
 
       const { user } = interception.response.body;
 
@@ -489,21 +426,19 @@ describe("Login Page Test", () => {
       expect(user.createdAt).to.be.a("string");
       // Regex pour valider le format ISO : YYYY-MM-DDTHH:mm:ss.sssZ
       expect(user.createdAt).to.match(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
       );
 
       // updatedAt : Date de dernière modification
       expect(user).to.have.property("updatedAt");
       expect(user.updatedAt).to.be.a("string");
       expect(user.updatedAt).to.match(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
       );
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 5 : TEST API DIRECT AVEC CY.REQUEST()
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 5 : Test API direct avec cy.request()
@@ -522,7 +457,6 @@ describe("Login Page Test", () => {
    * - Utile pour tester les API REST
    * - Ne nécessite pas d'UI
    *
-   * ⚠️ ATTENTION : Nécessite que le backend soit lancé
    */
   it("Should successfully connect via cy.request()", () => {
     // cy.request() : Fait un appel HTTP direct
@@ -538,28 +472,22 @@ describe("Login Page Test", () => {
       // Ne pas échouer automatiquement sur erreur HTTP (pour tester les 4xx)
       failOnStatusCode: false,
     }).then((response) => {
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LE STATUS CODE
-      // ───────────────────────────────────────────────────────────────────────
 
       expect(response.status).to.eq(200);
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LA STRUCTURE DE LA RÉPONSE
-      // ───────────────────────────────────────────────────────────────────────
 
       expect(response.body).to.have.property("success", true);
       expect(response.body).to.have.property(
         "message",
-        "Connection successful"
+        "Connection successful",
       );
       expect(response.body).to.have.property("token");
       expect(response.body).to.have.property("refreshToken");
       expect(response.body).to.have.property("user");
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LES TOKENS
-      // ───────────────────────────────────────────────────────────────────────
 
       const { token, refreshToken } = response.body;
       expect(token).to.be.a("string");
@@ -567,9 +495,7 @@ describe("Login Page Test", () => {
       expect(refreshToken).to.be.a("string");
       expect(refreshToken).to.not.be.empty;
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER L'OBJET USER
-      // ───────────────────────────────────────────────────────────────────────
 
       const { user } = response.body;
       expect(user).to.have.property("_id");
@@ -581,9 +507,7 @@ describe("Login Page Test", () => {
       expect(user).to.have.property("createdAt");
       expect(user).to.have.property("updatedAt");
 
-      // ───────────────────────────────────────────────────────────────────────
       // LOGGER LES DONNÉES POUR DEBUG
-      // ───────────────────────────────────────────────────────────────────────
 
       // cy.log() : Affiche dans le log Cypress (visible dans l'UI Cypress)
       cy.log("Token reçu:", token);
@@ -591,9 +515,7 @@ describe("Login Page Test", () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 6 : IDENTIFIANTS INCORRECTS (ERREUR 401)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 6 : Test avec identifiants incorrects
@@ -635,9 +557,7 @@ describe("Login Page Test", () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 7 : EMAIL MANQUANT (ERREUR 400)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 7 : Test avec email manquant
@@ -670,9 +590,7 @@ describe("Login Page Test", () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 8 : MOT DE PASSE MANQUANT (ERREUR 400)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 8 : Test avec mot de passe manquant
@@ -698,9 +616,7 @@ describe("Login Page Test", () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 9 : VÉRIFICATION DÉTAILLÉE DES DONNÉES USER (200)
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 9 : Vérification approfondie des données utilisateur
@@ -730,23 +646,17 @@ describe("Login Page Test", () => {
         password: "Mg!2025@1985/*",
       },
     }).then((response) => {
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LE STATUS 200
-      // ───────────────────────────────────────────────────────────────────────
 
       expect(response.status).to.eq(200);
 
       const { user } = response.body;
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER L'EMAIL (identifiant unique)
-      // ───────────────────────────────────────────────────────────────────────
 
       expect(user.email).to.eq("mathieu.gillet@hotmail.fr");
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LES CHAMPS OBLIGATOIRES (type et contenu)
-      // ───────────────────────────────────────────────────────────────────────
 
       // _id : Doit être une string non vide
       expect(user._id).to.be.a("string");
@@ -760,9 +670,7 @@ describe("Login Page Test", () => {
       expect(user.lastname).to.be.a("string");
       expect(user.lastname).to.not.be.empty;
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LA CONSTRUCTION DU NOM COMPLET
-      // ───────────────────────────────────────────────────────────────────────
 
       // Le name doit contenir le firstname
       expect(user.name).to.include(user.firstname);
@@ -770,117 +678,22 @@ describe("Login Page Test", () => {
       // Le name doit contenir le lastname
       expect(user.name).to.include(user.lastname);
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LE RÔLE (parmi les valeurs autorisées)
-      // ───────────────────────────────────────────────────────────────────────
 
       // .to.be.oneOf() : Vérifie que la valeur est dans la liste
       expect(user.role).to.be.oneOf(["user", "admin", "moderator"]);
 
-      // ───────────────────────────────────────────────────────────────────────
       // VÉRIFIER LES DATES (format ISO 8601)
-      // ───────────────────────────────────────────────────────────────────────
 
       // createdAt : Format YYYY-MM-DDTHH:mm:ss.sssZ
       expect(user.createdAt).to.match(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
       );
 
       // updatedAt : Même format
       expect(user.updatedAt).to.match(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
       );
     });
   });
 });
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// FIN DES TESTS E2E
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * RÉSUMÉ DE LA COUVERTURE DES TESTS E2E
- *
- * ✅ TEST 1 : Affichage complet de la page (UI)
- * ✅ TEST 2 : Capture de requête POST réelle avec vérifications
- * ✅ TEST 3 : Connexion avec vraie API (test d'intégration)
- * ✅ TEST 4 : Réponse mockée complète (structure validée)
- * ✅ TEST 5 : Test API direct avec cy.request() (succès)
- * ✅ TEST 6 : Identifiants incorrects (401)
- * ✅ TEST 7 : Email manquant (400)
- * ✅ TEST 8 : Password manquant (400)
- * ✅ TEST 9 : Vérification détaillée des données user (200)
- *
- * Total : 9 tests E2E couvrant UI + API + erreurs
- *
- * TYPES DE TESTS UTILISÉS :
- *
- * 1. TESTS UI (User Interface) :
- *    - TEST 1 : Vérifie l'affichage visuel
- *    - Utilise cy.visit(), cy.get(), cy.contains()
- *    - Simule un utilisateur qui regarde la page
- *
- * 2. TESTS D'INTÉGRATION (UI + API) :
- *    - TEST 2, 3 : Formulaire → Backend → Redirection
- *    - Utilise cy.type(), cy.click(), cy.intercept()
- *    - Simule un utilisateur qui remplit le formulaire
- *
- * 3. TESTS API (API seulement) :
- *    - TEST 5, 6, 7, 8, 9 : Appels HTTP directs
- *    - Utilise cy.request()
- *    - Teste le backend sans UI
- *
- * 4. TESTS AVEC MOCKS :
- *    - TEST 4 : Réponse mockée pour contrôle total
- *    - Utilise cy.intercept() avec body
- *    - N'a pas besoin du backend
- *
- * DIFFÉRENCES AVEC TESTS UNITAIRES JEST :
- *
- * | Aspect          | Jest (Unitaire)        | Cypress (E2E)           |
- * |-----------------|------------------------|-------------------------|
- * | Scope           | Une fonction           | Application complète    |
- * | Navigateur      | Non (Node.js)          | Oui (Chrome, etc.)      |
- * | UI              | Non testée             | Testée                  |
- * | API             | Toujours mockée        | Vraie ou mockée         |
- * | Vitesse         | Très rapide (ms)       | Lent (secondes)         |
- * | Isolation       | Totale                 | Partielle               |
- * | Confiance       | Moyenne                | Élevée                  |
- *
- * BONNES PRATIQUES APPLIQUÉES :
- * ✓ beforeEach pour état initial propre
- * ✓ Alias (@loginRequest) pour interceptions
- * ✓ failOnStatusCode: false pour tester erreurs
- * ✓ Timeouts appropriés pour attendre redirections
- * ✓ Vérifications strictes des types et formats
- * ✓ Tests de tous les codes HTTP (200, 400, 401)
- * ✓ Commentaires ultra-détaillés
- * ✓ Mix de tests avec vraie API et mocks
- *
- * COMMANDES CYPRESS UTILISÉES :
- * - cy.visit() : Charger une page
- * - cy.get() : Sélectionner un élément
- * - cy.contains() : Trouver par texte
- * - cy.type() : Saisir du texte
- * - cy.click() : Cliquer
- * - cy.check() : Cocher une checkbox
- * - cy.intercept() : Intercepter requêtes
- * - cy.wait() : Attendre une requête
- * - cy.request() : Appel HTTP direct
- * - cy.window() : Accéder à window
- * - cy.url() : Vérifier l'URL
- * - cy.log() : Logger
- *
- * POUR EXÉCUTER CES TESTS :
- *
- * 1. Lancer l'application frontend :
- *    npm run dev
- *
- * 2. Lancer le backend (pour tests avec vraie API) :
- *    npm run start:backend
- *
- * 3. Ouvrir Cypress :
- *    npx cypress open
- *    OU
- *    npx cypress run (mode headless)
- */

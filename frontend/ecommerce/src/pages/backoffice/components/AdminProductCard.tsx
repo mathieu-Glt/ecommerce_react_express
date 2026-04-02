@@ -50,7 +50,7 @@ export default function AdminProductCard({ product, onDelete }: ProductProps) {
               Edit Product
             </Link>
           </div>
-          {/* 📦 Bouton suppression du produit */}
+          {/* Bouton suppression du produit */}
           <div className="product-delete-info">
             {/* <button className="product-delete-button">Delete Product</button> */}
             <button
@@ -58,7 +58,7 @@ export default function AdminProductCard({ product, onDelete }: ProductProps) {
               className="product-delete-button"
               type="button"
             >
-              🗑️ Delete Product
+              Delete Product
             </button>{" "}
           </div>
         </div>

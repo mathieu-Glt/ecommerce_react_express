@@ -8,9 +8,7 @@ import {
   deleteExistingComment as deleteCommentThunk,
 } from "../thunks/commentThunk";
 
-// ====================================================
-// 🧠 ÉTAT INITIAL
-// ====================================================
+// ÉTAT INITIAL
 
 const initialState: CommentState = {
   comments: [],
@@ -18,17 +16,14 @@ const initialState: CommentState = {
   error: null,
 };
 
-// ====================================================
-// 🧩 COMMENT SLICE
-// ====================================================
+// COMMENT SLICE
 
 const commentSlice: Slice<CommentState> = createSlice({
   name: "comments",
   initialState,
 
-  // ----------------------------------------------------
-  // 🔹 Synchronous reducers
-  // ----------------------------------------------------
+  // Synchronous reducers
+
   reducers: {
     /**
      * Completely clears the list of comments
@@ -54,13 +49,11 @@ const commentSlice: Slice<CommentState> = createSlice({
     },
   },
 
-  // ----------------------------------------------------
-  // 🔹 Extra reducers — Async thunks (API)
-  // ----------------------------------------------------
+  // Extra reducers — Async thunks (API)
   extraReducers: (builder) => {
-    // ==========================================
+
     // FETCH ALL COMMENTS
-    // ==========================================
+
     builder
       .addCase(fetchAllCommentsThunk.pending, (state) => {
         state.loading = true;
@@ -75,9 +68,8 @@ const commentSlice: Slice<CommentState> = createSlice({
         state.error = (action.payload as string) || "Error fetching comments";
       });
 
-    // ==========================================
     // FETCH COMMENTS BY PRODUCT
-    // ==========================================
+
     builder
       .addCase(fetchCommentsByProductThunk.pending, (state) => {
         state.loading = true;
@@ -93,9 +85,8 @@ const commentSlice: Slice<CommentState> = createSlice({
           (action.payload as string) || "Error fetching comments for product";
       });
 
-    // ==========================================
     // FETCH COMMENTS BY USER
-    // ==========================================
+
     builder
       .addCase(fetchCommentsByUserThunk.pending, (state) => {
         state.loading = true;
@@ -111,9 +102,8 @@ const commentSlice: Slice<CommentState> = createSlice({
           (action.payload as string) || "Error fetching comments for user";
       });
 
-    // ==========================================
     // POST COMMENT
-    // ==========================================
+
     builder
       .addCase(postCommentThunk.pending, (state) => {
         state.loading = true;
@@ -128,9 +118,8 @@ const commentSlice: Slice<CommentState> = createSlice({
         state.error = (action.payload as string) || "Error adding comment";
       });
 
-    // ==========================================
     // DELETE COMMENT
-    // ==========================================
+
     builder
       .addCase(deleteCommentThunk.pending, (state) => {
         state.loading = true;
@@ -147,9 +136,7 @@ const commentSlice: Slice<CommentState> = createSlice({
   },
 });
 
-// ====================================================
-// 🧭 EXPORTS
-// ====================================================
+// EXPORTS
 
 export const { clearComments, setError, setLoading } = commentSlice.actions;
 

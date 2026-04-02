@@ -32,6 +32,6 @@ export interface RegisterFormData {
   email: string;
   password: string;
   confirmPassword?: string | undefined;
-  picture?: File | null; // ✅ File ou null
+  picture?: File | null; 
   address?: string;
 }

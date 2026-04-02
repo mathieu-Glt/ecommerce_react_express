@@ -1,4 +1,3 @@
-// AdminDashboardPage.tsx
 import React, { useEffect, useState } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { PieChart } from "@mui/x-charts/PieChart";

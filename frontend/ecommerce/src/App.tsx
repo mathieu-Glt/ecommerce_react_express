@@ -12,15 +12,6 @@ import { fetchCsrfToken } from "./hooks/useApi";
 
 function AppContent() {
   const { openBarFilter, toggleBarFilter, onSubmitSearchBar } = useFilter();
-  let fetchCount = 0;
-  // useEffect(() => {
-  //   fetchCount++;
-  //   fetchCsrfToken()
-  //     .then((token) => {
-  //     })
-  //     .catch((error) => {
-  //     });
-  // }, []);
 
   return (
     <>

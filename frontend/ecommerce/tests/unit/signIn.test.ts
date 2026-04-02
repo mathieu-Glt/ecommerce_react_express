@@ -1,8 +1,5 @@
-// tests/unit/signIn.test.ts
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 1 : CRÉATION DES MOCKS
-// ═══════════════════════════════════════════════════════════════════════════════
+// CRÉATION DES MOCKS
 // Les mocks sont des fonctions simulées qui remplacent les vraies fonctions HTTP
 // d'Axios. Cela permet de tester notre code sans faire de vraies requêtes réseau.
 
@@ -22,10 +19,9 @@ const mockGet = jest.fn(); // Mock pour les requêtes GET (lire des ressources)
 const mockPut = jest.fn(); // Mock pour les requêtes PUT (mettre à jour)
 const mockDelete = jest.fn(); // Mock pour les requêtes DELETE (supprimer)
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 2 : MOCK DU HOOK useApi
-// ═══════════════════════════════════════════════════════════════════════════════
-// ⚠️ TRÈS IMPORTANT : Ce mock DOIT être défini AVANT l'import de auth.ts
+// MOCK DU HOOK useApi
+
+// TRÈS IMPORTANT : Ce mock DOIT être défini AVANT l'import de auth.ts
 //
 // Pourquoi cet ordre est crucial ?
 // 1. Jest exécute les mocks en premier
@@ -63,10 +59,9 @@ jest.mock("../../src/hooks/useApi", () => ({
   })),
 }));
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 3 : IMPORTS
-// ═══════════════════════════════════════════════════════════════════════════════
-// ⚠️ Ces imports doivent venir APRÈS les mocks (voir section 2)
+// IMPORTS
+
+// Ces imports doivent venir APRÈS les mocks (voir section 2)
 
 // Import des types Axios nécessaires pour créer nos fixtures (données de test)
 import { AxiosError, AxiosResponse } from "axios";
@@ -80,9 +75,7 @@ import { API_ROUTES } from "../../src/services/constants/api-routes";
 // Import des types TypeScript pour le typage fort
 import type { LoginResponse } from "../../src/interfaces/response.interface";
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 4 : SUITE DE TESTS
-// ═══════════════════════════════════════════════════════════════════════════════
+// SUITE DE TESTS
 
 /**
  * Tests unitaires pour la fonction signIn
@@ -98,9 +91,8 @@ import type { LoginResponse } from "../../src/interfaces/response.interface";
  * se comporte comme prévu dans toutes les situations.
  */
 describe("signIn", () => {
-  // ─────────────────────────────────────────────────────────────────────────────
+
   // AVANT CHAQUE TEST : Nettoyage
-  // ─────────────────────────────────────────────────────────────────────────────
 
   /**
    * beforeEach() s'exécute AVANT chaque test individuel
@@ -119,9 +111,7 @@ describe("signIn", () => {
     localStorage.clear(); // Vider le localStorage pour partir d'un état propre
   });
 
-  // ─────────────────────────────────────────────────────────────────────────────
   // DONNÉES DE TEST COMMUNES (FIXTURES)
-  // ─────────────────────────────────────────────────────────────────────────────
 
   /**
    * Données de connexion valides utilisées comme base pour tous les tests
@@ -166,9 +156,7 @@ describe("signIn", () => {
     refreshToken: "fake-refresh-token", // Token de renouvellement
   };
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 1 : CONNEXION RÉUSSIE
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 1 : Login successfully
@@ -194,9 +182,8 @@ describe("signIn", () => {
    * - Les tokens sont essentiels pour toutes les requêtes authentifiées
    */
   it("should return the login data if successful", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
-    // ARRANGE : Préparer les données de test (FIXTURE)
-    // ─────────────────────────────────────────────────────────────────────────
+
+    // Préparer les données de test (FIXTURE)
 
     // Créer une FIXTURE qui simule une réponse HTTP réussie d'Axios
     // Cette structure imite exactement ce qu'Axios retourne lors d'un appel API réussi
@@ -226,10 +213,6 @@ describe("signIn", () => {
       config: {} as any,
     };
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // ARRANGE : Configurer le MOCK (STUB)
-    // ─────────────────────────────────────────────────────────────────────────
-
     // Configurer le MOCK mockPost pour qu'il retourne notre FIXTURE
     // mockResolvedValueOnce() = Simule une promesse résolue (succès) UNE FOIS
     //
@@ -246,9 +229,7 @@ describe("signIn", () => {
     // - Isolation complète du test unitaire
     mockPost.mockResolvedValueOnce(axiosResponse);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT : Exécuter la fonction à tester
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Appeler la vraie fonction signIn() avec les données de login
     // À l'intérieur, signIn() va appeler api.post() qui est mocké
@@ -266,13 +247,9 @@ describe("signIn", () => {
     // donc on doit utiliser await pour obtenir le résultat
     const result = await signIn(loginData);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ASSERT : Vérifier les résultats (6 ASSERTIONS)
-    // ─────────────────────────────────────────────────────────────────────────
 
-    // ───────────────────────────────────────────────────────────────────────
     // ASSERTION 1 : Vérifier l'appel API avec les bons paramètres
-    // ───────────────────────────────────────────────────────────────────────
 
     // toHaveBeenCalledWith() vérifie que la fonction mock a été appelée
     // avec EXACTEMENT ces arguments (comparaison stricte)
@@ -288,12 +265,10 @@ describe("signIn", () => {
     // - Vérifie que l'ordre des paramètres est correct
     expect(mockPost).toHaveBeenCalledWith(
       API_ROUTES.AUTH.LOGIN, // Premier argument : URL '/api/auth/login'
-      loginData // Deuxième argument : { email, password }
+      loginData, // Deuxième argument : { email, password }
     );
 
-    // ───────────────────────────────────────────────────────────────────────
     // ASSERTION 2 : Vérifier le nombre d'appels API
-    // ───────────────────────────────────────────────────────────────────────
 
     // toHaveBeenCalledTimes(1) s'assure qu'il n'y a pas eu d'appels multiples
     // ou d'appels manquants
@@ -301,7 +276,7 @@ describe("signIn", () => {
     // Scénarios détectés :
     // - 0 appel = La fonction n'a pas essayé d'appeler l'API (bug critique!)
     // - 2+ appels = Appels dupliqués ou retry logic non désirée (bug de performance!)
-    // - 1 appel = Comportement correct ✅
+    // - 1 appel = Comportement correct
     //
     // Pourquoi c'est important ?
     // - Évite les appels API inutiles (coût, performance)
@@ -309,9 +284,7 @@ describe("signIn", () => {
     // - Garantit un comportement prévisible
     expect(mockPost).toHaveBeenCalledTimes(1);
 
-    // ───────────────────────────────────────────────────────────────────────
     // ASSERTION 3 : Vérifier l'égalité complète de la réponse
-    // ───────────────────────────────────────────────────────────────────────
 
     // toEqual() fait une comparaison profonde (deep equality) de tous les champs
     // C'est différent de toBe() qui fait une comparaison par référence (===)
@@ -329,9 +302,7 @@ describe("signIn", () => {
     // - Vérifie que TOUS les champs sont présents (pas juste quelques-uns)
     expect(result).toEqual(apiResponse);
 
-    // ───────────────────────────────────────────────────────────────────────
     // ASSERTION 4 : Vérifier le flag de succès
-    // ───────────────────────────────────────────────────────────────────────
 
     // toBe() fait une comparaison stricte (===) avec vérification du type
     // toBe(true) vérifie : result.success === true (et non juste truthy)
@@ -348,9 +319,7 @@ describe("signIn", () => {
     // - Stocker le token ou non
     expect(result.success).toBe(true);
 
-    // ───────────────────────────────────────────────────────────────────────
     // ASSERTION 5 : Vérifier l'email de l'utilisateur connecté
-    // ───────────────────────────────────────────────────────────────────────
 
     // Vérifie que l'email de l'utilisateur retourné correspond à celui envoyé
     // On descend dans l'objet result.user.email pour vérifier une donnée précise
@@ -367,9 +336,7 @@ describe("signIn", () => {
     // - Email vide = Données manquantes (bug backend!)
     expect(result.user.email).toBe("test@example.com");
 
-    // ───────────────────────────────────────────────────────────────────────
     // ASSERTION 6 : Vérifier la présence du token JWT
-    // ───────────────────────────────────────────────────────────────────────
 
     // Vérifie que le token JWT est présent et correct
     // Le token est essentiel pour l'authentification, donc on le vérifie explicitement
@@ -387,9 +354,8 @@ describe("signIn", () => {
     // - Renouvelé avec le refreshToken quand il expire
     expect(result.token).toBe("fake-jwt-token");
 
-    // ═══════════════════════════════════════════════════════════════════════
     // RÉSUMÉ DU FLUX DE CE TEST :
-    // ═══════════════════════════════════════════════════════════════════════
+
     // 1. ARRANGE : On crée une fausse réponse HTTP (axiosResponse)
     // 2. ARRANGE : On configure mockPost pour retourner cette réponse
     // 3. ACT : On appelle signIn() qui utilise mockPost au lieu du vrai api.post()
@@ -400,12 +366,9 @@ describe("signIn", () => {
     //    - Le flag success est true
     //    - L'email de l'utilisateur est correct
     //    - Le token JWT est présent
-    // ═══════════════════════════════════════════════════════════════════════
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 2 : IDENTIFIANTS INCORRECTS
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 2 : Login with incorrect credentials
@@ -458,21 +421,17 @@ describe("signIn", () => {
         statusText: "Unauthorized", // Texte du statut HTTP
         headers: {}, // En-têtes HTTP
         config: {} as any, // Configuration Axios
-      }
+      },
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Configurer le mock pour rejeter avec cette erreur
-    // ─────────────────────────────────────────────────────────────────────────
 
     // mockRejectedValueOnce() simule UNE promesse rejetée (échec) UNE FOIS
     // Quand signIn() appellera api.post(), le mock lancera cette erreur
     // au lieu de retourner un succès
     mockPost.mockRejectedValueOnce(axiosError);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT & ASSERT : Vérifier que l'exception est lancée avec le bon message
-    // ─────────────────────────────────────────────────────────────────────────
 
     // expect().rejects.toThrow() est une assertion spéciale pour les promesses
     // qui vérifie qu'une exception est lancée
@@ -487,7 +446,7 @@ describe("signIn", () => {
     // - Le message est mal extrait (bug de parsing!)
     // - Le backend a changé le format de réponse (breaking change!)
     await expect(signIn(loginData)).rejects.toThrow(
-      "Email or password incorrect"
+      "Email or password incorrect",
     );
 
     // Vérifier que l'API a bien été appelée (même si elle a échoué)
@@ -495,9 +454,7 @@ describe("signIn", () => {
     expect(mockPost).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGIN, loginData);
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 3 : EMAIL MANQUANT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 3 : Missing email
@@ -520,9 +477,7 @@ describe("signIn", () => {
    * pour montrer que le code doit gérer les deux formats (robustesse)
    */
   it("should throw an error if the email is missing", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Créer une erreur de validation (format simplifié)
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Note : Ici on utilise un objet simple au lieu d'une vraie AxiosError
     // Le code de signIn() doit être assez robuste pour gérer les deux formats
@@ -538,20 +493,16 @@ describe("signIn", () => {
     // Configurer le mock pour rejeter avec cette erreur de validation
     mockPost.mockRejectedValueOnce(errorResponse);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT & ASSERT : Vérifier l'exception pour un email vide
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Appeler signIn() avec un email vide et vérifier que l'exception est lancée
     // { email: "", password: "password123" } simule un formulaire avec email vide
     await expect(
-      signIn({ email: "", password: "password123" })
+      signIn({ email: "", password: "password123" }),
     ).rejects.toThrow("Email is required");
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 4 : MOT DE PASSE MANQUANT
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 4 : Missing password
@@ -581,13 +532,11 @@ describe("signIn", () => {
     // Vérifier que l'exception est lancée avec le bon message
     // { email: "test@example.com", password: "" } simule un mot de passe vide
     await expect(
-      signIn({ email: "test@example.com", password: "" })
+      signIn({ email: "test@example.com", password: "" }),
     ).rejects.toThrow("Password is required");
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 5 : STRUCTURE DE LA RÉPONSE
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 5 : Check the complete structure of the response
@@ -612,9 +561,7 @@ describe("signIn", () => {
    * - Présence de TOUS les champs, même optionnels (address peut être vide mais doit exister)
    */
   it("should return a response with the correct structure", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Créer la fixture de réponse
-    // ─────────────────────────────────────────────────────────────────────────
 
     const axiosResponse: AxiosResponse<LoginResponse> = {
       data: apiResponse, // Contient la structure complète à vérifier
@@ -627,15 +574,11 @@ describe("signIn", () => {
     // Configurer le mock pour retourner cette réponse
     mockPost.mockResolvedValueOnce(axiosResponse);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT : Appeler la fonction
-    // ─────────────────────────────────────────────────────────────────────────
 
     const result = await signIn(loginData);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ASSERT : Vérifier chaque propriété individuellement
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Vérifier les propriétés de la réponse de premier niveau
     // Ces champs sont essentiels pour le fonctionnement de l'application
@@ -669,9 +612,7 @@ describe("signIn", () => {
     // etc.
   });
 
-  // ═══════════════════════════════════════════════════════════════════════════
   // TEST 6 : ERREUR SERVEUR 500
-  // ═══════════════════════════════════════════════════════════════════════════
 
   /**
    * TEST 6 : Server error 500
@@ -705,9 +646,7 @@ describe("signIn", () => {
    * - Ne PAS afficher de stack trace à l'utilisateur
    */
   it("should handle server 500 errors", async () => {
-    // ─────────────────────────────────────────────────────────────────────────
     // ARRANGE : Créer une erreur serveur 500
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Format simplifié (pas une vraie AxiosError)
     // Le code doit être robuste et gérer ce format aussi
@@ -723,9 +662,7 @@ describe("signIn", () => {
     // Configurer le mock pour rejeter avec cette erreur serveur
     mockPost.mockRejectedValueOnce(serverError);
 
-    // ─────────────────────────────────────────────────────────────────────────
     // ACT & ASSERT : Vérifier la propagation de l'erreur
-    // ─────────────────────────────────────────────────────────────────────────
 
     // Vérifier que l'exception est lancée avec le message d'erreur
     await expect(signIn(loginData)).rejects.toThrow("Internal server error");
@@ -739,46 +676,3 @@ describe("signIn", () => {
   });
 });
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FIN DES TESTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * RÉSUMÉ DE LA COUVERTURE DE TESTS
- *
- * ✅ TEST 1 : Connexion réussie (happy path) - Status 200
- * ✅ TEST 2 : Identifiants incorrects - Status 401
- * ✅ TEST 3 : Email manquant - Status 400
- * ✅ TEST 4 : Mot de passe manquant - Status 400
- * ✅ TEST 5 : Structure de la réponse (contrat API)
- * ✅ TEST 6 : Erreur serveur - Status 500
- *
- * Total : 6 tests couvrant tous les scénarios critiques de connexion
- *
- * PATTERN UTILISÉ : AAA (Arrange-Act-Assert)
- * - ARRANGE : Préparer les données et configurer les mocks
- * - ACT     : Exécuter la fonction testée
- * - ASSERT  : Vérifier les résultats avec des assertions
- *
- * BONNES PRATIQUES APPLIQUÉES :
- * ✓ Tests isolés (beforeEach nettoyage systématique)
- * ✓ Mocks configurés correctement (ordre des imports respecté)
- * ✓ Fixtures réutilisables (loginData, apiResponse)
- * ✓ Assertions explicites et complètes
- * ✓ Commentaires ultra-détaillés (pédagogiques)
- * ✓ Nommage clair et descriptif (should...)
- * ✓ Couverture complète (succès + erreurs + validations)
- * ✓ Tests de contrat (structure de réponse)
- *
- * CODES HTTP TESTÉS :
- * - 200 OK : Authentification réussie
- * - 400 Bad Request : Validation (champs manquants)
- * - 401 Unauthorized : Identifiants incorrects
- * - 500 Internal Server Error : Erreur serveur
- *
- * DIFFÉRENCES AVEC signUp :
- * - Status 200 (lecture) au lieu de 201 (création)
- * - Teste token + refreshToken (pas de création d'utilisateur)
- * - Moins de validations (juste email + password)
- * - Pas de FormData (pas d'upload de fichier)
- */

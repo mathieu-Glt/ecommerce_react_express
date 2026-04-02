@@ -14,7 +14,7 @@ import type {
   UserProviderProps,
 } from "../interfaces/userContext.interface";
 
-const DEBUG_AUTH = process.env.NODE_ENV === "development";
+//const DEBUG_AUTH = process.env.NODE_ENV === "development";
 
 /**
  * User Context - provides authentication state to the entire app
@@ -31,9 +31,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   // Use useRef to avoid calling fetchCurrentUser multiple times
   const hasInitialized = useRef(false);
 
-  // ============================================
   // HYDRATATION AU DÉMARRAGE
-  // ============================================
 
   useEffect(() => {
     // Execute only once
@@ -47,29 +45,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     dispatch(fetchCurrentUser()).unwrap();
   }, []); // No dependencies - runs only once on mount
 
-  // ============================================
   // DEBUG LOGS (Development only)
-  // ============================================
-  // No dependencies - runs on every render but does not cause a loop
-  // useEffect(() => {
-  //   if (DEBUG_AUTH) {
-  //     console.group("🔐 UserContext Auth State");
-  //     console.log("👤 User:", authValue.user);
-  //     console.log("🔑 Token:", authValue.token ? "présent" : "absent");
-  //     console.log(
-  //       "♻️ Refresh Token:",
-  //       authValue.refreshToken ? "présent" : "absent"
-  //     );
-  //     console.log("✅ Authenticated:", authValue.isAuthenticated);
-  //     console.log("⏳ Loading:", authValue.loading);
-  //     console.log("❌ Error:", authValue.error);
-  //     console.groupEnd();
-  //   }
-  //   });
 
-  // ============================================
+
   // MEMOIZED CONTEXT VALUE
-  // ============================================
 
   const contextValue = useMemo(() => {
     let normalizedError: string | null = null;
@@ -90,9 +69,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     };
   }, [authValue]);
 
-  // ============================================
   // RENDER
-  // ============================================
 
   return (
     <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>

@@ -24,11 +24,11 @@ export interface LogoutSuccessResponse {
  * Tous les champs sont OBLIGATOIRES (pas de ?)
  */
 export interface LoginResponse {
-  success: true; // ✅ Obligatoire
-  message: string; // ✅ Obligatoire
-  user: User; // ✅ Obligatoire
-  token: string; // ✅ Obligatoire
-  refreshToken: string; // ✅ Obligatoire
+  success: true; 
+  message: string; 
+  user: User; 
+  token: string; 
+  refreshToken: string; 
   data?: DataResponseAuth;
 }
 interface DataResponseAuth {
@@ -118,7 +118,7 @@ export type ApiResponse =
  * Type guard pour vérifier si c'est une erreur
  */
 export function isErrorResponse(
-  response: ApiResponse
+  response: ApiResponse,
 ): response is ResponseErrorInterface {
   return response.success === false;
 }
@@ -127,7 +127,7 @@ export function isErrorResponse(
  * Type guard pour vérifier si c'est une réponse de login
  */
 export function isLoginResponse(
-  response: ApiResponse
+  response: ApiResponse,
 ): response is LoginResponse {
   return (
     response.success === true &&
@@ -141,7 +141,7 @@ export function isLoginResponse(
  * Type guard pour vérifier si c'est une réponse de register
  */
 export function isRegisterResponse(
-  response: ApiResponse
+  response: ApiResponse,
 ): response is RegisterResponse {
   return (
     response.success === true && "user" in response && !("token" in response)
@@ -152,7 +152,7 @@ export function isRegisterResponse(
  * Type guard pour vérifier si c'est une réponse de profile
  */
 export function isProfileResponse(
-  response: ApiResponse
+  response: ApiResponse,
 ): response is ProfileResponse {
   return (
     response.success === true && "user" in response && !("token" in response)
@@ -168,6 +168,7 @@ export interface CurrentUserResponse {
 
 export interface FetchCurrentUserResponse {
   success: true;
+  token?: string;
   user: User;
 }
 

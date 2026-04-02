@@ -32,9 +32,8 @@ async function fetchCsrfToken(): Promise<any> {
 
   return csrfTokenPromise;
 }
-// ============================================
 // CREATE A SINGLE GLOBAL INSTANCE
-// ============================================
+
 const BASE_URL =
   import.meta.env?.VITE_API_BASE_URL || "http://localhost:8000/api/";
 
@@ -43,9 +42,8 @@ const api: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-// -----------------------------
 // Request Interceptor
-// -----------------------------
+
 api.interceptors.request.use(
   async (config) => {
     config.headers = config.headers || {};
@@ -56,11 +54,12 @@ api.interceptors.request.use(
       config.headers["Authorization"] = `Bearer ${token}`;
     }
 
-    // CSRF Token
+    // CSRF Token dans la requête on vérifie la présence des méthodes "POST", "PUT", "DELETE", "PATCH"
     const needsCsrf = ["POST", "PUT", "DELETE", "PATCH"].includes(
-      config.method?.toUpperCase() || ""
+      config.method?.toUpperCase() || "",
     );
-
+    // Si la requete contient bien les méthodes ci desus
+    // et qu'elles incluent une protectin scsrf alors lance la methode fetchCsrfToken
     if (needsCsrf && !config.url?.includes("csrf-token")) {
       if (!csrfToken) {
         await fetchCsrfToken();
@@ -78,11 +77,11 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
-// -----------------------------
 // Response Interceptor
-// -----------------------------
+
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -134,12 +133,11 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
-// ============================================
 // EXPORT THE INSTANCE DIRECTLY
-// ============================================
+
 export { api, fetchCsrfToken };
 
 // useApi always returns the same instance

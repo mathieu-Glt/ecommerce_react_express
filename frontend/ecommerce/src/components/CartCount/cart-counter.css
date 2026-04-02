@@ -9,16 +9,16 @@
 
 .cart-badge {
   position: absolute;
-  top: 8px; /* ajuste la position verticale */
-  right: -8px; /* ajuste la position horizontale */
+  top: 8px; 
+  right: -8px; 
   width: 24px;
   height: 24px;
-  background-color: red; /* badge rouge */
-  border-radius: 50%; /* cercle parfait */
+  background-color: red; 
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: blue; /* texte bleu */
+  color: blue; 
   font-weight: bold;
   font-size: 14px;
 }

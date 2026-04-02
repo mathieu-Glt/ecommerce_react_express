@@ -13,9 +13,7 @@ import {
 //   deleteSubCategory,
 // } from "../thunks/subCategoryThunk";
 
-// ====================================================
-// 🧠 INITIAL STATE
-// ====================================================
+// INITIAL STATE
 const initialState: SubCategoryState = {
   subCategories: [],
   selectedSubCategory: null,
@@ -23,16 +21,12 @@ const initialState: SubCategoryState = {
   error: null,
 };
 
-// ====================================================
-// 🧩 SUB-CATEGORY SLICE
-// ====================================================
+// SUB-CATEGORY SLICE
 const subCategorySlice: Slice<SubCategoryState> = createSlice({
   name: "subCategories",
   initialState,
 
-  // ----------------------------------------------------
-  // 🔹 Synchronous reducers
-  // ----------------------------------------------------
+  // Synchronous reducers
   reducers: {
     /**
      * Completely clears the list of sub-categories
@@ -53,14 +47,11 @@ const subCategorySlice: Slice<SubCategoryState> = createSlice({
     },
   },
 
-  // ----------------------------------------------------
-  // 🔸 Extra asynchronous reducers (thunks)
-  // ----------------------------------------------------
+  // Extra asynchronous reducers (thunks)
   extraReducers: (builder) => {
     builder
-      // ==========================================
+
       // FETCH SUB-CATEGORIES
-      // ==========================================
       .addCase(fetchSubCategories.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -74,9 +65,7 @@ const subCategorySlice: Slice<SubCategoryState> = createSlice({
         state.error = action.error.message || "Failed to fetch sub-categories";
       });
 
-    // ==========================================
     // FETCH SUB-CATEGORY BY ID
-    // ==========================================
     builder
       .addCase(fetchSubCategoryById.pending, (state) => {
         state.loading = true;
@@ -94,9 +83,6 @@ const subCategorySlice: Slice<SubCategoryState> = createSlice({
   },
 });
 
-// ====================================================
-// 🧾 EXPORTS
-// ====================================================
 export const { clearSubCategories, setSelectedSubCategory } =
   subCategorySlice.actions;
 

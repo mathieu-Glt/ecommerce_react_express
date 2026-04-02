@@ -1,4 +1,3 @@
-// src/pages/backoffice/AdminProductCreatePage.tsx
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import axios, { type AxiosInstance } from "axios";
@@ -150,7 +149,7 @@ const AdminProductCreatePage = () => {
         for (let [key, value] of formDataToSend.entries()) {
           if (value instanceof File) {
           } else {
-            console.log(`${key}: ${value}`);
+            // console.log(`${key}: ${value}`);
           }
         }
 

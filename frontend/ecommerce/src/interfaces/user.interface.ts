@@ -16,6 +16,12 @@ export interface User {
   updatedAt?: string;
 }
 
+export interface LoginPayload {
+  user: User;
+  token: string;
+  refreshToken?: string | null;
+}
+
 export interface AuthState {
   user: User | null;
   token: string | null;
@@ -38,8 +44,6 @@ export interface RegisterCredentials {
   picture: string;
   confirmPassword: string;
 }
-
-
 
 export interface ResponseDataLogin {
   user: User;

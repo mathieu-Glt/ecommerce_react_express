@@ -1,4 +1,3 @@
-// src/components/navigation/NavBar.tsx
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../../routes";

@@ -1,4 +1,3 @@
-// context/FilterContext.tsx
 import { createContext, useContext, useState } from "react";
 import { useProduct } from "../hooks/useProduct";
 import type { Product } from "../interfaces/product.interface";

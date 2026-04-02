@@ -28,9 +28,7 @@ export const useCategory = () => {
     (state) => state.category
   );
 
-  // ============================================
   // FETCH ALL CATEGORIES
-  // ============================================
   const getAllCategories = useCallback(async (): Promise<
     Category[] | undefined
   > => {
@@ -43,9 +41,7 @@ export const useCategory = () => {
     }
   }, [dispatch, toast]);
 
-  // ============================================
   // FETCH CATEGORY BY ID
-  // ============================================
   const getCategoryById = useCallback(
     async (id: string): Promise<Category | null> => {
       try {
@@ -59,9 +55,7 @@ export const useCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // FETCH CATEGORY BY SLUG
-  // ============================================
   const getCategoryBySlug = useCallback(
     async (slug: string): Promise<Category | null> => {
       try {
@@ -75,9 +69,7 @@ export const useCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // CREATE CATEGORY
-  // ============================================
   const createCategory = useCallback(
     async (data: Record<string, any> | FormData): Promise<Category | null> => {
       try {
@@ -92,9 +84,7 @@ export const useCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // UPDATE CATEGORY
-  // ============================================
   const updateCategory = useCallback(
     async (
       id: string,
@@ -112,9 +102,7 @@ export const useCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // DELETE CATEGORY
-  // ============================================
   const deleteCategory = useCallback(
     async (id: string): Promise<boolean> => {
       try {
@@ -129,9 +117,7 @@ export const useCategory = () => {
     [dispatch, toast]
   );
 
-  // ============================================
   // MEMOIZED RETURN VALUE
-  // ============================================
   const categoryContextValue = useMemo(
     () => ({
       categories,
