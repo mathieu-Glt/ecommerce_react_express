@@ -1,5 +1,3 @@
-// Dans server/routes/invoiceRoutes.js (ou stripeRoutes.js)
-
 const express = require("express");
 const router = express.Router();
 const path = require("path");

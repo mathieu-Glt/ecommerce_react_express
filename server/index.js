@@ -73,10 +73,10 @@ const {
 const app = express();
 const httpServer = require("http").createServer(app);
 
-// 1. COOKIE PARSER - MUST BE FIRST
+// COOKIE PARSER - MUST BE FIRST
 app.use(cookieParser());
 
-// 2. CORS - CONFIGURATION DYNAMIQUE POUR PRODUCTION
+// CORS - CONFIGURATION DYNAMIQUE POUR PRODUCTION
 /**
  * Configure CORS based on environment
  * Development: Allow localhost
@@ -121,7 +121,7 @@ app.use(ipBlockerMiddleware); // Block blocked IPs
 // Explicitly handle OPTIONS requests (preflight)
 // app.options("*", cors());
 
-// 3. SECURITY
+// SECURITY
 /**
  * helmet() is a security middleware that protects your Express application by automatically setting various HTTP security headers.
  * Equivalent to using multiple helmet middlewares individually, such as :
@@ -142,7 +142,7 @@ app.use(ipBlockerMiddleware); // Block blocked IPs
  */
 app.use(helmet()); // Secures HTTP headers with Helmet
 
-// 3.1 PREVENT HTTP PARAM POLLUTION
+//  PREVENT HTTP PARAM POLLUTION
 /**
  * hpp() is a middleware that protects against HTTP parameter pollution attacks.
  * These attacks occur when attackers send multiple parameters with the same name in an HTTP request,
@@ -153,7 +153,7 @@ app.use(helmet()); // Secures HTTP headers with Helmet
  */
 app.use(hpp());
 
-// 4. RATE LIMITER - Increased for development
+// RATE LIMITER - Increased for development
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // Increased temporarily for debugging
@@ -171,7 +171,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// 5. BODY PARSERS
+// BODY PARSERS
 /**
  * Increasing size limits for JSON and URL-encoded requests
  * Useful for uploads of base64 images or large payloads
@@ -185,7 +185,7 @@ app.use(express.json({ limit: "10mb" }));
  */
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// 6. SESSION - CONFIGURATION DYNAMIQUE
+// SESSION - CONFIGURATION DYNAMIQUE
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || "your-secret-key",
   resave: false,
@@ -207,10 +207,10 @@ if (process.env.NODE_ENV !== "production") {
 
 const sessionMiddleware = session(sessionConfig);
 app.use(sessionMiddleware);
-// 7. SOCKET.IO
+// SOCKET.IO
 initSocket(httpServer, sessionMiddleware);
 
-// 8. CSRF PROTECTION - CONFIGURATION DYNAMIQUE
+// CSRF PROTECTION - CONFIGURATION DYNAMIQUE
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
@@ -255,7 +255,7 @@ app.use((req, res, next) => {
 //   next();
 // });
 
-// 9. XSS & MONGO SANITIZE
+// XSS & MONGO SANITIZE
 /**
  * xssSanitizeMiddleware nettoie les entrées utilisateur pour prévenir les attaques XSS
  * mongoSanitizeSafe protège contre les injections NoSQL en supprimant les opérateurs MongoDB des entrées utilisateur
@@ -271,14 +271,14 @@ app.use(mongoSanitizeSafe);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// 11. STATIC FILES
+// STATIC FILES
 /**
  * Servir les fichiers statiques pour les uploads et les factures
  */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/invoices", express.static(path.join(__dirname, "invoices")));
 
-// 12. REQUEST LOGGER
+// REQUEST LOGGER
 if (process.env.NODE_ENV !== "production") {
   // En développement : afficher dans la console
   app.use(morgan("dev"));
@@ -312,11 +312,11 @@ if (process.env.NODE_ENV !== "production") {
 //   next();
 // });
 
-// 13. LOAD ROUTES
+// LOAD ROUTES
 app.get("/api/admin/metrics", /* requireAdmin, */ metricsRoute);
 loadRoutes(app);
 
-// 14. ERROR HANDLER (DOIT ÊTRE À LA FIN)
+// ERROR HANDLER (DOIT ÊTRE À LA FIN)
 app.use((err, req, res, next) => {
   // Logger l'erreur avec Winston
   logger.error({
@@ -331,7 +331,7 @@ app.use((err, req, res, next) => {
   // Appeler l'error handler existant
   errorHandler(err, req, res, next);
 });
-// 15. START SERVER
+// START SERVER
 logger.info({
   type: "SERVER_INIT",
   message: "Initializing server...",
