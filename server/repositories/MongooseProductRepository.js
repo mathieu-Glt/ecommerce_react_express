@@ -66,7 +66,7 @@ class MongooseProductRepository extends IProductRepository {
    */
   async getProductsByCategoryAccessories(limit, categoryId) {
     const accessoriesCategoryId = new mongoose.Types.ObjectId(
-      "68af139bad37cf7ede6bd1ef"
+      "68af139bad37cf7ede6bd1ef",
     ); // Replace with the actual ID of the "accessories" category
     return await this.Product.find({ category: categoryId })
       .populate("category", "name slug")
@@ -82,7 +82,7 @@ class MongooseProductRepository extends IProductRepository {
    */
   async getProductsByCategoryOutillage(limit, categoryId) {
     const outillageCategoryId = new mongoose.Types.ObjectId(
-      "68b1a8a7ee346bc5b9809b51"
+      "68b1a8a7ee346bc5b9809b51",
     ); // Replace with the actual ID of the "outillage" category
     return await this.Product.find({ category: categoryId })
       .populate("category", "name slug")
@@ -253,7 +253,7 @@ class MongooseProductRepository extends IProductRepository {
         // Calculate the average only if item.star exists
         const total = prod.rating.reduce(
           (acc, item) => acc + (item.star || 0),
-          0
+          0,
         );
         prod.averageRating = total / prod.rating.length;
       }
@@ -395,7 +395,7 @@ class MongooseProductRepository extends IProductRepository {
     if (!product) return null;
 
     const existingRating = product.rating.find(
-      (r) => r.postedBy.toString() === userId.toString() // To compare ObjectId as strings to check if the user has already rated the product
+      (r) => r.postedBy.toString() === userId.toString(), // To compare ObjectId as strings to check if the user has already rated the product
     );
 
     if (existingRating) {
@@ -462,11 +462,11 @@ class MongooseProductRepository extends IProductRepository {
 
     // Find the user's rating
     const userRating = product.rating.find(
-      (r) => r.postedBy.toString() === userId
+      (r) => r.postedBy.toString() === userId,
     );
 
     if (!userRating) {
-      return null; // Important to avoid 500 error
+      return null;
     }
 
     return userRating;

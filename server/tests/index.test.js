@@ -38,8 +38,6 @@ describe("CSRF Token Endpoint", () => {
       expect(response.body).toHaveProperty("csrfToken");
       expect(typeof response.body.csrfToken).toBe("string");
       expect(response.body.csrfToken.length).toBeGreaterThan(0);
-
-      console.log("📌 CSRF Token received:", response.body.csrfToken);
     });
 
     /**
@@ -62,7 +60,7 @@ describe("CSRF Token Endpoint", () => {
 
       // Log individual cookies for debugging
       cookies.forEach((cookie, index) => {
-        console.log(`   Cookie ${index + 1}:`, cookie.split(";")[0]);
+        // console.log(`   Cookie ${index + 1}:`, cookie.split(";")[0]);
       });
     });
 
@@ -129,8 +127,6 @@ describe("CSRF Token Endpoint", () => {
       // Typical CSRF token length is between 20-100 characters
       expect(token.length).toBeGreaterThanOrEqual(20);
       expect(token.length).toBeLessThanOrEqual(100);
-
-      console.log("✅ Token format validated:", token);
     });
 
     /**
@@ -150,10 +146,8 @@ describe("CSRF Token Endpoint", () => {
       responses.forEach((response, index) => {
         expect(response.body).toHaveProperty("csrfToken");
         expect(typeof response.body.csrfToken).toBe("string");
-        console.log(`   Request ${index + 1} token:`, response.body.csrfToken);
+        // console.log(`   Request ${index + 1} token:`, response.body.csrfToken);
       });
-
-      console.log("✅ All concurrent requests successful");
     });
   });
 
@@ -172,9 +166,8 @@ describe("CSRF Token Endpoint", () => {
       const csrfToken = csrfResponse.body.csrfToken;
       const cookies = csrfResponse.headers["set-cookie"];
 
-      console.log("🔐 CSRF Setup:");
-      console.log("   Token retrieved:", csrfToken);
-      console.log("   Cookies received:", cookies);
+      // console.log("   Token retrieved:", csrfToken);
+      // console.log("   Cookies received:", cookies);
 
       // Verify token
       expect(csrfToken).toBeDefined();
@@ -184,8 +177,6 @@ describe("CSRF Token Endpoint", () => {
       // Verify cookies
       expect(cookies).toBeDefined();
       expect(Array.isArray(cookies)).toBe(true);
-
-      console.log("✅ CSRF token ready for use in POST/PUT/DELETE requests");
 
       // NOTE: To test with a real endpoint, uncomment and modify:
       /*

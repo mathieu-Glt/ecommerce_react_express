@@ -19,7 +19,7 @@
  *
  * This service follows the Dependency Inversion Principle (SOLID),
  * ensuring it does not depend on low-level implementation details.
- * 
+ *
  */
 
 /**
@@ -70,7 +70,7 @@ class ProductService {
   async getProductsByPriceRange(minPrice, maxPrice) {
     return await this.productRepository.getProductsByPriceRange(
       minPrice,
-      maxPrice
+      maxPrice,
     );
   }
 
@@ -182,7 +182,7 @@ class ProductService {
     return await this.productRepository.updateRatingToProductRepo(
       productId,
       userId,
-      star
+      star,
     );
   }
 
@@ -195,7 +195,7 @@ class ProductService {
   async takeRatingFromProduct(productId, userId) {
     const result = await this.productRepository.takeRatingFromProductRepo(
       productId,
-      userId
+      userId,
     );
     return result;
   }
@@ -207,7 +207,7 @@ class ProductService {
    */
   async findProductsByCategorySlugService(categoryId) {
     return await this.productRepository.findProductsByCategoryIdRepo(
-      categoryId
+      categoryId,
     );
   }
 
@@ -218,7 +218,7 @@ class ProductService {
    */
   async findProductsBySubCategoryIdService(subCategoryId) {
     return await this.productRepository.findProductsBySubCategoryIdRepo(
-      subCategoryId
+      subCategoryId,
     );
   }
 
@@ -262,7 +262,7 @@ class ProductService {
   async findProductsByPriceRangeService(minPrice, maxPrice) {
     const results = await this.productRepository.findProductsByPriceRangeRepo(
       minPrice,
-      maxPrice
+      maxPrice,
     );
     return results;
   }

@@ -32,7 +32,7 @@ class UserService {
 // SOLUTION : INVERSION DE DÉPENDANCE
 // ============================================================================
 
-// ✅ ÉTAPE 1 : Créer une interface/abstraction
+// ÉTAPE 1 : Créer une interface/abstraction
 class IUserRepository {
   async findOrCreateUser(userData) {
     throw new Error("Method must be implemented");
@@ -47,7 +47,7 @@ class IUserRepository {
   }
 }
 
-// ✅ ÉTAPE 2 : Implémentation Mongoose
+// ÉTAPE 2 : Implémentation Mongoose
 class MongooseUserRepository extends IUserRepository {
   constructor(UserModel) {
     super();
@@ -89,7 +89,7 @@ class MongooseUserRepository extends IUserRepository {
   }
 }
 
-// ✅ ÉTAPE 3 : Implémentation MySQL
+// ÉTAPE 3 : Implémentation MySQL
 class MySQLUserRepository extends IUserRepository {
   constructor(database) {
     super();
@@ -176,15 +176,15 @@ class MySQLUserRepository extends IUserRepository {
   }
 }
 
-// ✅ ÉTAPE 4 : Service qui dépend de l'abstraction
+// ÉTAPE 4 : Service qui dépend de l'abstraction
 class UserService {
   constructor(userRepository) {
-    // ✅ Dépend de l'abstraction, pas de l'implémentation
+    // Dépend de l'abstraction, pas de l'implémentation
     this.userRepository = userRepository;
   }
 
   async findOrCreateUser(userData) {
-    // ✅ Le service ne sait pas s'il utilise Mongoose ou MySQL
+    // Le service ne sait pas s'il utilise Mongoose ou MySQL
     return await this.userRepository.findOrCreateUser(userData);
   }
 
@@ -201,14 +201,14 @@ class UserService {
 // CONFIGURATION ET INJECTION DE DÉPENDANCE
 // ============================================================================
 
-// ✅ Configuration pour Mongoose
+// Configuration pour Mongoose
 function createMongooseUserService() {
   const User = require("../models/User");
   const userRepository = new MongooseUserRepository(User);
   return new UserService(userRepository);
 }
 
-// ✅ Configuration pour MySQL
+// Configuration pour MySQL
 function createMySQLUserService() {
   const mysql = require("mysql2/promise");
   const connection = mysql.createConnection({
@@ -222,7 +222,7 @@ function createMySQLUserService() {
   return new UserService(userRepository);
 }
 
-// ✅ Factory pattern pour choisir l'implémentation
+// Factory pattern pour choisir l'implémentation
 function createUserService(databaseType = "mongoose") {
   switch (databaseType) {
     case "mongoose":
@@ -238,7 +238,7 @@ function createUserService(databaseType = "mongoose") {
 // UTILISATION DANS LES CONTRÔLEURS
 // ============================================================================
 
-// ✅ Le contrôleur ne change pas du tout !
+// Le contrôleur ne change pas du tout !
 const userService = createUserService(process.env.DATABASE_TYPE);
 
 exports.createOrUpdateUser = asyncHandler(async (req, res) => {

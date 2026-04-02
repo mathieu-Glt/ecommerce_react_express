@@ -52,7 +52,7 @@ router.get(
   "/google",
   passport.authenticate("google", { scope: ["email", "profile"] }), // scope to request email and profile
   (req, res) => {
-    console.log("Google login initiated");
+    // console.log("Google login initiated");
   }
 );
 
@@ -249,7 +249,7 @@ router.get(
     prompt: "consent",
   }),
   (req, res) => {
-    console.log("Azure login initiated");
+    // console.log("Azure login initiated");
   }
 );
 

@@ -73,10 +73,6 @@ const mongoSanitizeSafe = (req, res, next) => {
       } catch (defineError) {
         // Log only in development
         if (process.env.NODE_ENV === "development") {
-          console.warn(
-            "⚠️  Could not redefine req.query:",
-            defineError.message
-          );
         }
         return next(defineError);
       }
@@ -84,7 +80,7 @@ const mongoSanitizeSafe = (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("❌ Error in mongoSanitize middleware:", error);
+    // console.error("Error in mongoSanitize middleware:", error);
     // In case of error, continue anyway to not block the application
     return next(error);
   }

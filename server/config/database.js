@@ -5,25 +5,14 @@ const mongoose = require("mongoose");
  */
 const connectDB = async () => {
   try {
-    console.log("🔄 Connecting to MongoDB...");
-    console.log(
-      "📍 MongoDB URI:",
-      process.env.MONGODB_URI ? "SET ✅" : "MISSING ❌"
-    );
-    console.log("📍 Database:", process.env.MONGODB_URI?.split("/").pop());
+    console.log("Connecting to MongoDB...");
+    console.log("MongoDB URI:", process.env.MONGODB_URI ? "SET" : "MISSING ");
+    // console.log("Database:", process.env.MONGODB_URI?.split("/").pop());
 
     await mongoose.connect(process.env.MONGODB_URI);
 
-    console.log("✅ MongoDB connected successfully");
+    // console.log("MongoDB connected successfully");
   } catch (error) {
-    console.error("═══════════════════════════════════════");
-    console.error("❌ MONGODB CONNECTION ERROR:");
-    console.error("═══════════════════════════════════════");
-    console.error("Error name:", error.name);
-    console.error("Error message:", error.message);
-    console.error("Error code:", error.code);
-    console.error("Full error:", error);
-    console.error("═══════════════════════════════════════");
     throw error;
   }
 };
@@ -36,7 +25,7 @@ const validateDatabaseConfig = () => {
   if (databaseType === "mongoose") {
     if (!process.env.MONGODB_URI) {
       throw new Error(
-        "MONGODB_URI environment variable is required for mongoose"
+        "MONGODB_URI environment variable is required for mongoose",
       );
     }
   } else if (databaseType === "mysql") {
@@ -45,7 +34,7 @@ const validateDatabaseConfig = () => {
 
     if (missingVars.length > 0) {
       throw new Error(
-        `Missing MySQL environment variables: ${missingVars.join(", ")}`
+        `Missing MySQL environment variables: ${missingVars.join(", ")}`,
       );
     }
   }
@@ -64,17 +53,17 @@ module.exports = { connectDB, validateDatabaseConfig };
 //     try {
 //       if (databaseType === "mongoose") {
 //         const conn = await mongoose.connect(process.env.MONGODB_URI);
-//         console.log("✅ Connected to MongoDB");
+//         console.log("Connected to MongoDB");
 //         return conn;
 //       } else if (databaseType === "mysql") {
 //         // Pour MySQL, la connexion sera gérée par le repository
-//         console.log("✅ MySQL configuration ready");
+//         console.log("MySQL configuration ready");
 //         return null;
 //       } else {
 //         throw new Error(`Unsupported database type: ${databaseType}`);
 //       }
 //     } catch (error) {
-//       console.error("❌ Error connecting to database:", error);
+//       console.error("Error connecting to database:", error);
 //       process.exit(1);
 //     }
 //   }

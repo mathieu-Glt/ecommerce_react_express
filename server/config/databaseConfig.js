@@ -4,9 +4,7 @@
  * Pour choisir entre Mongoose et MySQL, modifiez la variable DATABASE_TYPE dans votre fichier .env
  */
 
-// ============================================================================
 // ÉTAPE 1 : Créer/modifier le fichier .env dans le dossier server/
-// ============================================================================
 
 /*
 # Pour utiliser MongoDB avec Mongoose :
@@ -21,9 +19,7 @@ DB_PASSWORD=password
 DB_NAME=ecommerce
 */
 
-// ============================================================================
 // ÉTAPE 2 : Comment le serveur fait le choix
-// ============================================================================
 
 /**
  * Dans server/index.js, ligne 8 :
@@ -35,9 +31,7 @@ DB_NAME=ecommerce
  * - Si pas de valeur → utilise mongoose par défaut
  */
 
-// ============================================================================
 // ÉTAPE 3 : Comment tester le changement
-// ============================================================================
 
 /**
  * 1. Modifiez votre fichier .env :
@@ -47,13 +41,11 @@ DB_NAME=ecommerce
  *    npm start
  *
  * 3. Regardez les logs :
- *    📊 Database type: mysql
- *    ✅ MySQL configuration ready
+ *    Database type: mysql
+ *    MySQL configuration ready
  */
 
-// ============================================================================
 // EXEMPLE DE FICHIER .env COMPLET
-// ============================================================================
 
 const exampleEnvFile = `
 # Configuration de la base de données
@@ -73,9 +65,7 @@ PORT=8000
 NODE_ENV=development
 `;
 
-// ============================================================================
 // VÉRIFICATION DE LA CONFIGURATION
-// ============================================================================
 
 function checkDatabaseConfig() {
   const databaseType = process.env.DATABASE_TYPE || "mongoose";

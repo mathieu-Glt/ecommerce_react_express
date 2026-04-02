@@ -55,16 +55,16 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ["admin", "user"], default: "user" },
     isActive: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-// 🔠 Uppercase lastname avant validation
+// Uppercase lastname avant validation
 userSchema.pre("validate", function (next) {
   if (this.lastname) this.lastname = this.lastname.trim().toUpperCase();
   next();
 });
 
-// 🔐 Hashage mot de passe
+// Hashage mot de passe
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   if (
@@ -81,7 +81,7 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// 🧍‍♂️ Avatar par défaut si non défini
+// Avatar par défaut si non défini
 userSchema.methods.getProfilePicture = function () {
   if (this.picture) return this.picture;
   const initials = `${this.firstname?.[0] || ""}${
@@ -90,7 +90,7 @@ userSchema.methods.getProfilePicture = function () {
   return `https://ui-avatars.com/api/?name=${initials}&background=random&color=fff&size=200`;
 };
 
-// 🧩 Virtual : commentaires de l’utilisateur
+// commentaires de l’utilisateur
 userSchema.virtual("comments", {
   ref: "Comment",
   localField: "_id",
@@ -98,7 +98,7 @@ userSchema.virtual("comments", {
   justOne: false,
 });
 
-// 🔒 Nettoyage des données
+// Nettoyage des données
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;

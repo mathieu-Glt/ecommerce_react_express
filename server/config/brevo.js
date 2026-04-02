@@ -36,7 +36,6 @@ const sendResetEmail = async (toEmail, name, resetLink) => {
       logoUrl: LOGO_URL,
     });
 
-
     // Plain text fallback
     const textContent = `
 Hello ${name},

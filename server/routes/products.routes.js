@@ -4,7 +4,6 @@ const router = express.Router();
 const {
   createProduct,
   getProducts,
-  getProductBySlug,
   getProductById,
   updateProduct,
   deleteProduct,
@@ -41,9 +40,7 @@ const {
  * @module routes/productRoutes
  */
 
-// ========================================
 // PUBLIC ROUTES - SPECIFIC PATHS FIRST
-// ========================================
 
 /**
  * @route GET /
@@ -108,9 +105,7 @@ router.get("/category/accessories", getProductsByCategoryAcesories);
  */
 router.get("/category/outillage", getProductsByCategoryOutillage);
 
-// ========================================
 // PUBLIC ROUTES - DYNAMIC PARAMETERS (MUST BE LAST)
-// ========================================
 
 /**
  * @route GET /:id
@@ -119,9 +114,7 @@ router.get("/category/outillage", getProductsByCategoryOutillage);
  */
 router.get("/:id", getProductById);
 
-// ========================================
 // PROTECTED ROUTES - CREATE, UPDATE, DELETE
-// ========================================
 
 /**
  * @route POST /
@@ -161,9 +154,7 @@ router.put(
  */
 router.delete("/:id", authenticateToken, requireRole(["admin"]), deleteProduct);
 
-// ========================================
 // PROTECTED ROUTES - RATINGS
-// ========================================
 
 /**
  * @route POST /:id/rate
@@ -199,9 +190,7 @@ router.put(
  */
 router.get("/:id/rate/check", authenticateToken, takeProductRating);
 
-// ========================================
 // PUBLIC ROUTES - SUB-ROUTES WITH :id PARAMETER
-// ========================================
 
 /**
  * @route GET /:id/category

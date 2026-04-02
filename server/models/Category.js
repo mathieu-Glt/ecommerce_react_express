@@ -32,7 +32,7 @@ const categorySchema = new mongoose.Schema(
     },
     subs: [{ type: ObjectId, ref: "Sub" }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Category", categorySchema);

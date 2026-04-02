@@ -27,7 +27,7 @@ const authService = new AuthService(userService.userRepository);
  */
 const extractToken = (req) => {
   const authHeader = req.headers["authorization"];
-  console.log("Authorization Header:", authHeader);
+  // console.log("Authorization Header:", authHeader);
   // Check for Bearer token format and extract token
   return authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 };

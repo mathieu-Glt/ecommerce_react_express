@@ -102,9 +102,7 @@ describe("Authentication Tests", () => {
   });
 
   /**
-   * ========================================
    * LOGIN TESTS
-   * ========================================
    */
   describe("POST /api/auth/login", () => {
     describe("Success Cases", () => {
@@ -323,16 +321,14 @@ describe("Authentication Tests", () => {
   });
 
   /**
-   * ========================================
    * REGISTER TESTS
-   * ========================================
    */
   describe("POST /api/auth/register", () => {
     it("should register successfully with valid credentials and profile picture", async () => {
       const response = await agent
         .post("/api/auth/register")
         .set("X-CSRF-Token", csrfToken)
-        .field("email", "testuser1@example.com") // ✅ Email unique
+        .field("email", "testuser1@example.com") 
         .field("password", "TestPassword123!")
         .field("firstname", "John")
         .field("lastname", "Doe")
@@ -361,7 +357,7 @@ describe("Authentication Tests", () => {
       // Verify password is NOT in response
       expect(user).not.toHaveProperty("password");
 
-      // ✅ MODIFIÉ : Vérifier les tokens uniquement s'ils existent
+      // MODIFIÉ : Vérifier les tokens uniquement s'ils existent
       // Ton controller register ne retourne pas de tokens actuellement
       if (response.body.token) {
         expect(typeof response.body.token).toBe("string");
@@ -378,7 +374,7 @@ describe("Authentication Tests", () => {
       await agent
         .post("/api/auth/register")
         .set("X-CSRF-Token", csrfToken)
-        .field("email", "duplicate2@example.com") // ✅ Email unique
+        .field("email", "duplicate2@example.com") 
         .field("password", "TestPassword123!")
         .field("firstname", "John")
         .field("lastname", "Doe")
@@ -389,7 +385,7 @@ describe("Authentication Tests", () => {
       const response = await agent
         .post("/api/auth/register")
         .set("X-CSRF-Token", csrfToken)
-        .field("email", "duplicate2@example.com") // ✅ Même email
+        .field("email", "duplicate2@example.com") 
         .field("password", "DifferentPassword123!")
         .field("firstname", "Jane")
         .field("lastname", "Smith")
@@ -430,7 +426,7 @@ describe("Authentication Tests", () => {
       const response = await agent
         .post("/api/auth/register")
         .set("X-CSRF-Token", csrfToken)
-        .field("email", "testuser3@example.com") // ✅ Email unique
+        .field("email", "testuser3@example.com") 
         .field("password", "Short1!")
         .field("firstname", "John")
         .field("lastname", "Doe")
@@ -444,7 +440,7 @@ describe("Authentication Tests", () => {
       const response = await agent
         .post("/api/auth/register")
         .set("X-CSRF-Token", csrfToken)
-        .field("email", "testuser4@example.com") // ✅ Email unique
+        .field("email", "testuser4@example.com") 
         .field("password", "TestPassword123!")
         .field("firstname", "John")
         .field("lastname", "Doe")

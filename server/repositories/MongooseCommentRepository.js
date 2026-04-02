@@ -35,13 +35,13 @@ class MongooseCommentRepository extends ICommentRepository {
       //  Result after populate()  :  {
       //   _id: "comment123",
       //   text: "Super produit !",
-      //   user: {                          // ← Full object!
+      //   user: {                         
       //     _id: "user456",
       //     firstname: "John",
       //     lastname: "Doe",
       //     picture: "avatar.jpg"
       //   },
-      //   product: {                       // ← Full object!
+      //   product: {                       
       //     _id: "product789",
       //     name: "iPhone 15",
       //     price: 999

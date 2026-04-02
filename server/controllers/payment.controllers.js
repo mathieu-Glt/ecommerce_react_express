@@ -31,11 +31,9 @@ require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const paypalClientId = process.env.CLIENT_ID_PAYPAL;
 const paypalSecret = process.env.CLIENT_SECRET_PAYPAL;
-const PAYPAL_BASE = "https://api-m.sandbox.paypal.com"; // sandbox for test
+const PAYPAL_BASE = "https://api-m.sandbox.paypal.com";
 
-/* ============================================================
-   STRIPE - Creation of the payment session
-============================================================ */
+//STRIPE - Creation of the payment session
 exports.createCheckoutSession = asyncHandler(async (req, res) => {
   const userId = req.user?.userId;
   try {
@@ -67,9 +65,7 @@ exports.createCheckoutSession = asyncHandler(async (req, res) => {
   }
 });
 
-/* ============================================================
-   STRIPE - Invoice generation after success
-============================================================ */
+//STRIPE - Invoice generation after success
 exports.stripeSuccess = asyncHandler(async (req, res) => {
   const { session_id } = req.query;
 
@@ -111,7 +107,6 @@ exports.stripeSuccess = asyncHandler(async (req, res) => {
       }, 5000);
     });
 
-    // ✅ Retourner l'URL du backend, pas du frontend !
     const frontendUrl =
       process.env.FRONTEND_URL ||
       "https://frontend-typescript-react-gules.vercel.app";
@@ -120,22 +115,20 @@ exports.stripeSuccess = asyncHandler(async (req, res) => {
 
     // Redirect to the frontend with the invoice URL as a parameter
     res.redirect(
-      `${frontendUrl}/merci?invoice=${fileName}&downloadUrl=${backendUrl}/api/invoices/${fileName}`
+      `${frontendUrl}/merci?invoice=${fileName}&downloadUrl=${backendUrl}/api/invoices/${fileName}`,
     );
   } catch (err) {
     res.status(500).send("Error processing payment.");
   }
 });
 
-/* ============================================================
-   PAYPAL - Creation of the order
-============================================================ */
+//PAYPAL - Creation of the order
 exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
   const { amount } = req.body;
 
   try {
     const auth = Buffer.from(`${paypalClientId}:${paypalSecret}`).toString(
-      "base64"
+      "base64",
     );
 
     const tokenRes = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
@@ -184,9 +177,7 @@ exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
   }
 });
 
-/* ============================================================
-   PAYPAL - Capture of the payment and invoice generation
-============================================================ */
+//PAYPAL - Capture of the payment and invoice generation
 // exports.capturePaypalPayment = asyncHandler(async (req, res) => {
 //   const { token } = req.query;
 //   console.log("Capturing Paypal payment for token :", token);
@@ -254,11 +245,11 @@ exports.getPaymentWithPaypal = asyncHandler(async (req, res) => {
 //       // });
 
 //       // return res.download(filePath, fileName);
-//       // ✅ Redirige vers le front avec l'URL de la facture en paramètre
+//       // Redirige vers le front avec l'URL de la facture en paramètre
 //       const redirectUrl = `${
 //         process.env.FRONTEND_URL || "http://localhost:5173"
 //       }/merci-paypal?invoice=${fileName}`;
-//       console.log("✅ Redirection vers :", redirectUrl);
+//       console.log("Redirection vers :", redirectUrl);
 //       res.redirect(redirectUrl);
 //     }
 
@@ -278,7 +269,7 @@ exports.capturePaypalPayment = async (req, res) => {
 
   try {
     const auth = Buffer.from(`${paypalClientId}:${paypalSecret}`).toString(
-      "base64"
+      "base64",
     );
 
     // Obtain a PayPal access token
@@ -301,7 +292,7 @@ exports.capturePaypalPayment = async (req, res) => {
           Authorization: `Bearer ${tokenData.access_token}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     const captureData = await captureRes.json();

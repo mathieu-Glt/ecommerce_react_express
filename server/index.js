@@ -33,12 +33,20 @@
  * Load environment variables from .env file in development only
  * In production (Render), environment variables are injected directly
  */
+const logger = require("./utils/logger");
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config({ path: __dirname + "/.env" });
-  console.log("✅ Loaded .env file for development");
+  logger.info({
+    type: "ENV_LOADED",
+    message: "Environment variables loaded from .env file",
+  });
 } else {
-  console.log("✅ Using environment variables from platform (production)");
+  logger.info({
+    type: "ENV_LOADED",
+    message: "Environment variables loaded for production",
+  });
 }
+
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
@@ -56,18 +64,19 @@ const { connectDB, validateDatabaseConfig } = require("./config/database");
 const { errorHandler } = require("./utils/errorHandler");
 const mongoSanitizeSafe = require("./middleware/mongoSanitizeSafe");
 const xssSanitizeMiddleware = require("./middleware/xssCleanSafe");
+const {
+  monitoringMiddleware,
+  ipBlockerMiddleware,
+  metricsRoute,
+} = require("./utils/monitoring");
 
 const app = express();
 const httpServer = require("http").createServer(app);
 
-// =============================================
 // 1. COOKIE PARSER - MUST BE FIRST
-// =============================================
 app.use(cookieParser());
 
-// =============================================
 // 2. CORS - CONFIGURATION DYNAMIQUE POUR PRODUCTION
-// =============================================
 /**
  * Configure CORS based on environment
  * Development: Allow localhost
@@ -86,7 +95,12 @@ const corsOptions = {
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.warn(`⚠️  CORS blocked origin: ${origin}`);
+      console.warn(`CORS blocked origin: ${origin}`);
+      logger.warn({
+        type: "CORS_BLOCKED",
+        origin: origin,
+        timestamp: new Date().toISOString(),
+      });
       callback(new Error("Not allowed by CORS"));
     }
   },
@@ -103,12 +117,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(ipBlockerMiddleware); // Block blocked IPs
 // Explicitly handle OPTIONS requests (preflight)
 // app.options("*", cors());
 
-// =============================================
 // 3. SECURITY
-// =============================================
 /**
  * helmet() is a security middleware that protects your Express application by automatically setting various HTTP security headers.
  * Equivalent to using multiple helmet middlewares individually, such as :
@@ -129,9 +142,7 @@ app.use(cors(corsOptions));
  */
 app.use(helmet()); // Secures HTTP headers with Helmet
 
-// =============================================
 // 3.1 PREVENT HTTP PARAM POLLUTION
-// =============================================
 /**
  * hpp() is a middleware that protects against HTTP parameter pollution attacks.
  * These attacks occur when attackers send multiple parameters with the same name in an HTTP request,
@@ -142,19 +153,25 @@ app.use(helmet()); // Secures HTTP headers with Helmet
  */
 app.use(hpp());
 
-// =============================================
 // 4. RATE LIMITER - Increased for development
-// =============================================
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // Increased temporarily for debugging
   message: "Too many requests, please try again later.",
+  handler: (req, res) => {
+    logger.warn({
+      type: "RATE_LIMIT_EXCEEDED",
+      ip: req.ip,
+      path: req.path,
+    });
+    res.status(429).json({
+      error: "Too many requests, please try again later.",
+    });
+  },
 });
 app.use(limiter);
 
-// =============================================
 // 5. BODY PARSERS
-// =============================================
 /**
  * Increasing size limits for JSON and URL-encoded requests
  * Useful for uploads of base64 images or large payloads
@@ -168,9 +185,7 @@ app.use(express.json({ limit: "10mb" }));
  */
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// =============================================
 // 6. SESSION - CONFIGURATION DYNAMIQUE
-// =============================================
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || "your-secret-key",
   resave: false,
@@ -184,21 +199,18 @@ const sessionConfig = {
 };
 
 if (process.env.NODE_ENV !== "production") {
-  console.warn(
-    "⚠️  WARNING: Using MemoryStore for sessions (not suitable for production)"
-  );
+  logger.warn({
+    type: "DEV_MODE",
+    message: "Using default session configuration for development",
+  });
 }
 
 const sessionMiddleware = session(sessionConfig);
 app.use(sessionMiddleware);
-// =============================================
 // 7. SOCKET.IO
-// =============================================
 initSocket(httpServer, sessionMiddleware);
 
-// =============================================
 // 8. CSRF PROTECTION - CONFIGURATION DYNAMIQUE
-// =============================================
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
@@ -243,9 +255,7 @@ app.use((req, res, next) => {
 //   next();
 // });
 
-// =============================================
 // 9. XSS & MONGO SANITIZE
-// =============================================
 /**
  * xssSanitizeMiddleware nettoie les entrées utilisateur pour prévenir les attaques XSS
  * mongoSanitizeSafe protège contre les injections NoSQL en supprimant les opérateurs MongoDB des entrées utilisateur
@@ -253,9 +263,7 @@ app.use((req, res, next) => {
 app.use(xssSanitizeMiddleware);
 app.use(mongoSanitizeSafe);
 
-// =============================================
 // 10. PASSPORT
-// =============================================
 /**
  * Initialisation de Passport pour l'authentification
  * Utilisation des sessions pour maintenir l'état de l'utilisateur connecté
@@ -263,20 +271,27 @@ app.use(mongoSanitizeSafe);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// =============================================
 // 11. STATIC FILES
-// =============================================
 /**
  * Servir les fichiers statiques pour les uploads et les factures
  */
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/invoices", express.static(path.join(__dirname, "invoices")));
 
-// =============================================
 // 12. REQUEST LOGGER
-// =============================================
-app.use(morgan("dev"));
-
+if (process.env.NODE_ENV !== "production") {
+  // En développement : afficher dans la console
+  app.use(morgan("dev"));
+} else {
+  // En production : logger dans Winston
+  app.use(
+    morgan("combined", {
+      stream: {
+        write: (message) => logger.info(message.trim()),
+      },
+    }),
+  );
+}
 // Middleware pour logger toutes les URLs
 // app.use((req, res, next) => {
 //   console.log(`📌 ${req.method} ${req.url}`);
@@ -297,69 +312,64 @@ app.use(morgan("dev"));
 //   next();
 // });
 
-// =============================================
 // 13. LOAD ROUTES
-// =============================================
+app.get("/api/admin/metrics", /* requireAdmin, */ metricsRoute);
 loadRoutes(app);
 
-// =============================================
 // 14. ERROR HANDLER (DOIT ÊTRE À LA FIN)
-// =============================================
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+  // Logger l'erreur avec Winston
+  logger.error({
+    type: "ERROR",
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+    ip: req.ip,
+  });
 
-// =============================================
+  // Appeler l'error handler existant
+  errorHandler(err, req, res, next);
+});
 // 15. START SERVER
-// =============================================
-console.log("═══════════════════════════════════════");
-console.log("🚀 INITIALIZING SERVER...");
-console.log("═══════════════════════════════════════");
-console.log(`📍 Node version: ${process.version}`);
-console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
-console.log(`📍 Port: ${process.env.PORT || 8000}`);
-console.log(
-  `📍 Frontend URL: ${process.env.FRONTEND_URL || "http://localhost:5173"}`
-);
-console.log("═══════════════════════════════════════\n");
-
+logger.info({
+  type: "SERVER_INIT",
+  message: "Initializing server...",
+});
 const initializeApp = async () => {
   try {
-    console.log("🔄 Validating database configuration...");
     validateDatabaseConfig();
 
-    console.log("🔄 Connecting to MongoDB...");
     await connectDB();
-    console.log("✅ MongoDB connected successfully\n");
+
+    logger.info({
+      type: "DATABASE_CONNECTED",
+      message: "MongoDB connected successfully",
+    });
 
     const PORT = process.env.PORT || 8000;
 
-    // ✅ IMPORTANT: Listen on 0.0.0.0 for Render.com
+    // IMPORTANT: Listen on 0.0.0.0 for Render.com
     httpServer.listen(PORT, "0.0.0.0", () => {
-      console.log("═══════════════════════════════════════");
-      console.log("✅ SERVER STARTED SUCCESSFULLY!");
-      console.log("═══════════════════════════════════════");
-      console.log(`🌐 Server running on port ${PORT}`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(
-        `📡 Frontend URL: ${
-          process.env.FRONTEND_URL || "http://localhost:5173"
-        }`
-      );
-      console.log(`🗄️  Database: ${process.env.DATABASE_TYPE || "mongoose"}`);
-      console.log("═══════════════════════════════════════");
+      logger.info({
+        type: "SERVER_STARTED",
+        port: PORT,
+        environment: process.env.NODE_ENV || "development",
+      });
 
       if (process.env.NODE_ENV !== "production") {
-        console.log(`\n🔗 Local API: http://localhost:${PORT}/api`);
-        console.log(`🔗 Health Check: http://localhost:${PORT}/api/health`);
-        console.log(`🔗 CSRF Token: http://localhost:${PORT}/api/csrf-token\n`);
+        logger.info({
+          type: "DEV_MODE",
+          message: "Server running in development mode",
+        });
       }
     });
   } catch (error) {
-    console.error("═══════════════════════════════════════");
-    console.error("❌ SERVER FAILED TO START!");
-    console.error("═══════════════════════════════════════");
-    console.error("❌ Error:", error.message);
-    console.error("❌ Stack:", error.stack);
-    console.error("═══════════════════════════════════════\n");
+    logger.error({
+      type: "SERVER_START_FAILED",
+      message: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   }
 };
