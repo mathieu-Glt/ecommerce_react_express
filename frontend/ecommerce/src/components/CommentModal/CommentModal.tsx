@@ -26,8 +26,7 @@ export default function CommentsModal({
 
   useEffect(() => {
     if (open && productId) {
-      fetchCommentsByProductId(productId).catch((err) =>
-      );
+      fetchCommentsByProductId(productId).catch((err) => console.error(err));
     }
   }, [open, productId, fetchCommentsByProductId]);
 
@@ -44,10 +43,10 @@ export default function CommentsModal({
         async () => {
           await deleteComment(commentId);
           await fetchCommentsByProductId(productId);
-        }
+        },
       );
     },
-    [deleteComment, fetchCommentsByProductId, productId]
+    [deleteComment, fetchCommentsByProductId, productId],
   );
 
   return (

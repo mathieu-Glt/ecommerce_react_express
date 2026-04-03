@@ -23,7 +23,6 @@ const HomePage = lazy(() =>
 const ProductPage = lazy(() =>
   import("../pages/ProductPage").then((m) => ({ default: m.ProductPage })),
 );
-
 const LoginPage = lazy(() =>
   import("../pages/LoginPage").then((m) => ({ default: m.LoginPage })),
 );
@@ -34,9 +33,7 @@ const CartPage = lazy(() =>
   import("../pages/CartPage").then((m) => ({ default: m.CartPage })),
 );
 const PaypalSuccessPage = lazy(() =>
-  import("../pages/PaypalSuccessPage").then((m) => ({
-    default: m.default,
-  })),
+  import("../pages/PaypalSuccessPage").then((m) => ({ default: m.default })),
 );
 const OrderConfirmationPage = lazy(() =>
   import("../pages/OrderConfirmationPage").then((m) => ({
@@ -55,9 +52,7 @@ const ResetPasswordPage = lazy(() =>
   import("../pages/ResetPasswordPage").then((m) => ({ default: m.default })),
 );
 const MerciPagePaypal = lazy(() =>
-  import("../pages/PaypalSuccessPage").then((m) => ({
-    default: m.default,
-  })),
+  import("../pages/PaypalSuccessPage").then((m) => ({ default: m.default })),
 );
 
 // ==================== PROTECTED PAGES (USER) ====================
@@ -81,13 +76,11 @@ const AdminProductEditPage = lazy(() =>
     default: m.default,
   })),
 );
-
 const AdminPageProducts = lazy(() =>
   import("../pages/backoffice/AdminPageProducts").then((m) => ({
     default: m.AdminProductPage,
   })),
 );
-
 const AdminCouponPage = lazy(() =>
   import("../pages/backoffice/AdminCouponPage").then((m) => ({
     default: m.AdminCouponPage,
@@ -103,7 +96,6 @@ const ThankYouPaymentSuccess = lazy(() =>
     default: m.default,
   })),
 );
-
 const FailedTransctionPaypal = lazy(() =>
   import("../pages/FailedTransctionPaypal").then((m) => ({
     default: m.default,
@@ -113,16 +105,11 @@ const FailedTransctionPaypal = lazy(() =>
 // ==================== ROUTES CONFIGURATION ====================
 export const AppRoutes = () => {
   const routes = useRoutes([
-    // ==================== ROUTES WITH HEADER + FOOTER ====================
+    // ==================== ROUTES AVEC LAYOUT (MainLayout) ====================
     {
-      element: React.createElement(
-        RequireAuthAccess,
-        null,
-        React.createElement(MainLayout)
-        MainLayout,
-      ),
+      element: React.createElement(MainLayout),
       children: [
-        // PUBLIC ROUTES
+        // Routes publiques avec layout
         { path: "/", element: SuspenseWrapper(HomePage) },
         { path: "/products", element: SuspenseWrapper(ProductPage) },
         {
@@ -134,24 +121,15 @@ export const AppRoutes = () => {
           path: "/paypal/success",
           element: SuspenseWrapper(PaypalSuccessPage),
         },
-        {
-          path: "/cancel",
-          element: SuspenseWrapper(FailedTransctionPaypal),
-        },
+        { path: "/cancel", element: SuspenseWrapper(FailedTransctionPaypal) },
         {
           path: "/order-confirmation",
           element: SuspenseWrapper(OrderConfirmationPage),
         },
-        {
-          path: "/merci",
-          element: SuspenseWrapper(ThankYouPaymentSuccess),
-        },
-        {
-          path: "/merci-paypal",
-          element: SuspenseWrapper(MerciPagePaypal),
-        },
+        { path: "/merci", element: SuspenseWrapper(ThankYouPaymentSuccess) },
+        { path: "/merci-paypal", element: SuspenseWrapper(MerciPagePaypal) },
 
-        // USER ROUTES (Protégées par RequireAuthAccess)
+        // Route protégée (user uniquement)
         {
           path: "/profile",
           element: React.createElement(
@@ -160,6 +138,15 @@ export const AppRoutes = () => {
             SuspenseWrapper(UserProfilePage),
           ),
         },
+      ],
+    },
+    // ==================== PUBLIC ROUTES ====================
+    {
+      element: React.createElement(MainLayout),
+      children: [
+        { path: "/", element: SuspenseWrapper(HomePage) },
+        { path: "/login", element: SuspenseWrapper(LoginPage) },
+        { path: "/register", element: SuspenseWrapper(RegisterPage) },
         {
           path: "/forgot-password",
           element: SuspenseWrapper(ForgotPasswordPage),
@@ -168,13 +155,10 @@ export const AppRoutes = () => {
           path: "/reset-password/:token",
           element: SuspenseWrapper(ResetPasswordPage),
         },
-
-        { path: "/login", element: SuspenseWrapper(LoginPage) },
-        { path: "/register", element: SuspenseWrapper(RegisterPage) },
       ],
     },
 
-    // ==================== ADMIN ROUTES (Layout with RequireAdminRoleAccess) ====================
+    // ==================== ADMIN ROUTES ====================
     {
       path: "/admin",
       element: React.createElement(
@@ -190,10 +174,7 @@ export const AppRoutes = () => {
             replace: true,
           }),
         },
-        {
-          path: "dashboard",
-          element: SuspenseWrapper(AdminDashboardPage),
-        },
+        { path: "dashboard", element: SuspenseWrapper(AdminDashboardPage) },
         {
           path: "products/create",
           element: SuspenseWrapper(AdminProductCreatePage),
@@ -202,14 +183,8 @@ export const AppRoutes = () => {
           path: "products/edit/:id",
           element: SuspenseWrapper(AdminProductEditPage),
         },
-        {
-          path: "coupons",
-          element: SuspenseWrapper(AdminCouponPage),
-        },
-        {
-          path: "products",
-          element: SuspenseWrapper(AdminPageProducts),
-        },
+        { path: "coupons", element: SuspenseWrapper(AdminCouponPage) },
+        { path: "products", element: SuspenseWrapper(AdminPageProducts) },
       ],
     },
 
@@ -237,7 +212,6 @@ export const ROUTES = {
     CREATE_PRODUCTS: "/admin/products/create",
     EDIT_PRODUCTS: "/admin/products/edit",
     LIST_PRODUCTS: "/admin/products",
-    // CREATE_PRODUCT: "/admin/products/create",
     EDIT_PRODUCT: (id: string) => `/admin/products/edit/${id}`,
     COUPONS: "/admin/coupons",
   },

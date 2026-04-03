@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { RequireAdminRoleAccess } from "../../guards/RequireAdminRoleAccess";
 import { AdminHeader } from "../../components/backoffice/AdminHeader/AdminHeader";
+import { Footer } from "../../components/footer/Footer";
 
 export const AdminLayout = () => {
   return (
@@ -14,6 +15,9 @@ export const AdminLayout = () => {
       <main className="main-content">
         <Outlet />
       </main>
+
+      {/* Footer at the bottom */}
+      <Footer />
     </div>
   );
 };

@@ -26,7 +26,7 @@ export const LoginPage = () => {
   const handleLogin = async (
     email: string,
     password: string,
-    rememberMe = false
+    rememberMe = false,
   ): Promise<void> => {
     try {
       const result = await login(email, password);
@@ -40,7 +40,7 @@ export const LoginPage = () => {
           setRefreshToken(result.results.refreshToken);
         }
 
-        navigate("/");
+        //navigate("/");
       } else {
         console.error("Login failed:", result.message);
       }
@@ -51,7 +51,7 @@ export const LoginPage = () => {
   // Wrapper to match expected signature
   const handleLoginForm = async (
     values: { email: string; password: string; rememberMe: boolean },
-    formikHelpers?: FormikHelpers<{ email: string; password: string }>
+    formikHelpers?: FormikHelpers<{ email: string; password: string }>,
   ) => {
     setValidated(true);
     const { email, password, rememberMe } = values;

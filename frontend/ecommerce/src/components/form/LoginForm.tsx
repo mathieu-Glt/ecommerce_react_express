@@ -130,7 +130,8 @@ const LoginForm: React.FC<LoginProps> = ({
                 variant="primary"
                 type="submit"
                 className="w-100 mb-3"
-                disabled={loading || !formik.isValid || !formik.dirty}
+                // disabled={loading || !formik.isValid || !formik.dirty}
+                disabled={loading}
               >
                 {loading ? (
                   <>

@@ -30,6 +30,11 @@ export const loginUser = createAsyncThunk<
   try {
     const response = await signIn(credentials);
     const { user, token, refreshToken } = response;
+    console.log("authThunk ~ loginUser : ", user, token, refreshToken);
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("refreshToken", refreshToken);
+    localStorage.setItem("user", JSON.stringify(user));
     return { success: true, results: { user, token, refreshToken } };
   } catch (err: any) {
     return thunkAPI.rejectWithValue({

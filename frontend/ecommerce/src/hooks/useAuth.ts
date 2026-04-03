@@ -63,34 +63,21 @@ export const useAuth = () => {
    * @returns Promise<boolean> - true if successful
    */
   const login = useCallback(
-    async (email: string, password: string): Promise<LoginApiResponse> => {
+    async (email: string, password: string) => {
       try {
         const result = await dispatch(loginUser({ email, password })).unwrap();
 
-        // The middleware has already saved to localStorage!
-        // No need for setUserStorage(), setTokenStorage(), etc.
-
         toast.showSuccess(`Welcome back, ${result.results.user.firstname}!`);
-
-        // Navigate to dashboard
         navigate("/");
 
-        return {
-          success: true,
-          results: {
-            user: result.results.user,
-            token: result.results.token,
-            refreshToken: result.results.refreshToken,
-          },
-        };
+        return result;
       } catch (err: any) {
         toast.showError(err?.message || "Login failed");
         return err;
       }
     },
-    [dispatch, navigate, toast]
+    [dispatch, navigate, toast],
   );
-
   // REGISTER
 
   /**
@@ -105,7 +92,7 @@ export const useAuth = () => {
         const result = await dispatch(registerUser(credentials)).unwrap();
 
         toast.showSuccess(
-          `Welcome ${result.results.user.firstname}! Please check your email to verify your account.`
+          `Welcome ${result.results.user.firstname}! Please check your email to verify your account.`,
         );
 
         // Redirection vers login
@@ -117,7 +104,7 @@ export const useAuth = () => {
         return false;
       }
     },
-    [dispatch, navigate, toast]
+    [dispatch, navigate, toast],
   );
 
   // LOGOUT
@@ -157,17 +144,17 @@ export const useAuth = () => {
     async (email: string): Promise<void> => {
       try {
         const result = await dispatch(
-          sendResetPasswordEmail({ email })
+          sendResetPasswordEmail({ email }),
         ).unwrap();
 
         toast.showSuccess(
-          result.message || "Reset link has been sent to your email"
+          result.message || "Reset link has been sent to your email",
         );
       } catch (err: any) {
         toast.showError(err?.message || "Failed to send reset email");
       }
     },
-    [dispatch, toast]
+    [dispatch, toast],
   );
 
   // RESET PASSWORD
@@ -191,7 +178,7 @@ export const useAuth = () => {
           resetPasswordThunk({
             password: data.password,
             token: data.token,
-          })
+          }),
         ).unwrap();
 
         toast.showSuccess(result.message || "Password reset successful");
@@ -202,7 +189,7 @@ export const useAuth = () => {
         toast.showError(err?.message || "Failed to reset password");
       }
     },
-    [dispatch, navigate, toast]
+    [dispatch, navigate, toast],
   );
 
   // REFRESH USER
@@ -242,7 +229,7 @@ export const useAuth = () => {
         toast.showInfo("Profile update feature coming soon");
       }
     },
-    [user, toast]
+    [user, toast],
   );
 
   // CHECK AUTH
@@ -325,9 +312,8 @@ export const useAuth = () => {
       updateUserProfile,
       forgotResetPassword,
       resetPasswordAuth,
-    ]
+    ],
   );
 
   return authContextValue;
 };
-

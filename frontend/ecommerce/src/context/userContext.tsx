@@ -27,6 +27,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   const authValue = useAuth();
+  console.log("userContext ~ authValue : ", authValue);
 
   // Use useRef to avoid calling fetchCurrentUser multiple times
   const hasInitialized = useRef(false);
@@ -40,13 +41,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
 
     hasInitialized.current = true;
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      return;
+    }
     // Récupérer/vérifier l'utilisateur actuel
     dispatch(fetchCurrentUser()).unwrap();
   }, []); // No dependencies - runs only once on mount
 
   // DEBUG LOGS (Development only)
-
 
   // MEMOIZED CONTEXT VALUE
 
@@ -85,7 +89,7 @@ export const useUserContext = (): UserContextType => {
   if (context === undefined) {
     throw new Error(
       "useUserContext must be used within a UserProvider. " +
-        "Wrap your component tree with <UserProvider>...</UserProvider>"
+        "Wrap your component tree with <UserProvider>...</UserProvider>",
     );
   }
 

@@ -11,7 +11,14 @@ import { loginUser, registerUser, fetchCurrentUser } from "../thunks/authThunk";
 import { loadAuthStateFromLocalStorage } from "../middleware/localStorageMiddleware";
 
 // HYDRATION - Loading from localStorage
-
+export interface ApiResponse {
+  success: boolean;
+  results: {
+    user: User;
+    token: string;
+    refreshToken: string;
+  };
+}
 /**
  * Loads the authentication state from localStorage on startup
  * Executes only once when the file is imported
@@ -148,15 +155,13 @@ const authSlice: Slice<AuthState> = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        const payload = action.payload as ApiResponse;
         state.loading = false;
-        state.user = (action.payload as payloadDataUser).user ?? null;
-        state.token = (action.payload as payloadDataToken).token ?? null;
-        state.refreshToken =
-          (action.payload as payloadDataRefreshToken).refreshToken ?? null;
+        state.user = payload.results?.user ?? null;
+        state.token = payload.results?.token ?? null;
+        state.refreshToken = payload.results?.refreshToken ?? null;
         state.isAuthenticated = true;
         state.error = null;
-
-        // The middleware will automatically save to localStorage
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -173,13 +178,12 @@ const authSlice: Slice<AuthState> = createSlice({
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        const payload = action.payload as ApiResponse;
         state.loading = false;
-        state.user = (action.payload as payloadDataUser).user ?? null;
-        state.token = null; // No token after registration (must log in)
+        state.user = payload.results?.user ?? null;
+        state.token = null;
         state.isAuthenticated = true;
         state.error = null;
-
-        // The middleware will automatically save to localStorage
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
