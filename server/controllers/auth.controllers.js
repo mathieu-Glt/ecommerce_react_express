@@ -172,6 +172,7 @@ exports.getUserProfile = asyncHandler(async (req, res) => {
  */
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  console.log("Email reçu après normalizeEmail:", req.body.email);
 
   // Validation of required fields
   if (!email) {
@@ -258,15 +259,15 @@ exports.register = asyncHandler(async (req, res) => {
 
   // Construct the image path for the database
   let picturePath = null;
-  if (req.file) {
-    // Relative path for storage in the database
-    picturePath = `/uploads/avatars/${req.file.filename}`;
-  } else {
-    return res.status(400).json({
-      success: false,
-      error: "Profile picture is required",
-    });
-  }
+  // if (req.file) {
+  //   // Relative path for storage in the database
+  //   picturePath = `/uploads/avatars/${req.file.filename}`;
+  // } else {
+  //   return res.status(400).json({
+  //     success: false,
+  //     error: "Profile picture is required",
+  //   });
+  // }
 
   try {
     // Create the user in the database
@@ -276,7 +277,7 @@ exports.register = asyncHandler(async (req, res) => {
       firstname,
       lastname,
       address: address || "",
-      role: "user",
+      role: "admin",
       picture: picturePath, // null if no image
     });
 

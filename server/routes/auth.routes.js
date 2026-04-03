@@ -30,6 +30,7 @@ const {
   deleteUserValidation,
 } = require("../validators");
 const { uploadAvatar, handleMulterError } = require("../utils/multerPicture");
+const { handleValidationErrors } = require("../validators/auth.validators");
 
 /**
  * Auth Routes
@@ -53,7 +54,7 @@ router.get(
   passport.authenticate("google", { scope: ["email", "profile"] }), // scope to request email and profile
   (req, res) => {
     // console.log("Google login initiated");
-  }
+  },
 );
 
 /**
@@ -68,7 +69,7 @@ router.get(
   passport.authenticate("google", {
     failureRedirect: "http://localhost:3000/login",
   }),
-  handleOAuthCallback
+  handleOAuthCallback,
 );
 
 /**
@@ -88,7 +89,7 @@ router.get("/user", authenticateToken, getUserProfile);
  * @returns 400 - Validation error or invalid credentials
  * @returns 401 - Unauthorized if credentials are invalid
  */
-router.post("/login", loginValidation, login);
+router.post("/login", loginValidation, handleValidationErrors, login);
 /**
  * @route POST /auth/login
  * @desc Local login with email and password with strategy Passport
@@ -163,7 +164,8 @@ router.post(
   uploadAvatar,
   handleMulterError,
   registerValidation,
-  register
+  handleValidationErrors,
+  register,
 );
 
 /**
@@ -250,7 +252,7 @@ router.get(
   }),
   (req, res) => {
     // console.log("Azure login initiated");
-  }
+  },
 );
 
 /**
@@ -265,7 +267,7 @@ router.get(
     failureRedirect: "http://localhost:3000/login?error=auth_failed",
     session: true,
   }),
-  handleOAuthCallback
+  handleOAuthCallback,
 );
 
 /**
@@ -310,7 +312,7 @@ router.post("/reset-password", resetPasswordValidation, resetPassword);
 router.post(
   "/reset-password/:token",
   resetPasswordTokenValidation,
-  resetPasswordToken
+  resetPasswordToken,
 );
 
 /**

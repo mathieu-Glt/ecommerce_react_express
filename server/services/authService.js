@@ -126,6 +126,7 @@ class AuthService {
   async authenticateUser(email, password) {
     try {
       const userResult = await this.userRepository.getUserByEmail(email);
+      console.log("AuthService ~ authenticateUser - userResult : ", userResult);
 
       // Verify if the user exists
       if (!userResult.success || !userResult.user) {
@@ -145,6 +146,16 @@ class AuthService {
 
       // Verify the password
       const isPasswordValid = await bcrypt.compare(password, user.password);
+      console.log(
+        "AuthService ~ authenticateUser - isPasswordValid : ",
+        isPasswordValid,
+      );
+
+      console.log("JWT_SECRET défini:", !!process.env.JWT_SECRET);
+      console.log(
+        "JWT_REFRESH_SECRET défini:",
+        !!process.env.JWT_REFRESH_SECRET,
+      );
 
       if (!isPasswordValid) {
         return { success: false, error: "Email or password incorrect" };
@@ -152,6 +163,7 @@ class AuthService {
 
       // Generate tokens
       const token = this.generateToken(user);
+      console.log("token généré:", !!token);
       const refreshToken = this.generateRefreshToken(user);
 
       const userData = {
@@ -261,7 +273,7 @@ class AuthService {
         lastname: result.user.lastname,
         picture: result.user.picture,
         address: result.user.address || "",
-        role: result.user.role || "user",
+        role: result.user.role || "admin",
         createdAt: result.user.createdAt,
         updatedAt: result.user.updatedAt,
       };

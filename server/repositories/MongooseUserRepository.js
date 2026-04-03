@@ -129,10 +129,15 @@ class MongooseUserRepository extends IUserRepository {
    */
   async getUserByEmail(email) {
     try {
-      const user = await this.User.findOne({ email });
+      const user = await this.User.findOne({
+        email: email.toLowerCase().trim(),
+      });
+      if (!user) {
+        return { success: false, user: null };
+      }
       return { success: true, user };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, user: null, error: error.message };
     }
   }
 
@@ -175,7 +180,7 @@ class MongooseUserRepository extends IUserRepository {
       const user = await this.User.findByIdAndUpdate(
         userId,
         { password: hashedPassword },
-        { new: true }
+        { new: true },
       );
 
       if (!user) {
